@@ -17,6 +17,11 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/saas/LoginView.vue'),
+    },
     // /:orderId -> 仅匹配数字
     { path: '/:orderId(\\d+)', component: HomeView },
     // /:productName -> 匹配其他任何内容

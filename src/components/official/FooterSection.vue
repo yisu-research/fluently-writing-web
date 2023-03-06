@@ -2,7 +2,6 @@
   <footer class="bg-white">
     <div class="mx-auto overflow-hidden px-6 sm:py-8 lg:px-8">
       <p class="text-center text-xs leading-5 text-gray-500">&copy; 2023 一粟科研, Inc. All rights reserved.</p>
-
     </div>
   </footer>
 </template>

@@ -9,7 +9,11 @@
             <dl class="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-white">
-                  <component :is="feature.icon" class="absolute top-1 left-1 h-5 w-5 text-teal-600" aria-hidden="true" />
+                  <component
+                    :is="feature.icon"
+                    class="absolute top-1 left-1 h-5 w-5 text-teal-600"
+                    aria-hidden="true"
+                  />
                   {{ feature.name }}
                 </dt>
 
@@ -20,20 +24,34 @@
         </div>
         <div class="sm:px-6 lg:px-0 col-span-4">
           <div class="mx-auto max-w-2xl sm:mx-0 sm:max-w-none">
-            <img :src=EnglishWritingImg alt="Product screenshot"
-              class="sm:rounded-3xl bg-gray-300 ring-13 ring-white/10" />
+            <img
+              :src="EnglishWritingImg"
+              alt="Product screenshot"
+              class="sm:rounded-3xl bg-gray-300 ring-13 ring-white/10"
+            />
           </div>
         </div>
       </div>
     </div>
     <svg
       class="pointer-events-none absolute top-1/2 left-12 -z-10 h-[42.375rem] -translate-y-1/2 transform-gpu blur-3xl lg:top-auto lg:bottom-[-12rem] lg:translate-y-0"
-      viewBox="0 0 1155 678" fill="none">
-      <path fill="url(#c0458c57-1330-459f-9d5c-f0d75c210466)" fill-opacity=".25"
-        d="M317.219 518.975L203.852 678 0 438.341l317.219 80.634 204.172-286.402c1.307 132.337 45.083 346.658 209.733 145.248C936.936 126.058 882.053-94.234 1031.02 41.331c119.18 108.451 130.68 295.337 121.53 375.223L855 299l21.173 362.054-558.954-142.079z" />
+      viewBox="0 0 1155 678"
+      fill="none"
+    >
+      <path
+        fill="url(#c0458c57-1330-459f-9d5c-f0d75c210466)"
+        fill-opacity=".25"
+        d="M317.219 518.975L203.852 678 0 438.341l317.219 80.634 204.172-286.402c1.307 132.337 45.083 346.658 209.733 145.248C936.936 126.058 882.053-94.234 1031.02 41.331c119.18 108.451 130.68 295.337 121.53 375.223L855 299l21.173 362.054-558.954-142.079z"
+      />
       <defs>
-        <linearGradient id="c0458c57-1330-459f-9d5c-f0d75c210466" x1="1155.49" x2="-78.208" y1=".177" y2="474.645"
-          gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="c0458c57-1330-459f-9d5c-f0d75c210466"
+          x1="1155.49"
+          x2="-78.208"
+          y1=".177"
+          y2="474.645"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stop-color="#21D3FF" />
           <stop offset="1" stop-color="#10FFF3" />
         </linearGradient>
@@ -43,8 +61,8 @@
 </template>
 
 <script setup>
-import { NewspaperIcon, AcademicCapIcon, LanguageIcon } from '@heroicons/vue/20/solid'
-import EnglishWritingImg from '@/assets/images/english_writing.png'
+import { NewspaperIcon, AcademicCapIcon, LanguageIcon } from '@heroicons/vue/20/solid';
+import EnglishWritingImg from '@/assets/images/english_writing.png';
 
 const features = [
   {
@@ -62,5 +80,5 @@ const features = [
     description: '帮助您快速完成结课论文',
     icon: AcademicCapIcon,
   },
-]
+];
 </script>
