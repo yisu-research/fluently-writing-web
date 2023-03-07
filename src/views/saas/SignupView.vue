@@ -1,6 +1,6 @@
 <template>
   <div class="bg-teal-50/[0.3] w-full">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center h-screen opacity-9">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center h-screen">
       <div
         class="overflow-hidden rounded-lg bg-white shadow-lg w-full h-screen my-4 sm:h-auto flex flex-col justify-between"
       >
@@ -11,11 +11,11 @@
           <div
             class="sm:rounded-sm hidden w-full ring-13 py-8 ring-white/10 bg-teal-50 lg:flex lg:flex-1 lg:justify-center"
           >
-            <img :src="NatureSvg" alt="Product screenshot" class="w-80 mx-10" />
+            <img :src="WelcomeSvg" alt="Product screenshot" class="w-80 mx-10" />
           </div>
 
           <!-- 登录表单 -->
-          <div class="sm:px-6 sm:w-96 flex-2 flex flex-col justify-between items-center">
+          <div class="sm:px-6 lg:w-1/2 w-full flex-2 flex flex-col justify-between items-center">
             <div class="my-4 flex justify-center items-center">
               <img class="mr-4 h-12 w-auto" :src="LogoSvg" alt="Your Company" />
               <h2 class="text-center text-3xl font-bold tracking-tight text-gray-900">一粟创作助手</h2>
@@ -32,12 +32,15 @@
                     </n-form-item-row>
                     <n-form-item-row label="验证码">
                       <n-input />
+                      <n-button strong secondary type="primary" class="ml-4" :disabled="disabled" @click="sendCode"
+                        >{{ timer === 0 ? '发送验证码' : `${timer}秒后重新发送` }}
+                      </n-button>
                     </n-form-item-row>
                     <n-form-item-row label="密码">
                       <n-input />
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong> 登录 </n-button>
+                  <n-button type="primary" block secondary strong> 注册 </n-button>
                 </n-tab-pane>
               </n-tabs>
               <div class="flex items-center justify-end">
@@ -49,7 +52,7 @@
 
         <!-- footer -->
         <div class="px-4 sm:px-6">
-          <div class="border-t border-slate-900/5 py-4 sm:py-10">
+          <div class="border-t border-slate-900/5 py-4">
             <div class="flex flex-wrap justify-center items-center">
               <svg
                 id="svg20"
@@ -128,5 +131,52 @@
 
 <script setup>
 import LogoSvg from '@/assets/svg/logo.svg';
-import NatureSvg from '@/assets/svg/nature.svg';
+import WelcomeSvg from '@/assets/svg/welcome.svg';
+import { useIntervalFn } from '@vueuse/core';
+import api from './api';
+
+import { ref } from 'vue';
+
+/// 定时器
+const timer = ref(0);
+
+/// 禁用按钮
+const disabled = ref(false);
+
+const { pause, resume } = useIntervalFn(
+  () => {
+    /// 每次定时任务 控制时间递减
+    if (timer.value <= 0) {
+      // 恢复按钮
+      disabled.value = false;
+      // 停止递减： 停止定时器
+      pause();
+    } else {
+      timer.value -= 1;
+    }
+  },
+  1000,
+  {
+    // 首次是否自动启动定时任务：true（默认值，自动启动），false，不需要自动启动
+    immediate: false,
+    // 是否延时执行定时任务（false(默认值)，不延时；true表示延时）
+    immediateCallback: false,
+  },
+);
+
+// 发送验证码
+const sendCode = async () => {
+  let res = await api.sendCodeApi({ phone_number: '13196426725' });
+  console.log(res);
+  // 开启定时效果
+  if (timer.value === 0) {
+    // 禁用按钮
+    disabled.value = true;
+    timer.value = 10;
+    // 重启定时器
+    resume();
+  } else {
+    return;
+  }
+};
 </script>

@@ -133,13 +133,13 @@
         <p class="mt-6 text-2xl leading-8 text-gray-600">{{ slogan }}</p>
         <p class="mt-6 text-lg leading-8 text-gray-600">
           {{ footnote }}
-          <a href="https://chat.openai.com" class="text-teal-600 hover:text-teal-500">ChatGPT</a>
+          <a href="https://chat.openai.com" class="text-teal-400 hover:text-teal-300">ChatGPT</a>
         </p>
         <div class="mt-10 flex items-center gap-x-6">
           <a
             href="#"
-            class="rounded-md bg-teal-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >{{ start }}</a
+            class="rounded-md bg-teal-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            ><router-link to="/saas/creation">{{ start }}</router-link></a
           >
         </div>
       </div>

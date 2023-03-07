@@ -6,12 +6,12 @@ export const basicRoutes = [
     path: '/',
     component: () => import('@/views/HomeView.vue'),
   },
-  {
-    name: '404',
-    path: '/404',
-    component: () => import('@/views/error-page/404.vue'),
-    isHidden: true,
-  },
+  // {
+  //   name: '404',
+  //   path: '/404',
+  //   component: () => import('@/views/error-page/404.vue'),
+  //   isHidden: true,
+  // },
 
   {
     name: 'Login',
@@ -31,39 +31,87 @@ export const basicRoutes = [
       title: '注册页',
     },
   },
-
   {
-    name: 'ExternalLink',
-    path: '/external-link',
+    name: 'Creation',
+    path: '/saas',
     component: Layout,
-    meta: {
-      title: '外部链接',
-      icon: 'mdi:link-variant',
-      order: 4,
-    },
+    redirect: '/saas/creation',
     children: [
       {
-        name: 'LinkGithubSrc',
-        path: 'https://github.com/zclzone/vue-naive-admin',
+        name: 'Creation',
+        path: 'creation',
+        component: () => import('@/views/saas/creation/index.vue'),
         meta: {
-          title: '源码 - github',
-          icon: 'mdi:github',
+          title: '新的创作',
+          icon: 'mdi:home',
+          order: 0,
+        },
+      },
+    ],
+  },
+
+  {
+    name: 'userCenter',
+    path: '/saas',
+    component: Layout,
+    redirect: 'saas/user-center',
+    children: [
+      {
+        name: 'UserCenter',
+        path: 'user-center',
+        component: () => import('@/views/saas/user-info/index.vue'),
+        meta: {
+          title: '个人中心',
+          icon: 'mdi:home',
+          order: 0,
+        },
+      },
+    ],
+  },
+
+  {
+    name: 'Cost',
+    path: '/saas',
+    component: Layout,
+    redirect: '/saas/cost',
+    children: [
+      {
+        name: 'Cost',
+        path: 'cost',
+        component: () => import('@/views/saas/cost/index.vue'),
+        meta: {
+          title: '费用中心',
+          icon: 'mdi:home',
+          order: 0,
+        },
+      },
+    ],
+  },
+
+  {
+    name: '模版',
+    path: '/saas/template',
+    component: Layout,
+    redirect: '/saas/template/template-one',
+    children: [
+      {
+        name: 'TemplateOnw',
+        path: 'template-one',
+        component: () => import('@/views/saas/templates/template-one/index.vue'),
+        meta: {
+          title: '模板一',
+          icon: 'mdi:home',
+          order: 0,
         },
       },
       {
-        name: 'LinkGiteeSrc',
-        path: 'https://gitee.com/zclzone/vue-naive-admin',
+        name: 'TemplateTwo',
+        path: 'template-two',
+        component: () => import('@/views/saas/templates/template-two/index.vue'),
         meta: {
-          title: '源码 - gitee',
-          icon: 'simple-icons:gitee',
-        },
-      },
-      {
-        name: 'LinkDocs',
-        path: 'https://zclzone.github.io/vue-naive-admin-docs',
-        meta: {
-          title: '文档 - vuepress',
-          icon: 'mdi:vuejs',
+          title: '模板二',
+          icon: 'mdi:home',
+          order: 0,
         },
       },
     ],
@@ -84,9 +132,11 @@ export const EMPTY_ROUTE = {
 };
 
 const modules = import.meta.glob('@/views/**/route.js', { eager: true });
+console.log(modules);
 const asyncRoutes = [];
 Object.keys(modules).forEach((key) => {
   asyncRoutes.push(modules[key].default);
 });
+console.log(asyncRoutes);
 
 export { asyncRoutes };

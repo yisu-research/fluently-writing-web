@@ -3,6 +3,8 @@ import { getToken } from '@/utils';
 import { resolveResError } from './helpers';
 
 export function reqResolve(config) {
+  console.log('ddddddddddddddddddddddddddd');
+  console.log(config);
   // 处理不需要token的请求
   if (config.noNeedToken) {
     return config;

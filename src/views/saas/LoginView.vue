@@ -1,6 +1,6 @@
 <template>
   <div class="bg-teal-50/[0.3] w-full">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center h-screen opacity-9">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center h-screen">
       <div
         class="overflow-hidden rounded-lg bg-white shadow-lg w-full h-screen my-4 sm:h-auto flex flex-col justify-between"
       >
@@ -54,7 +54,7 @@
 
         <!-- footer -->
         <div class="px-4 sm:px-6">
-          <div class="border-t border-slate-900/5 py-4 sm:py-10">
+          <div class="border-t border-slate-900/5 py-4">
             <div class="flex flex-wrap justify-center items-center">
               <svg
                 id="svg20"
