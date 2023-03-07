@@ -3,5 +3,10 @@ import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <RouterView />
+  <!-- <RouterView /> -->
+  <AppProvider>
+    <router-view v-slot="{ Component }">
+      <component :is="Component" />
+    </router-view>
+  </AppProvider>
 </template>

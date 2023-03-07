@@ -24,5 +24,6 @@ module.exports = {
         ignores: ['index', '401', '404'],
       },
     ],
+    'no-undef': 'off',
   },
 };

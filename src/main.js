@@ -1,22 +1,25 @@
+import '@/styles/reset.css';
+import './styles/style.css';
+import './styles/preflight.css';
+import 'virtual:svg-icons-register';
+
 import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-
+import { setupRouter } from '@/router';
+import { setupStore } from '@/store';
 import App from './App.vue';
-import router from './router';
 
-import './assets/style.css';
+async function setupApp() {
+  const app = createApp(App);
 
-const app = createApp(App);
+  setupStore(app);
 
-await setTimeout(() => {
-  app.config.globalProperties.$message.success('hello');
-}, 5000);
+  await setupRouter(app);
 
-app.use(createPinia());
-app.use(router);
+  const meta = document.createElement('meta');
+  meta.name = 'naive-ui-style';
+  document.head.appendChild(meta);
 
-const meta = document.createElement('meta');
-meta.name = 'naive-ui-style';
-document.head.appendChild(meta);
+  app.mount('#app');
+}
 
-app.mount('#app');
+setupApp();

@@ -24,7 +24,7 @@ export function convertEnv(envOptions) {
   if (!envOptions) return result;
 
   for (const envKey in envOptions) {
-    if (Object.hasOwn(envOptions, envKey) === false) continue;
+    if (!Object.hasOwn(envOptions, envKey)) continue;
     let envVal = envOptions[envKey];
     if (['true', 'false'].includes(envVal)) envVal = envVal === 'true';
 

@@ -5,16 +5,6 @@ import { createViteProxy, viteDefine } from './build/config';
 import { createVitePlugins } from './build/plugin';
 import { OUTPUT_DIR } from './build/constant';
 
-// https://vitejs.dev/config/
-// export default defineConfig({
-//   plugins: [vue()],
-//   resolve: {
-//     alias: {
-//       '@': fileURLToPath(new URL('./src', import.meta.url)),
-//     },
-//   },
-// });
-
 export default defineConfig(({ command, mode }) => {
   const srcPath = getSrcPath();
   const rootPath = getRootPath();
@@ -44,7 +34,7 @@ export default defineConfig(({ command, mode }) => {
       target: 'es2015',
       outDir: OUTPUT_DIR,
       reportCompressedSize: false, // 启用/禁用 gzip 压缩大小报告
-      chunkSizeWarningLimit: 1024, // chunk 大小警告的限制（单位kb）
+      chunkSizeWarningLimit: 1024, // chunk
     },
   };
 });

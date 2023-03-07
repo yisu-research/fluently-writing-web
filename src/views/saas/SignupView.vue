@@ -21,10 +21,16 @@
               <h2 class="text-center text-3xl font-bold tracking-tight text-gray-900">一粟创作助手</h2>
             </div>
             <div class="w-full mt-12">
-              <n-tabs default-value="signin-username" size="large" justify-content="space-evenly">
-                <n-tab-pane name="signin-username" tab="用户名登录">
+              <n-tabs default-value="signin-username" size="large" justify-content="start">
+                <n-tab-pane name="signin-username" tab="注册">
                   <n-form>
                     <n-form-item-row label="用户名">
+                      <n-input />
+                    </n-form-item-row>
+                    <n-form-item-row label="手机号">
+                      <n-input />
+                    </n-form-item-row>
+                    <n-form-item-row label="验证码">
                       <n-input />
                     </n-form-item-row>
                     <n-form-item-row label="密码">
@@ -33,20 +39,9 @@
                   </n-form>
                   <n-button type="primary" block secondary strong> 登录 </n-button>
                 </n-tab-pane>
-                <n-tab-pane name="signin-phone" tab="手机号登录">
-                  <n-form>
-                    <n-form-item-row label="手机号">
-                      <n-input />
-                    </n-form-item-row>
-                    <n-form-item-row label="验证码">
-                      <n-input />
-                    </n-form-item-row>
-                  </n-form>
-                  <n-button type="primary" block secondary strong> 登录 </n-button>
-                </n-tab-pane>
               </n-tabs>
               <div class="flex items-center justify-end">
-                <n-button text class="my-4 sm:mb-0"><router-link to="/signup">没有账号？去注册</router-link> </n-button>
+                <n-button text class="my-4 sm:mb-0"><router-link to="/login">已有账号？去登录</router-link> </n-button>
               </div>
             </div>
           </div>
