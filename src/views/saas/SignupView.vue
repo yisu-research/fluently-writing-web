@@ -132,11 +132,13 @@
 <script setup>
 import LogoSvg from '@/assets/svg/logo.svg';
 import WelcomeSvg from '@/assets/svg/welcome.svg';
+import { setToken } from '@/utils';
 import { useIntervalFn } from '@vueuse/core';
 import api from './api';
 import { useMessage } from 'naive-ui';
 
 import { ref } from 'vue';
+const router = useRouter();
 
 /// 定时器
 const timer = ref(0);
@@ -184,15 +186,19 @@ async function onSignup() {
       message.success('Valid');
       console.log(formValue.value);
       try {
-        await api.signupApi(formValue.value);
+        let res = await api.signupApi(formValue.value);
+        console.log(res);
         $message.success('注册成功');
+
+        setToken(res.token);
+        router.push('/saas');
       } catch (error) {
-        console.log(error);
-        $message.error('注册失败');
+        console.log(error.error.error);
+        $message.error(error.error.error);
       }
     } else {
       console.log(errors);
-      message.error('Invalid');
+      message.error('无效的数据');
     }
   });
 }
@@ -227,11 +233,12 @@ const sendCode = async () => {
   }
   try {
     await api.sendCodeApi({ phone_number: formValue.value.phone_number });
+    message.success('发送成功！');
     // 开启定时效果
     if (timer.value === 0) {
       // 禁用按钮
       disabled.value = true;
-      timer.value = 10;
+      timer.value = 60;
       // 重启定时器
       resume();
     } else {

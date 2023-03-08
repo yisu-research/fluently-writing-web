@@ -4,7 +4,7 @@
       v-for="tag in tagsStore.tags"
       ref="tabRefs"
       :key="tag.path"
-      class="px-15 mx-5 rounded-4 cursor-pointer hover:color-primary"
+      class="px-4 mx-1 cursor-pointer rounded-1 hover:color-primary"
       :type="tagsStore.activeTag === tag.path ? 'primary' : 'default'"
       :closable="tagsStore.tags.length > 1"
       @click="handleTagClick(tag.path)"
@@ -24,67 +24,67 @@
 </template>
 
 <script setup>
-import ContextMenu from './ContextMenu.vue'
-import { useTagsStore } from '@/store'
-import ScrollX from '@/components/common/ScrollX.vue'
+import ContextMenu from './ContextMenu.vue';
+import { useTagsStore } from '@/store';
+import ScrollX from '@/components/common/ScrollX.vue';
 
-const route = useRoute()
-const router = useRouter()
-const tagsStore = useTagsStore()
-const tabRefs = ref([])
-const scrollXRef = ref(null)
+const route = useRoute();
+const router = useRouter();
+const tagsStore = useTagsStore();
+const tabRefs = ref([]);
+const scrollXRef = ref(null);
 
 const contextMenuOption = reactive({
   show: false,
   x: 0,
   y: 0,
   currentPath: '',
-})
+});
 
 watch(
   () => route.path,
   () => {
-    const { name, fullPath: path } = route
-    const title = route.meta?.title
-    tagsStore.addTag({ name, path, title })
+    const { name, fullPath: path } = route;
+    const title = route.meta?.title;
+    tagsStore.addTag({ name, path, title });
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 watch(
   () => tagsStore.activeIndex,
   async (activeIndex) => {
-    await nextTick()
-    const activeTabElement = tabRefs.value[activeIndex]?.$el
-    if (!activeTabElement) return
-    const { offsetLeft: x, offsetWidth: width } = activeTabElement
-    scrollXRef.value?.handleScroll(x + width, width)
+    await nextTick();
+    const activeTabElement = tabRefs.value[activeIndex]?.$el;
+    if (!activeTabElement) return;
+    const { offsetLeft: x, offsetWidth: width } = activeTabElement;
+    scrollXRef.value?.handleScroll(x + width, width);
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 const handleTagClick = (path) => {
-  tagsStore.setActiveTag(path)
-  router.push(path)
-}
+  tagsStore.setActiveTag(path);
+  router.push(path);
+};
 
 function showContextMenu() {
-  contextMenuOption.show = true
+  contextMenuOption.show = true;
 }
 function hideContextMenu() {
-  contextMenuOption.show = false
+  contextMenuOption.show = false;
 }
 function setContextMenu(x, y, currentPath) {
-  Object.assign(contextMenuOption, { x, y, currentPath })
+  Object.assign(contextMenuOption, { x, y, currentPath });
 }
 
 // 右击菜单
 async function handleContextMenu(e, tagItem) {
-  const { clientX, clientY } = e
-  hideContextMenu()
-  setContextMenu(clientX, clientY, tagItem.path)
-  await nextTick()
-  showContextMenu()
+  const { clientX, clientY } = e;
+  hideContextMenu();
+  setContextMenu(clientX, clientY, tagItem.path);
+  await nextTick();
+  showContextMenu();
 }
 </script>
 

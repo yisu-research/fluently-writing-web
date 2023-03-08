@@ -44,7 +44,7 @@ export const basicRoutes = [
         component: () => import('@/views/saas/creation/index.vue'),
         meta: {
           title: '新的创作',
-          icon: 'mdi:home',
+          icon: 'uil:facebook-messenger-alt',
           order: 0,
         },
       },
@@ -63,7 +63,7 @@ export const basicRoutes = [
         component: () => import('@/views/saas/user-info/index.vue'),
         meta: {
           title: '个人中心',
-          icon: 'mdi:home',
+          icon: 'uil:user',
           order: 0,
         },
       },
@@ -82,7 +82,7 @@ export const basicRoutes = [
         component: () => import('@/views/saas/cost/index.vue'),
         meta: {
           title: '费用中心',
-          icon: 'mdi:home',
+          icon: 'uil:receipt-alt',
           order: 0,
         },
       },
@@ -94,6 +94,11 @@ export const basicRoutes = [
     path: '/saas/template',
     component: Layout,
     redirect: '/saas/template/template-one',
+    meta: {
+      title: '模板',
+      icon: 'uil:comment-image',
+      order: 0,
+    },
     children: [
       {
         name: 'TemplateOnw',
@@ -101,7 +106,7 @@ export const basicRoutes = [
         component: () => import('@/views/saas/templates/template-one/index.vue'),
         meta: {
           title: '模板一',
-          icon: 'mdi:home',
+          icon: 'uil:file-check-alt',
           order: 0,
         },
       },
@@ -111,7 +116,7 @@ export const basicRoutes = [
         component: () => import('@/views/saas/templates/template-two/index.vue'),
         meta: {
           title: '模板二',
-          icon: 'mdi:home',
+          icon: 'uil:file-check-alt',
           order: 0,
         },
       },

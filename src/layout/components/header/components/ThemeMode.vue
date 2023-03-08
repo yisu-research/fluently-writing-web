@@ -1,13 +1,13 @@
 <script setup>
-import { useAppStore } from '@/store'
-import { useDark, useToggle } from '@vueuse/core'
+import { useAppStore } from '@/store';
+import { useDark, useToggle } from '@vueuse/core';
 
-const appStore = useAppStore()
-const isDark = useDark()
+const appStore = useAppStore();
+const isDark = useDark();
 const toggleDark = () => {
-  appStore.toggleDark()
-  useToggle(isDark)()
-}
+  appStore.toggleDark();
+  useToggle(isDark)();
+};
 </script>
 
 <template>

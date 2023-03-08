@@ -6,4 +6,7 @@ export default {
 
   // 注册
   signupApi: (data) => request.post('/api/signup', data, { noNeedTip: true, noNeedToken: true }),
+
+  // 登录
+  loginApi: (data) => request.post('/api/login', data, { noNeedTip: true, noNeedToken: true }),
 };

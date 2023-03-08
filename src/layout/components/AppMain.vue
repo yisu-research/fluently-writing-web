@@ -7,13 +7,13 @@
 </template>
 
 <script setup>
-import { useAppStore } from '@/store'
-import { useRouter } from 'vue-router'
-const appStore = useAppStore()
-const router = useRouter()
+import { useAppStore } from '@/store';
+import { useRouter } from 'vue-router';
+const appStore = useAppStore();
+const router = useRouter();
 
-const allRoutes = router.getRoutes()
+const allRoutes = router.getRoutes();
 const keepAliveRouteNames = computed(() => {
-  return allRoutes.filter((route) => route.meta?.keepAlive).map((route) => route.name)
-})
+  return allRoutes.filter((route) => route.meta?.keepAlive).map((route) => route.name);
+});
 </script>

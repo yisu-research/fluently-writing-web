@@ -12,19 +12,19 @@
 </template>
 
 <script setup>
-import { renderCustomIcon, renderIcon } from '@/utils'
+import { renderCustomIcon, renderIcon } from '@/utils';
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 function handleBreadClick(path) {
-  if (path === route.path) return
-  router.push(path)
+  if (path === route.path) return;
+  router.push(path);
 }
 
 function getIcon(meta) {
-  if (meta?.customIcon) return renderCustomIcon(meta.customIcon, { size: 18 })
-  if (meta?.icon) return renderIcon(meta.icon, { size: 18 })
-  return null
+  if (meta?.customIcon) return renderCustomIcon(meta.customIcon, { size: 18 });
+  if (meta?.icon) return renderIcon(meta.icon, { size: 18 });
+  return null;
 }
 </script>

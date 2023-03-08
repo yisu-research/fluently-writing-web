@@ -11,9 +11,9 @@
 </template>
 
 <script setup>
-import { useTagsStore, useAppStore } from '@/store'
-import { renderIcon } from '@/utils'
-import { useLocalStorage } from '@vueuse/core'
+import { useTagsStore, useAppStore } from '@/store';
+import { renderIcon } from '@/utils';
+// import { useLocalStorage } from '@vueuse/core';
 
 const props = defineProps({
   show: {
@@ -32,12 +32,12 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-})
+});
 
-const emit = defineEmits(['update:show'])
+const emit = defineEmits(['update:show']);
 
-const tagsStore = useTagsStore()
-const appStore = useAppStore()
+const tagsStore = useTagsStore();
+const appStore = useAppStore();
 
 const options = computed(() => [
   {
@@ -70,53 +70,53 @@ const options = computed(() => [
     disabled: tagsStore.tags.length <= 1 || props.currentPath === tagsStore.tags[tagsStore.tags.length - 1].path,
     icon: renderIcon('mdi:arrow-expand-right', { size: '14px' }),
   },
-])
+]);
 
-const route = useRoute()
+const route = useRoute();
 const actionMap = new Map([
   [
     'reload',
     () => {
       if (route.meta?.keepAlive) {
         // 重置keepAlive
-        appStore.setAliveKeys(route.name, +new Date())
+        appStore.setAliveKeys(route.name, Number(new Date()));
       }
-      appStore.reloadPage()
+      appStore.reloadPage();
     },
   ],
   [
     'close',
     () => {
-      tagsStore.removeTag(props.currentPath)
+      tagsStore.removeTag(props.currentPath);
     },
   ],
   [
     'close-other',
     () => {
-      tagsStore.removeOther(props.currentPath)
+      tagsStore.removeOther(props.currentPath);
     },
   ],
   [
     'close-left',
     () => {
-      tagsStore.removeLeft(props.currentPath)
+      tagsStore.removeLeft(props.currentPath);
     },
   ],
   [
     'close-right',
     () => {
-      tagsStore.removeRight(props.currentPath)
+      tagsStore.removeRight(props.currentPath);
     },
   ],
-])
+]);
 
 function handleHideDropdown() {
-  emit('update:show', false)
+  emit('update:show', false);
 }
 
 function handleSelect(key) {
-  const actionFn = actionMap.get(key)
-  actionFn && actionFn()
-  handleHideDropdown()
+  const actionFn = actionMap.get(key);
+  actionFn && actionFn();
+  handleHideDropdown();
 }
 </script>
