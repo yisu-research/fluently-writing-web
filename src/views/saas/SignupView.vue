@@ -1,46 +1,46 @@
 <template>
   <div class="bg-teal-50/[0.3] w-full">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center h-screen">
+    <div class="flex flex-col items-center justify-center h-screen px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div
-        class="overflow-hidden rounded-lg bg-white shadow-lg w-full h-screen my-4 sm:h-auto flex flex-col justify-between"
+        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-lg sm:h-auto"
       >
         <div class="px-4 sm:p-6 sm:flex sm:justify-center">
           <!-- Content goes here -->
 
           <!-- 插画 -->
           <div
-            class="sm:rounded-sm hidden w-full ring-13 py-8 ring-white/10 bg-teal-50 lg:flex lg:flex-1 lg:justify-center"
+            class="hidden w-full py-8 sm:rounded-sm ring-13 ring-white/10 bg-teal-50 lg:flex lg:flex-1 lg:justify-center"
           >
-            <img :src="WelcomeSvg" alt="Product screenshot" class="w-80 mx-10" />
+            <img :src="WelcomeSvg" alt="Product screenshot" class="mx-10 w-80" />
           </div>
 
           <!-- 登录表单 -->
-          <div class="sm:px-6 lg:w-1/2 w-full flex-2 flex flex-col justify-between items-center">
-            <div class="my-4 flex justify-center items-center">
-              <img class="mr-4 h-12 w-auto" :src="LogoSvg" alt="Your Company" />
-              <h2 class="text-center text-3xl font-bold tracking-tight text-gray-900">一粟创作助手</h2>
+          <div class="flex flex-col items-center justify-between w-full sm:px-6 lg:w-1/2 flex-2">
+            <div class="flex items-center justify-center my-4">
+              <img class="w-auto h-12 mr-4" :src="LogoSvg" alt="Your Company" />
+              <h2 class="text-3xl font-bold tracking-tight text-center text-gray-900">一粟创作助手</h2>
             </div>
             <div class="w-full mt-12">
               <n-tabs default-value="signin-username" size="large" justify-content="start">
                 <n-tab-pane name="signin-username" tab="注册">
-                  <n-form>
-                    <n-form-item-row label="用户名">
-                      <n-input />
+                  <n-form ref="formRef" :model="formValue" :rules="rules">
+                    <n-form-item-row label="用户名" path="username">
+                      <n-input v-model:value="formValue.username" placeholder="请输入用户名" />
                     </n-form-item-row>
-                    <n-form-item-row label="手机号">
-                      <n-input />
+                    <n-form-item-row label="手机号" path="phone_number">
+                      <n-input v-model:value="formValue.phone_number" placeholder="请输入手机号" />
                     </n-form-item-row>
-                    <n-form-item-row label="验证码">
-                      <n-input />
+                    <n-form-item-row label="验证码" path="code">
+                      <n-input v-model:value="formValue.code" placeholder="请输入验证码" />
                       <n-button strong secondary type="primary" class="ml-4" :disabled="disabled" @click="sendCode"
                         >{{ timer === 0 ? '发送验证码' : `${timer}秒后重新发送` }}
                       </n-button>
                     </n-form-item-row>
-                    <n-form-item-row label="密码">
-                      <n-input />
+                    <n-form-item-row label="密码" path="password">
+                      <n-input v-model:value="formValue.password" placeholder="请输入密码" type="password" />
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong> 注册 </n-button>
+                  <n-button type="primary" block secondary strong @click.prevent="onSignup"> 注册 </n-button>
                 </n-tab-pane>
               </n-tabs>
               <div class="flex items-center justify-end">
@@ -52,8 +52,8 @@
 
         <!-- footer -->
         <div class="px-4 sm:px-6">
-          <div class="border-t border-slate-900/5 py-4">
-            <div class="flex flex-wrap justify-center items-center">
+          <div class="py-4 border-t border-slate-900/5">
+            <div class="flex flex-wrap items-center justify-center">
               <svg
                 id="svg20"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -66,7 +66,7 @@
                 version="1.1"
                 fill="#ffffff"
                 viewBox="0 0 300 300"
-                class="text-primary-color text-indigo-400 mr-2"
+                class="mr-2 text-indigo-400 text-primary-color"
               >
                 <metadata id="metadata26">
                   <rdf:RDF
@@ -120,7 +120,7 @@
               </svg>
               <p class="font-bold">一粟科研</p>
             </div>
-            <p class="mt-5 text-center text-sm leading-6 text-slate-500">© 2023 一粟科研 Inc. All rights reserved.</p>
+            <p class="mt-5 text-sm leading-6 text-center text-slate-500">© 2023 一粟科研 Inc. All rights reserved.</p>
           </div>
           <p></p>
         </div>
@@ -134,6 +134,7 @@ import LogoSvg from '@/assets/svg/logo.svg';
 import WelcomeSvg from '@/assets/svg/welcome.svg';
 import { useIntervalFn } from '@vueuse/core';
 import api from './api';
+import { useMessage } from 'naive-ui';
 
 import { ref } from 'vue';
 
@@ -142,6 +143,59 @@ const timer = ref(0);
 
 /// 禁用按钮
 const disabled = ref(false);
+
+const formRef = ref(null);
+
+const message = useMessage();
+
+const formValue = ref({
+  username: '',
+  phone_number: '',
+  code: '',
+  password: '',
+});
+
+const rules = {
+  username: {
+    required: true,
+    message: '请输入姓名',
+    trigger: 'blur',
+  },
+  phone_number: {
+    required: true,
+    message: '请输入电话号码',
+    trigger: ['input'],
+  },
+  code: {
+    required: true,
+    message: '请输入验证码',
+    trigger: ['input'],
+  },
+  password: {
+    required: true,
+    message: '请输入密码',
+    trigger: ['input'],
+  },
+};
+
+async function onSignup() {
+  formRef.value?.validate(async (errors) => {
+    if (!errors) {
+      message.success('Valid');
+      console.log(formValue.value);
+      try {
+        await api.signupApi(formValue.value);
+        $message.success('注册成功');
+      } catch (error) {
+        console.log(error);
+        $message.error('注册失败');
+      }
+    } else {
+      console.log(errors);
+      message.error('Invalid');
+    }
+  });
+}
 
 const { pause, resume } = useIntervalFn(
   () => {
@@ -166,17 +220,26 @@ const { pause, resume } = useIntervalFn(
 
 // 发送验证码
 const sendCode = async () => {
-  let res = await api.sendCodeApi({ phone_number: '13196426725' });
-  console.log(res);
-  // 开启定时效果
-  if (timer.value === 0) {
-    // 禁用按钮
-    disabled.value = true;
-    timer.value = 10;
-    // 重启定时器
-    resume();
-  } else {
+  console.log({ phone_number: formValue.value.phone_number });
+  if (formValue.value.phone_number === '') {
+    message.error('无效的手机号');
     return;
+  }
+  try {
+    await api.sendCodeApi({ phone_number: formValue.value.phone_number });
+    // 开启定时效果
+    if (timer.value === 0) {
+      // 禁用按钮
+      disabled.value = true;
+      timer.value = 10;
+      // 重启定时器
+      resume();
+    } else {
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+    message.error('验证码发送失败');
   }
 };
 </script>

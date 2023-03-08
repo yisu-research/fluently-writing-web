@@ -4,6 +4,7 @@ export const basicRoutes = [
   {
     name: 'home',
     path: '/',
+    isHidden: true,
     component: () => import('@/views/HomeView.vue'),
   },
   // {

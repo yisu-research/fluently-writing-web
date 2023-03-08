@@ -1,6 +1,6 @@
 const proxyConfigMappings = {
   dev: {
-    prefix: '/',
+    prefix: '/api',
     target: 'https://ai.yisukeyan.com',
   },
   test: {
@@ -9,7 +9,7 @@ const proxyConfigMappings = {
   },
   prod: {
     prefix: '/api',
-    target: 'http://localhost:8080',
+    target: 'https://ai.yisukeyan.com',
   },
 };
 
