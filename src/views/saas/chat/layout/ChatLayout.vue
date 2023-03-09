@@ -3,20 +3,12 @@
   <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
     <div class="h-full overflow-hidden" :class="getMobileClass">
       <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
+        <Sider />
+        <!-- <Header v-if="isMobile" /> -->
         <NLayoutContent class="h-full">
-          <figure class="p-8 m-4 md:flex md:justify-start bg-slate-100 rounded-xl md:p-0 dark:bg-slate-800">
-            <img
-              class="w-24 h-24 mx-auto rounded-full md:m-none md:w-30 md:h-auto md:rounded-r-none md:rounded-l-xl"
-              src="@/assets/avatar.jpg"
-              alt=""
-            />
-            <div class="pt-1 text-center spa1ce-y-4 md:p-8 md:text-left">
-              <figcaption class="font-medium">
-                <div class="mb-2 text-teal-500">用户名：{{ userStore.name }}</div>
-                <div class="text-slate-700 dark:text-slate-500">手机号：{{ userStore.phone }}</div>
-              </figcaption>
-            </div>
-          </figure>
+          <RouterView v-slot="{ Component, route }">
+            <component :is="Component" :key="route.fullPath" />
+          </RouterView>
         </NLayoutContent>
       </NLayout>
     </div>
@@ -26,12 +18,21 @@
 <script setup>
 import { computed } from 'vue';
 import { NLayout, NLayoutContent } from 'naive-ui';
+// import { useRouter } from 'vue-router';
+import Sider from './sider/index.vue';
+// import Header from './header/index.vue';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { useUserStore } from '@/store';
+import { useAppStore } from '@/store';
 
-const userStore = useUserStore();
+// const router = useRouter();
+const appStore = useAppStore();
+// const chatStore = useChatStore();
+
+// router.replace({ name: 'Chat', params: { uuid: chatStore.active } });
 
 const { isMobile } = useBasicLayout();
+
+const collapsed = computed(() => appStore.siderCollapsed);
 
 const getMobileClass = computed(() => {
   if (isMobile.value) return ['rounded-none', 'shadow-none'];
@@ -39,6 +40,6 @@ const getMobileClass = computed(() => {
 });
 
 const getContainerClass = computed(() => {
-  return ['h-full'];
+  return ['h-full', { 'pl-[260px]': !isMobile.value && !collapsed.value }];
 });
 </script>

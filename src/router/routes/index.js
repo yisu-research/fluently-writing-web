@@ -1,4 +1,5 @@
 const Layout = () => import('@/layout/index.vue');
+const ChartLayout = () => import('@/views/saas/chat/layout/ChatLayout.vue');
 
 export const basicRoutes = [
   {
@@ -33,20 +34,28 @@ export const basicRoutes = [
     },
   },
   {
-    name: 'Creation',
+    name: 'Chat',
     path: '/saas',
     component: Layout,
-    redirect: '/saas/creation',
+    redirect: '/saas/chat',
     children: [
       {
-        name: 'Creation',
-        path: 'creation',
-        component: () => import('@/views/saas/creation/index.vue'),
+        name: 'Chat',
+        path: 'chat',
+        component: ChartLayout,
         meta: {
           title: '新的创作',
           icon: 'uil:facebook-messenger-alt',
           order: 0,
         },
+        children: [
+          {
+            name: 'chats',
+            path: ':name',
+            isHidden: true,
+            component: () => import('@/views/saas/chat/index.vue'),
+          },
+        ],
       },
     ],
   },

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative isolate overflow-hidden bg-white">
+  <div class="relative overflow-hidden bg-white isolate">
     <svg
       class="absolute inset-0 -z-10 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
       aria-hidden="true"
@@ -66,7 +66,7 @@
             @click="mobileMenuOpen = true"
           >
             <span class="sr-only">Open main menu</span>
-            <Bars3Icon class="h-6 w-6" aria-hidden="true" />
+            <Bars3Icon class="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
         <div class="hidden lg:flex lg:gap-x-12">
@@ -87,7 +87,7 @@
         </div>
       </nav>
       <Dialog as="div" :open="mobileMenuOpen" @close="mobileMenuOpen = false">
-        <DialogPanel class="fixed inset-0 z-10 overflow-y-auto bg-white px-6 py-6 lg:hidden">
+        <DialogPanel class="fixed inset-0 z-10 px-6 py-6 overflow-y-auto bg-white lg:hidden">
           <div class="flex items-center justify-between">
             <a href="#" class="-m-1.5 p-1.5">
               <span class="sr-only">Your Company</span>
@@ -95,17 +95,17 @@
             </a>
             <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
               <span class="sr-only">Close menu</span>
-              <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+              <XMarkIcon class="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
-          <div class="mt-6 flow-root">
+          <div class="flow-root mt-6">
             <div class="-my-6 divide-y divide-gray-500/10">
-              <div class="space-y-2 py-6">
+              <div class="py-6 space-y-2">
                 <a
                   v-for="item in navigation"
                   :key="item.name"
                   :href="item.href"
-                  class="-mx-3 block rounded-lg py-2 px-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-400/10"
+                  class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 rounded-lg hover:bg-gray-400/10"
                   >{{ item.name }}</a
                 >
               </div>
@@ -121,11 +121,11 @@
         </DialogPanel>
       </Dialog>
     </div>
-    <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
-      <div class="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
+    <div class="px-6 py-24 mx-auto max-w-7xl sm:py-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
+      <div class="max-w-2xl mx-auto lg:mx-0 lg:flex-auto">
         <!-- 渐变色标题 -->
         <h1
-          class="mt-10 max-w-lg text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-teal-300 sm:text-7xl"
+          class="max-w-lg mt-10 text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-teal-300 sm:text-7xl"
         >
           {{ title }}
         </h1>
@@ -135,11 +135,11 @@
           {{ footnote }}
           <a href="https://chat.openai.com" class="text-teal-400 hover:text-teal-300">ChatGPT</a>
         </p>
-        <div class="mt-10 flex items-center gap-x-6">
+        <div class="flex items-center mt-10 gap-x-6">
           <a
             href="#"
             class="rounded-md bg-teal-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            ><router-link to="/saas/creation">{{ start }}</router-link></a
+            ><router-link to="/saas">{{ start }}</router-link></a
           >
         </div>
       </div>

@@ -1,0 +1,16 @@
+<script setup>
+const emit = defineEmits();
+
+function handleClick() {
+  emit('click');
+}
+</script>
+
+<template>
+  <button
+    class="flex items-center justify-center w-10 h-10 transition rounded-full hover:bg-neutral-100"
+    @click="handleClick"
+  >
+    <slot />
+  </button>
+</template>

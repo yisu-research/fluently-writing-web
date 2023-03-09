@@ -1,4 +1,4 @@
-import { getToken, refreshAccessToken, isNullOrWhitespace } from '@/utils';
+import { getToken, isNullOrWhitespace } from '@/utils';
 
 const WHITE_LIST = ['/login', '/404', '/', '/signup'];
 export function createPermissionGuard(router) {
@@ -14,7 +14,7 @@ export function createPermissionGuard(router) {
     /** 有token的情况 */
     if (to.path === '/login') return { path: '/' };
 
-    refreshAccessToken();
+    // refreshAccessToken();
     return true;
   });
 }

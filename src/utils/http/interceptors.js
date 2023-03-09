@@ -17,7 +17,8 @@ export function reqResolve(config) {
    * * 加上 token
    * ! 认证方案: JWT Bearer
    */
-  config.headers.Authorization = config.headers.Authorization || 'Bearer ' + token;
+  config.headers.Authorization = 'Bearer ' + token;
+  config.headers['Accept'] = 'application/json';
 
   return config;
 }

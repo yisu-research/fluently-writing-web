@@ -9,6 +9,11 @@ export function createAxios(options = {}) {
     ...defaultOptions,
     ...options,
   });
+
+  service.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+  service.defaults.crossDomain = true;
+  service.defaults.withCredentials = true;
+
   service.interceptors.request.use(reqResolve, reqReject);
   service.interceptors.response.use(resResolve, resReject);
   return service;

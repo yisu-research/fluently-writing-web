@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
 import { setupRouterGuard } from './guard';
-import { basicRoutes, EMPTY_ROUTE, NOT_FOUND_ROUTE } from './routes';
+import { basicRoutes, EMPTY_ROUTE } from './routes';
 import { getToken, isNullOrWhitespace } from '@/utils';
-import { useUserStore, usePermissionStore } from '@/store';
+import { useUserStore } from '@/store';
 
 const isHash = import.meta.env.VITE_USE_HASH === 'true';
 
@@ -40,14 +40,9 @@ export async function addDynamicRoutes() {
   // 有token的情况
   try {
     const userStore = useUserStore();
-    const permissionStore = usePermissionStore();
-    !userStore.userId && (await userStore.getUserInfo());
-    const accessRoutes = permissionStore.generateRoutes(userStore.role);
-    accessRoutes.forEach((route) => {
-      !router.hasRoute(route.name) && router.addRoute(route);
-    });
-    router.hasRoute(EMPTY_ROUTE.name) && router.removeRoute(EMPTY_ROUTE.name);
-    router.addRoute(NOT_FOUND_ROUTE);
+    // !userStore.userId && (await userStore.getUserInfo());
+    await userStore.getUserInfo();
+    router.addRoute(EMPTY_ROUTE);
   } catch (error) {
     console.error(error);
   }

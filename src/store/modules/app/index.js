@@ -10,6 +10,7 @@ export const useAppStore = defineStore('app', {
       /** keepAlive路由的key，重新赋值可重置keepAlive */
       aliveKeys: {},
       isDark,
+      siderCollapsed: false,
     };
   },
   actions: {
@@ -32,6 +33,9 @@ export const useAppStore = defineStore('app', {
     },
     setCollapsed(collapsed) {
       this.collapsed = collapsed;
+    },
+    setSiderCollapsed(collapsed) {
+      this.siderCollapsed = collapsed;
     },
     setAliveKeys(key, val) {
       this.aliveKeys[key] = val;

@@ -2,7 +2,7 @@ import { lStorage } from '@/utils';
 import api from '@/api';
 
 const TOKEN_CODE = 'access_token';
-const DURATION = 6 * 60 * 60;
+const DURATION = 24 * 60 * 60 * 7;
 
 export function getToken() {
   return lStorage.get(TOKEN_CODE);

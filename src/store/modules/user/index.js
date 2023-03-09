@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { resetRouter } from '@/router';
 import { useTagsStore, usePermissionStore } from '@/store';
 import { removeToken, toLogin } from '@/utils';
-import api from '@/api';
+import api from '@/views/saas/api';
 
 export const useUserStore = defineStore('user', {
   state() {
@@ -15,10 +15,16 @@ export const useUserStore = defineStore('user', {
       return this.userInfo?.id;
     },
     name() {
-      return this.userInfo?.name;
+      return this.userInfo?.username;
+    },
+    phone() {
+      return this.userInfo?.phone_number;
     },
     avatar() {
       return this.userInfo?.avatar;
+    },
+    maxTokens() {
+      return this.userInfo?.max_tokens;
     },
     role() {
       return this.userInfo?.role || [];
@@ -27,9 +33,10 @@ export const useUserStore = defineStore('user', {
   actions: {
     async getUserInfo() {
       try {
-        const res = await api.getUser();
-        const { id, name, avatar, role } = res.data;
-        this.userInfo = { id, name, avatar, role };
+        const res = await api.getUserInfoApi();
+        console.log(res);
+        const { id, username, phone_number, max_tokens } = res;
+        this.userInfo = { id, username, phone_number, max_tokens };
         return Promise.resolve(res.data);
       } catch (error) {
         return Promise.reject(error);
