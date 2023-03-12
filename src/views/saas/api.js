@@ -16,14 +16,17 @@ export default {
   // 获取对话列表
   getChatListApi: (data) => request.get('/api/conversations', data, { noNeedTip: true }),
 
+  // 删除对话
+  deleteChatApi: (id) => request.delete(`/api/conversations/${id}`, { noNeedTip: true }),
+
   // 更新对话
-  updateChatApi: (data) => request.put('/api/conversations/:id', data, { noNeedTip: true }),
+  updateChatApi: (id, data) => request.put(`/api/conversations/${id}`, data, { noNeedTip: true }),
 
   // 发送消息
   postMessageApi: (data) => request.post('/api/messages', data, { noNeedTip: true }),
 
   // 获取消息列表
-  getMessageListApi: (data) => request.get('/api/messages', data, { noNeedTip: true }),
+  getMessageListApi: (data) => request.get('/api/messages', { noNeedTip: true, params: data, data: data }),
 
   // 用户详情
   getUserInfoApi: () => request.get('/api/user', { noNeedTip: true, noNeedToken: false }),

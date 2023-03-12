@@ -8,12 +8,6 @@ export const basicRoutes = [
     isHidden: true,
     component: () => import('@/views/HomeView.vue'),
   },
-  // {
-  //   name: '404',
-  //   path: '/404',
-  //   component: () => import('@/views/error-page/404.vue'),
-  //   isHidden: true,
-  // },
 
   {
     name: 'Login',
@@ -50,8 +44,8 @@ export const basicRoutes = [
         },
         children: [
           {
-            name: 'chats',
-            path: ':name',
+            name: 'Chat',
+            path: ':id',
             isHidden: true,
             component: () => import('@/views/saas/chat/index.vue'),
           },
@@ -152,6 +146,5 @@ const asyncRoutes = [];
 Object.keys(modules).forEach((key) => {
   asyncRoutes.push(modules[key].default);
 });
-console.log(asyncRoutes);
 
 export { asyncRoutes };

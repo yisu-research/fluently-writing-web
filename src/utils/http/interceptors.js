@@ -30,7 +30,7 @@ export function reqReject(error) {
 export function resResolve(response) {
   // TODO: 处理不同的 response.headers
   const { data, status, config, statusText } = response;
-  if (status !== 200) {
+  if (status >= 400) {
     const code = status;
 
     /** 根据code处理对应的操作，并返回处理后的message */

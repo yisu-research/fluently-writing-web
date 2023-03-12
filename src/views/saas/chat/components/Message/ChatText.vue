@@ -5,7 +5,12 @@ import mdKatex from '@traptitech/markdown-it-katex';
 import hljs from 'highlight.js';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 
-const props = defineProps();
+const props = defineProps({
+  text: String,
+  inversion: Boolean,
+  error: Boolean,
+  loading: Boolean,
+});
 
 const { isMobile } = useBasicLayout();
 

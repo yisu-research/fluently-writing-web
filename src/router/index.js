@@ -3,6 +3,7 @@ import { setupRouterGuard } from './guard';
 import { basicRoutes, EMPTY_ROUTE } from './routes';
 import { getToken, isNullOrWhitespace } from '@/utils';
 import { useUserStore } from '@/store';
+import { useChatStore } from '../store/modules/chat';
 
 const isHash = import.meta.env.VITE_USE_HASH === 'true';
 
@@ -29,10 +30,12 @@ export async function resetRouter() {
 }
 
 export async function addDynamicRoutes() {
+  // 查看本地token
   const token = getToken();
 
   // 没有token情况
   if (isNullOrWhitespace(token)) {
+    // 加载静态路由
     router.addRoute(EMPTY_ROUTE);
     return;
   }
@@ -40,8 +43,10 @@ export async function addDynamicRoutes() {
   // 有token的情况
   try {
     const userStore = useUserStore();
-    // !userStore.userId && (await userStore.getUserInfo());
-    await userStore.getUserInfo();
+    // 获取用户信息
+    !userStore.userId && (await userStore.getUserInfo());
+    const charStore = useChatStore();
+    await charStore.getChatList();
     router.addRoute(EMPTY_ROUTE);
   } catch (error) {
     console.error(error);

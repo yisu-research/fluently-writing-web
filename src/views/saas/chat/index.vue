@@ -31,7 +31,7 @@
                   <template #icon>
                     <SvgIcon icon="ri:stop-circle-line" />
                   </template>
-                  Stop Responding
+                  终止请求
                 </n-button>
               </div>
             </div>
@@ -42,11 +42,14 @@
     <footer :class="footerClass">
       <div class="w-full max-w-screen-xl m-auto">
         <div class="flex items-center justify-between space-x-2">
-          <HoverButton @click="handleClear">
-            <span class="text-xl text-[#4f555e]">
-              <SvgIcon icon="ri:delete-bin-line" />
-            </span>
-          </HoverButton>
+          <n-button tertiary type="error" @click="handleClear">
+            <template #icon>
+              <span class="text-xl">
+                <SvgIcon icon="eva:trash-2-outline" />
+              </span>
+            </template>
+          </n-button>
+
           <n-input
             v-model:value="prompt"
             type="textarea"
@@ -54,12 +57,13 @@
             :placeholder="placeholder"
             @keypress="handleEnter"
           />
-          <n-button type="primary" :disabled="buttonDisabled" @click="handleSubmit">
+          <n-button strong secondary type="success" :disabled="buttonDisabled" @click="handleSubmit">
             <template #icon>
               <span>
-                <SvgIcon icon="ri:send-plane-fill" />
+                <SvgIcon icon="uil:message" />
               </span>
             </template>
+            发送
           </n-button>
         </div>
       </div>
@@ -71,14 +75,22 @@
 import { useRoute } from 'vue-router';
 import { useChatStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { HoverButton, SvgIcon } from '@/components/common';
+import { SvgIcon } from '@/components/common';
 import { useScroll } from './hooks/useScroll';
 import { useChat } from './hooks/useChat';
 import { useCopyCode } from './hooks/useCopyCode';
+import { NButton, NInput, useDialog } from 'naive-ui';
 
 import { Message } from './components';
 
+import api from '@/views/saas/api';
+import { onMounted } from 'vue';
+
+let controller = new AbortController();
+
 const route = useRoute();
+const dialog = useDialog();
+
 const chatStore = useChatStore();
 useCopyCode();
 
@@ -87,9 +99,9 @@ const { isMobile } = useBasicLayout();
 const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat();
 const { scrollRef, scrollToBottom } = useScroll();
 
-const { uuid } = route.params;
+const id = route.params.id;
 
-const dataSources = computed(() => chatStore.getChatByUuid(Number(uuid)));
+const dataSources = computed(() => chatStore.getChatById(Number(id)));
 
 const conversationList = computed(() => dataSources.value.filter((item) => !item.inversion && !item.error));
 
@@ -100,7 +112,20 @@ function handleSubmit() {
   onConversation();
 }
 
+onMounted(async () => {
+  console.log('id');
+  console.log(id);
+  // await api.getMessageListApi({ conversation_id: id });
+  console.log('参数');
+  console.log(id);
+  console.log('聊天内容');
+  console.log(dataSources.value);
+});
+
+// 发送消息
 async function onConversation() {
+  console.log('发送消息');
+  console.log(id);
   const message = prompt.value;
 
   if (loading.value) return;
@@ -109,7 +134,7 @@ async function onConversation() {
 
   controller = new AbortController();
 
-  addChat(Number(uuid), {
+  addChat(Number(id), {
     dateTime: new Date().toLocaleString(),
     text: message,
     inversion: true,
@@ -127,7 +152,7 @@ async function onConversation() {
 
   if (lastContext) options = { ...lastContext };
 
-  addChat(Number(uuid), {
+  addChat(Number(id), {
     dateTime: new Date().toLocaleString(),
     text: '',
     loading: true,
@@ -139,50 +164,34 @@ async function onConversation() {
   scrollToBottom();
 
   try {
-    // (await fetchChatAPIProcess)
-    //   {
-    //     prompt: message,
-    //     options,
-    //     signal: controller.signal,
-    //     onDownloadProgress: ({ event }) => {
-    //       const xhr = event.target;
-    //       const { responseText } = xhr;
-    //       // Always process the final line
-    //       const lastIndex = responseText.lastIndexOf('\n');
-    //       let chunk = responseText;
-    //       if (lastIndex !== -1) chunk = responseText.substring(lastIndex);
-    //       try {
-    //         const data = JSON.parse(chunk);
-    //         updateChat(Number(uuid), dataSources.value.length - 1, {
-    //           dateTime: new Date().toLocaleString(),
-    //           text: data.text ?? '',
-    //           inversion: false,
-    //           error: false,
-    //           loading: false,
-    //           conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-    //           requestOptions: { prompt: message, options: { ...options } },
-    //         });
-    //         scrollToBottom();
-    //       } catch (error) {
-    //         //
-    //       }
-    //     },
-    //   };
+    const res = await api.postMessageApi({ content: message, conversation_id: Number(id) });
+    console.log('res', res.assistant_content);
+    updateChat(Number(id), dataSources.value.length - 1, {
+      dateTime: new Date().toLocaleString(),
+      text: res.assistant_content ?? '',
+      inversion: false,
+      error: false,
+      loading: false,
+      conversationOptions: { conversationId: id, parentMessageId: res.id },
+      requestOptions: { prompt: message, options: { ...options } },
+    });
+    scrollToBottom();
   } catch (error) {
-    const errorMessage = error?.message ?? t('common.wrong');
+    console.log('err', error);
+    const errorMessage = error?.message ?? '好像出了什么错误，请稍后重试';
 
     if (error.message === 'canceled') {
-      updateChatSome(Number(uuid), dataSources.value.length - 1, {
+      updateChatSome(Number(id), dataSources.value.length - 1, {
         loading: false,
       });
       scrollToBottom();
       return;
     }
 
-    const currentChat = getChatByUuidAndIndex(Number(uuid), dataSources.value.length - 1);
+    const currentChat = getChatByUuidAndIndex(Number(id), dataSources.value.length - 1);
 
     if (currentChat?.text && currentChat.text !== '') {
-      updateChatSome(Number(uuid), dataSources.value.length - 1, {
+      updateChatSome(Number(id), dataSources.value.length - 1, {
         text: `${currentChat.text}\n[${errorMessage}]`,
         error: false,
         loading: false,
@@ -190,7 +199,7 @@ async function onConversation() {
       return;
     }
 
-    updateChat(Number(uuid), dataSources.value.length - 1, {
+    updateChat(Number(id), dataSources.value.length - 1, {
       dateTime: new Date().toLocaleString(),
       text: errorMessage,
       inversion: false,
@@ -220,7 +229,7 @@ async function onRegenerate(index) {
 
   loading.value = true;
 
-  updateChat(Number(uuid), index, {
+  updateChat(Number(id), index, {
     dateTime: new Date().toLocaleString(),
     text: '',
     inversion: false,
@@ -231,45 +240,28 @@ async function onRegenerate(index) {
   });
 
   try {
-    // (await fetchChatAPIProcess)
-    //   {
-    //     prompt: message,
-    //     options,
-    //     signal: controller.signal,
-    //     onDownloadProgress: ({ event }) => {
-    //       const xhr = event.target;
-    //       const { responseText } = xhr;
-    //       // Always process the final line
-    //       const lastIndex = responseText.lastIndexOf('\n');
-    //       let chunk = responseText;
-    //       if (lastIndex !== -1) chunk = responseText.substring(lastIndex);
-    //       try {
-    //         const data = JSON.parse(chunk);
-    //         updateChat(Number(uuid), index, {
-    //           dateTime: new Date().toLocaleString(),
-    //           text: data.text ?? '',
-    //           inversion: false,
-    //           error: false,
-    //           loading: false,
-    //           conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-    //           requestOptions: { prompt: message, ...options },
-    //         });
-    //       } catch (error) {
-    //         //
-    //       }
-    //     },
-    //   };
+    const res = await api.postMessageApi({ content: message, conversation_id: Number(id) });
+    console.log('res', res.assistant_content);
+    updateChat(Number(id), index, {
+      dateTime: new Date().toLocaleString(),
+      text: res.assistant_content ?? '',
+      inversion: false,
+      error: false,
+      loading: false,
+      conversationOptions: { conversationId: id, parentMessageId: res.id },
+      requestOptions: { prompt: message, ...options },
+    });
   } catch (error) {
     if (error.message === 'canceled') {
-      updateChatSome(Number(uuid), index, {
+      updateChatSome(Number(id), index, {
         loading: false,
       });
       return;
     }
 
-    const errorMessage = error?.message ?? t('common.wrong');
+    const errorMessage = error?.message ?? '好像出错了，请稍后再试。';
 
-    updateChat(Number(uuid), index, {
+    updateChat(Number(id), index, {
       dateTime: new Date().toLocaleString(),
       text: errorMessage,
       inversion: false,
@@ -287,12 +279,12 @@ function handleDelete(index) {
   if (loading.value) return;
 
   dialog.warning({
-    title: t('chat.deleteMessage'),
-    content: t('chat.deleteMessageConfirm'),
-    positiveText: t('common.yes'),
-    negativeText: t('common.no'),
+    title: '删除消息',
+    content: '是否删除此消息?',
+    positiveText: '确认',
+    negativeText: '取消',
     onPositiveClick: () => {
-      chatStore.deleteChatByUuid(Number(uuid), index);
+      chatStore.deleteChatByUuid(Number(id), index);
     },
   });
 }
@@ -300,13 +292,14 @@ function handleDelete(index) {
 function handleClear() {
   if (loading.value) return;
 
+  console.log('dddddddddd');
   dialog.warning({
-    title: t('chat.clearChat'),
-    content: t('chat.clearChatConfirm'),
-    positiveText: t('common.yes'),
-    negativeText: t('common.no'),
+    title: '清空会话',
+    content: '是否清空会话?',
+    positiveText: '确认',
+    negativeText: '取消',
     onPositiveClick: () => {
-      chatStore.clearChatByUuid(Number(uuid));
+      chatStore.clearChatByUuid(Number(id));
     },
   });
 }

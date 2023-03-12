@@ -1,5 +1,5 @@
 export function createPageLoadingGuard(router) {
-  router.beforeEach(() => {
+  router.beforeEach((to, from) => {
     window.$loadingBar?.start();
   });
 

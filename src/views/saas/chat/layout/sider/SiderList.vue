@@ -1,25 +1,45 @@
 <script setup>
 import { useAppStore, useChatStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
+import api from '@/views/saas/api';
+import { onMounted } from 'vue';
 
 const appStore = useAppStore();
 const chatStore = useChatStore();
 
 const { isMobile } = useBasicLayout();
 
+// 获取对话列表
 const dataSources = computed(() => chatStore.history);
-async function handleSelect({ uuid }) {
-  if (isActive(uuid)) return;
+
+// 处理选择对话
+async function handleSelect({ id }) {
+  if (isActive(id)) return;
 
   if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
-  await chatStore.setActive(uuid);
+  await chatStore.setActive(id);
 
   if (isMobile.value) appStore.setSiderCollapsed(true);
 }
 
-function handleEdit({ uuid }, isEdit, event) {
+onMounted(async () => {
+  console.log('onMounted');
+  if (!chatStore.active && dataSources.value.length) {
+    await chatStore.setActive(dataSources.value[0].id);
+    if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
+  }
+});
+
+async function handleEdit({ id, name }, isEdit, event) {
   event?.stopPropagation();
-  chatStore.updateHistory(uuid, { isEdit });
+
+  try {
+    if (!isEdit) await api.updateChatApi(id, { name: name });
+  } catch (err) {
+    console.log(err);
+    $message.success('保存失败，请重试');
+  }
+  chatStore.updateHistory(id, { isEdit });
 }
 
 function handleDelete(index, event) {
@@ -27,13 +47,13 @@ function handleDelete(index, event) {
   chatStore.deleteHistory(index);
 }
 
-function handleEnter({ uuid }, isEdit, event) {
+function handleEnter({ id }, isEdit, event) {
   event?.stopPropagation();
-  if (event.key === 'Enter') chatStore.updateHistory(uuid, { isEdit });
+  if (event.key === 'Enter') chatStore.updateHistory(id, { isEdit });
 }
 
-function isActive(uuid) {
-  return chatStore.active === uuid;
+function isActive(id) {
+  return chatStore.active === id;
 }
 </script>
 
@@ -50,26 +70,26 @@ function isActive(uuid) {
       <template v-else>
         <div v-for="(item, index) of dataSources" :key="index">
           <a
-            class="relative flex items-center gap-3 px-3 py-3 break-all border rounded-md cursor-pointer hover:text-teal-4 hover:border-teal-3 hover:bg-teal-50 group"
-            :class="isActive(item.uuid) && ['border-teal-300', 'bg-teal-50', 'text-teal-500', 'pr-14']"
+            class="relative z-50 flex items-center gap-3 px-3 py-3 break-all border rounded-md cursor-pointer hover:text-teal-500 hover:border-teal-500 hover:scale-98 hover:shadow-md group"
+            :class="isActive(item.id) && ['border-teal-500', 'bg-teal-50/[0.4]', 'text-teal-500', 'pr-14']"
             @click="handleSelect(item)"
           >
             <span>
-              <SvgIcon icon="uil:comment-verify" />
+              <SvgIcon icon="uil:comment-dots" />
             </span>
             <div class="relative flex-1 overflow-hidden break-all text-ellipsis whitespace-nowrap">
               <n-input
                 v-if="item.isEdit"
-                v-model:value="item.title"
+                v-model:value="item.name"
                 size="tiny"
                 @keypress="handleEnter(item, false, $event)"
               />
-              <span v-else>{{ item.title }}</span>
+              <span v-else>{{ item.name }}</span>
             </div>
-            <div v-if="isActive(item.uuid)" class="absolute z-10 flex visible right-1">
+            <div v-if="isActive(item.id)" class="absolute z-10 flex visible right-1">
               <template v-if="item.isEdit">
                 <button class="p-1 bg-transparent" @click="handleEdit(item, false, $event)">
-                  <SvgIcon icon="ri:save-line" />
+                  <SvgIcon icon="uil:save" />
                 </button>
               </template>
               <template v-else>

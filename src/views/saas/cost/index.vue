@@ -10,7 +10,7 @@
               <dl class="grid grid-cols-1 text-center gap-y-16 gap-x-8 lg:grid-cols-3">
                 <div v-for="stat in stats" :key="stat.id" class="flex flex-col max-w-xs mx-auto gap-y-4">
                   <dt class="text-base leading-7 text-gray-100">{{ stat.name }}</dt>
-                  <dd class="order-first text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+                  <dd class="order-first text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                     {{ stat.value }}
                   </dd>
                 </div>
@@ -20,16 +20,67 @@
 
           <!-- 订单趋势 -->
           <div class="m-4 my-8 overflow-hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg">
-            <div class="px-4 py-5 sm:px-6">消费趋势</div>
-            <div class="px-4 py-5 bg-gray-100 sm:p-6 h-96">图表</div>
+            <div class="px-4 py-5 text-xl font-bold bg-gray-100 sm:px-6">消费记录</div>
+            <n-scrollbar class="max-h-96">
+              <div class="py-2 bg-white shadows ov-8erflow-hidden sm:rounded-md">
+                <ul role="list" class="divide-y divide-gray-200">
+                  <li v-for="position in state.orders" :key="position.id">
+                    <div
+                      class="block hover:bg-gray-50"
+                      @click="position.state !== 'pending' ? () => {} : handleUnpaid(position.code_url)"
+                    >
+                      <div class="px-4 py-4 sm:px-6">
+                        <div class="flex items-center justify-between">
+                          <p class="text-sm font-medium text-teal-500 truncate">{{ position.product_name }}</p>
+                          <div class="flex flex-shrink-0 ml-2">
+                            <p
+                              class="inline-flex px-2 text-xs font-semibold leading-5 text-teal-800 bg-green-200 rounded-full"
+                            >
+                              {{ stateMap[position.state] }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="mt-2 md:flex sm:justify-between">
+                          <div class="sm:flex">
+                            <p class="flex items-center mr-4 text-sm text-gray-500">
+                              <span class="mr-1">
+                                <SvgIcon icon="majesticons:translate" />
+                              </span>
+                              {{ position.product_tokens }} 字符
+                            </p>
+                          </div>
+                          <div class="sm:flex">
+                            <p class="flex items-center text-sm text-gray-500">
+                              <span class="mr-1">
+                                <SvgIcon icon="icon-park-twotone:transaction-order" />
+                              </span>
+                              {{ position.out_trade_no }}
+                            </p>
+                          </div>
+                          <div class="flex items-center mt-2 text-sm text-gray-500 sm:mt-0">
+                            <span>
+                              <SvgIcon icon="ph:timer-duotone" />
+                            </span>
+                            {{ formatDateTime(position.created_at) }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </n-scrollbar>
           </div>
-          <div class="py-24 bg-white sm:py-32">
+
+          <!-- 购买字符 -->
+          <div class="py-8 m-4 bg-white border-gray-200 rounded-md sm:py-8 border-1">
             <div class="px-6 mx-auto max-w-7xl lg:px-8">
               <div class="max-w-4xl mx-auto text-center">
                 <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">购买字符</p>
               </div>
               <div
-                class="grid max-w-md grid-cols-1 gap-8 mx-auto mt-10 isolate md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-4"
+                class="grid max-w-md grid-cols-1 mx-auto mt-10 gap-9 isolate md:max-w-2xl lg:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3"
               >
                 <div
                   v-for="tier in state.products"
@@ -102,9 +153,10 @@
 
 <script setup>
 import { computed, onMounted, reactive } from 'vue';
-import { NLayout, NLayoutContent } from 'naive-ui';
+import { NLayout, NLayoutContent, NButton } from 'naive-ui';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { useUserStore } from '@/store';
+import { formatDateTime } from '@/utils';
 
 import api from '../api';
 import { useQRCode } from '@vueuse/integrations/useQRCode';
@@ -119,12 +171,24 @@ const { isMobile } = useBasicLayout();
 
 const state = reactive({
   products: [],
+  orders: [],
   showModal: false,
 });
 
+const stateMap = {
+  pending: '待支付',
+  paid: '已支付',
+  canceled: '已取消',
+  closed: '已关闭',
+};
+
+const handleUnpaid = (url) => {
+  state.showModal = true;
+  text.value = url;
+};
+
 const handleOrder = async (id) => {
   state.showModal = true;
-  console.log(id);
 
   try {
     let res = await api.postOrderApi({ product_id: id });
@@ -147,10 +211,16 @@ const handleClose = () => {
 };
 
 // 关闭后更新页面数据
-const handleAfterLeave = () => {};
+const handleAfterLeave = async () => {
+  const res = await api.getOrderListApi();
+  state.orders = [];
+  state.orders = res;
+};
 onMounted(async () => {
   const data = await api.getProductListApi();
-  // const res = await api.getOrderListApi();
+  const res = await api.getOrderListApi();
+
+  state.orders = res;
 
   for (let i = 0; i < data.length; i++) {
     const item = data[i];

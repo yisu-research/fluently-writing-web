@@ -28,7 +28,7 @@ import { useAppStore } from '@/store';
 const appStore = useAppStore();
 // const chatStore = useChatStore();
 
-// router.replace({ name: 'Chat', params: { uuid: chatStore.active } });
+// router.replace({ name: 'Chat', params: { id: chatStore.active } });
 
 const { isMobile } = useBasicLayout();
 

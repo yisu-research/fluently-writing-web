@@ -7,7 +7,7 @@ import api from '@/views/saas/api';
 export const useUserStore = defineStore('user', {
   state() {
     return {
-      userInfo: {},
+      userInfo: { username: '一粟创作助手', phone_number: '激发灵感，提高效率' },
     };
   },
   getters: {
@@ -34,6 +34,7 @@ export const useUserStore = defineStore('user', {
     async getUserInfo() {
       try {
         const res = await api.getUserInfoApi();
+        console.log('getUserInfo');
         console.log(res);
         const { id, username, phone_number, max_tokens } = res;
         this.userInfo = { id, username, phone_number, max_tokens };

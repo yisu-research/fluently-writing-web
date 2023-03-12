@@ -6,7 +6,7 @@
         <NLayoutContent class="h-full">
           <figure class="p-8 m-4 md:flex md:justify-start bg-slate-100 rounded-xl md:p-0 dark:bg-slate-800">
             <img
-              class="w-24 h-24 mx-auto rounded-full md:m-none md:w-30 md:h-auto md:rounded-r-none md:rounded-l-xl"
+              class="w-24 h-24 mx-auto rounded-full md:mx-0 md:w-30 md:h-auto md:rounded-r-none md:rounded-l-xl"
               src="@/assets/avatar.jpg"
               alt=""
             />

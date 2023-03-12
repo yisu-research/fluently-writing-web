@@ -79,11 +79,7 @@
           >
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-          <RouterLink to="/login" class="text-sm font-semibold leading-6 text-gray-900"
-            >登录 <span aria-hidden="true">&rarr;</span></RouterLink
-          >
-          <!-- <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Log in <span
-              aria-hidden="true">&rarr;</span></a> -->
+          <RouterLink to="Login" class="text-sm font-semibold leading-6 text-gray-900">登录 </RouterLink>
         </div>
       </nav>
       <Dialog as="div" :open="mobileMenuOpen" @close="mobileMenuOpen = false">
@@ -110,11 +106,11 @@
                 >
               </div>
               <div class="py-6">
-                <a
-                  href="#"
+                <RouterLink
+                  to="Login"
                   class="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-6 text-gray-900 hover:bg-gray-400/10"
-                  >登录</a
-                >
+                  >登录
+                </RouterLink>
               </div>
             </div>
           </div>

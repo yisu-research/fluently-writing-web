@@ -2,9 +2,10 @@
 import { computed, watch } from 'vue';
 import { NButton, NLayoutSider } from 'naive-ui';
 import SiderList from './SiderList.vue';
-// import SiderFooter from './SiderFooter.vue';
 import { useAppStore, useChatStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
+import api from '@/views/saas/api';
+import day from 'dayjs';
 
 const appStore = useAppStore();
 const chatStore = useChatStore();
@@ -13,8 +14,22 @@ const { isMobile } = useBasicLayout();
 
 const collapsed = computed(() => appStore.siderCollapsed);
 
-function handleAdd() {
-  chatStore.addHistory({ title: 'New Chat', uuid: Date.now(), isEdit: false });
+async function handleAdd() {
+  // 请求创建对话
+  const uuid = day(Date.now()).format('YYMMDD-HH:mm:ss');
+  console.log({ name: uuid });
+  console.log('创建');
+  console.log(day(Date.now()).format('YY-MM-DD-HH:mm:ss'));
+  const res = await api.postChatApi({ name: uuid });
+  console.log(res);
+  const { id, name } = res;
+
+  chatStore.addHistory({ name: name, id: id, isEdit: false });
+
+  if (!chatStore.active) {
+    await chatStore.setActive(id);
+    if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
+  }
 }
 
 function handleUpdateCollapsed() {

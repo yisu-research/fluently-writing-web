@@ -3,20 +3,20 @@ import { useChatStore } from '@/store';
 export function useChat() {
   const chatStore = useChatStore();
 
-  const getChatByUuidAndIndex = (uuid, index) => {
-    return chatStore.getChatByUuidAndIndex(uuid, index);
+  const getChatByUuidAndIndex = (id, index) => {
+    return chatStore.getChatByUuidAndIndex(id, index);
   };
 
-  const addChat = (uuid, chat) => {
-    chatStore.addChatByUuid(uuid, chat);
+  const addChat = (id, chat) => {
+    chatStore.addChatByUuid(id, chat);
   };
 
-  const updateChat = (uuid, index, chat) => {
-    chatStore.updateChatByUuid(uuid, index, chat);
+  const updateChat = (id, index, chat) => {
+    chatStore.updateChatByUuid(id, index, chat);
   };
 
-  const updateChatSome = (uuid, index, chat) => {
-    chatStore.updateChatSomeByUuid(uuid, index, chat);
+  const updateChatSome = (id, index, chat) => {
+    chatStore.updateChatSomeByUuid(id, index, chat);
   };
 
   return {
