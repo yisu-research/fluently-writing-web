@@ -93,33 +93,18 @@ export const basicRoutes = [
   },
 
   {
-    name: '模版',
-    path: '/saas/template',
+    name: '帮助中心',
+    path: '/saas',
     component: Layout,
-    redirect: '/saas/template/template-one',
-    meta: {
-      title: '模板',
-      icon: 'uil:comment-image',
-      order: 0,
-    },
+    redirect: '/saas/help',
     children: [
       {
-        name: 'TemplateOnw',
-        path: 'template-one',
-        component: () => import('@/views/saas/templates/template-one/index.vue'),
+        name: 'Help',
+        path: 'help',
+        component: () => import('@/views/saas/help/index.vue'),
         meta: {
-          title: '模板一',
-          icon: 'uil:file-check-alt',
-          order: 0,
-        },
-      },
-      {
-        name: 'TemplateTwo',
-        path: 'template-two',
-        component: () => import('@/views/saas/templates/template-two/index.vue'),
-        meta: {
-          title: '模板二',
-          icon: 'uil:file-check-alt',
+          title: '帮助中心',
+          icon: 'uil:comment-image',
           order: 0,
         },
       },

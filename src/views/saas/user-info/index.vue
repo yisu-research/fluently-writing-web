@@ -4,7 +4,7 @@
     <div class="h-full overflow-hidden" :class="getMobileClass">
       <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
         <NLayoutContent class="h-full">
-          <figure class="p-8 m-4 md:flex md:justify-start bg-slate-100 rounded-xl md:p-0 dark:bg-slate-800">
+          <figure class="p-8 m-4 lg:w-1/2 md:flex md:justify-start bg-slate-100 rounded-xl md:p-0 dark:bg-slate-900">
             <img
               class="w-24 h-24 mx-auto rounded-full md:mx-0 md:w-30 md:h-auto md:rounded-r-none md:rounded-l-xl"
               src="@/assets/avatar.jpg"
@@ -17,6 +17,14 @@
               </figcaption>
             </div>
           </figure>
+          <div class="flex justify-center m-4 lg:w-1/2">
+            <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
+              <template #trigger>
+                <n-button type="error" dashed block> 退出账号 </n-button>
+              </template>
+              确定退出?
+            </n-popconfirm>
+          </div>
         </NLayoutContent>
       </NLayout>
     </div>
@@ -37,6 +45,11 @@ const getMobileClass = computed(() => {
   if (isMobile.value) return ['rounded-none', 'shadow-none'];
   return ['border', 'rounded-md', 'shadow-md'];
 });
+
+const handleLogout = (event) => {
+  event?.stopPropagation();
+  userStore.logout();
+};
 
 const getContainerClass = computed(() => {
   return ['h-full'];
