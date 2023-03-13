@@ -13,8 +13,8 @@
         </div>
         <div class="col-span-4 px-6 lg:px-0 lg:pt-4 lg:pl-4 lg:col-start-5">
           <div class="flex flex-col items-end justify-end max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
-            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助写代码</p>
-            <p class="mt-6 text-lg leading-8 text-gray-600">人人都是程序员，给出需求，立刻帮您码好代码</p>
+            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助力生活</p>
+            <p class="mt-6 text-lg leading-8 text-gray-600">生活中的各种琐事都可以来试试</p>
             <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-gray900">
@@ -66,18 +66,18 @@ import CodingImage from '@/assets/images/coding.png';
 
 const features = [
   {
-    name: '用Python处理Excel，',
-    description: '你也可以轻松搞定繁杂的数据',
+    name: '您的心理医生，在线给你正能量',
+    description: '',
     icon: TableCellsIcon,
   },
   {
-    name: '用Java编写贪吃蛇，',
-    description: '你也可以玩一玩自己写的游戏',
+    name: '您的资深导游，吃喝玩乐都很懂',
+    description: '',
     icon: SparklesIcon,
   },
   {
-    name: '用Js打造个人主页，',
-    description: '你也可以展示自己的技术与风采',
+    name: '您的穿搭顾问，时尚搭配不错过',
+    description: '',
     icon: DevicePhoneMobileIcon,
   },
 ];

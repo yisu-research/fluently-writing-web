@@ -1,17 +1,17 @@
 <template>
-  <div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+  <div class="relative py-24 overflow-hidden bg-gray-900 isolate sm:py-32">
     <div class="mx-auto max-w-7xl md:px-6 lg:px-8">
       <div class="grid grid-cols-1 gap-y-16 gap-x-8 sm:gap-y-20 lg:grid-cols-7 lg:items-start">
-        <div class="px-6 lg:px-0 lg:pt-4 lg:pr-4 col-span-3">
-          <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-lg">
+        <div class="col-span-3 px-6 lg:px-0 lg:pt-4 lg:pr-4">
+          <div class="max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
             <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助写作业</p>
             <p class="mt-6 text-lg leading-8 text-gray-400">依托海量知识储备，帮助您快速完成各科作业</p>
-            <dl class="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
+            <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-white">
                   <component
                     :is="feature.icon"
-                    class="absolute top-1 left-1 h-5 w-5 text-teal-600"
+                    class="absolute w-5 h-5 text-teal-600 top-1 left-1"
                     aria-hidden="true"
                   />
                   {{ feature.name }}
@@ -22,12 +22,12 @@
             </dl>
           </div>
         </div>
-        <div class="sm:px-6 lg:px-0 col-span-4">
-          <div class="mx-auto max-w-2xl sm:mx-0 sm:max-w-none">
+        <div class="col-span-4 sm:px-6 lg:px-0">
+          <div class="max-w-2xl mx-auto sm:mx-0 sm:max-w-none">
             <img
               :src="EnglishWritingImg"
               alt="Product screenshot"
-              class="sm:rounded-3xl bg-gray-300 ring-13 ring-white/10"
+              class="bg-gray-300 sm:rounded-3xl ring-13 ring-white/10"
             />
           </div>
         </div>
@@ -66,18 +66,18 @@ import EnglishWritingImg from '@/assets/images/english_writing.png';
 
 const features = [
   {
-    name: '助写学科报告。',
-    description: '帮助您快速完成学科报告',
-    icon: NewspaperIcon,
-  },
-  {
-    name: '助写英语作文。',
-    description: '帮助您快速完成英语作文',
+    name: '助写英语作文，',
+    description: '用法地道，逻辑严谨',
     icon: LanguageIcon,
   },
   {
-    name: '助写结课论文。',
-    description: '帮助您快速完成结课论文',
+    name: '助写实验报告，',
+    description: '数据翔实，分析深入',
+    icon: NewspaperIcon,
+  },
+  {
+    name: '助写结课论，',
+    description: '引用规范，论据充分',
     icon: AcademicCapIcon,
   },
 ];

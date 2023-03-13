@@ -1,23 +1,14 @@
 <template>
-  <div class="relative py-24 overflow-hidden bg-white isolate sm:py-32">
+  <div class="relative py-24 overflow-hidden bg-gray-900 isolate sm:py-32">
     <div class="mx-auto max-w-7xl md:px-6 lg:px-8">
-      <div class="grid grid-cols-1 gap-y-16 gap-x-8 sm:gap-y-20 lg:grid-cols-7 lg:items-center">
-        <div class="col-span-4 sm:px-6 lg:px-0 lg:col-start-1">
-          <div class="max-w-2xl mx-auto md:mx-0 md:max-w-none">
-            <img
-              :src="CodingImage"
-              alt="Product screenshot"
-              class="bg-gray-300 shadow-md sm:rounded-3xl ring-13 ring-white/10"
-            />
-          </div>
-        </div>
-        <div class="col-span-4 px-6 lg:px-0 lg:pt-4 lg:pl-4 lg:col-start-5">
-          <div class="flex flex-col items-end justify-end max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
-            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助写代码</p>
-            <p class="mt-6 text-lg leading-8 text-gray-600">人人都是程序员，给出需求，立刻帮您码好代码</p>
+      <div class="grid grid-cols-1 gap-y-16 gap-x-8 sm:gap-y-20 lg:grid-cols-7 lg:items-start">
+        <div class="col-span-3 px-6 lg:px-0 lg:pt-4 lg:pr-4">
+          <div class="max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
+            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助力工作</p>
+            <p class="mt-6 text-lg leading-8 text-gray-400">帮你从繁杂的工作中解放出来</p>
             <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
-                <dt class="inline font-semibold text-gray900">
+                <dt class="inline font-semibold text-white">
                   <component
                     :is="feature.icon"
                     class="absolute w-5 h-5 text-teal-600 top-1 left-1"
@@ -26,9 +17,18 @@
                   {{ feature.name }}
                 </dt>
 
-                <dd class="inline text-gray-600">{{ feature.description }}</dd>
+                <dd class="inline">{{ feature.description }}</dd>
               </div>
             </dl>
+          </div>
+        </div>
+        <div class="col-span-4 sm:px-6 lg:px-0">
+          <div class="max-w-2xl mx-auto sm:mx-0 sm:max-w-none">
+            <img
+              :src="EnglishWritingImg"
+              alt="Product screenshot"
+              class="bg-gray-300 sm:rounded-3xl ring-13 ring-white/10"
+            />
           </div>
         </div>
       </div>
@@ -61,24 +61,24 @@
 </template>
 
 <script setup>
-import { TableCellsIcon, SparklesIcon, DevicePhoneMobileIcon } from '@heroicons/vue/20/solid';
-import CodingImage from '@/assets/images/coding.png';
+import { NewspaperIcon, AcademicCapIcon, LanguageIcon } from '@heroicons/vue/20/solid';
+import EnglishWritingImg from '@/assets/images/english_writing.png';
 
 const features = [
   {
-    name: '用Python处理Excel，',
-    description: '你也可以轻松搞定繁杂的数据',
-    icon: TableCellsIcon,
+    name: '从大段录音文本中，一键出会议纪要',
+    description: '',
+    icon: LanguageIcon,
   },
   {
-    name: '用Java编写贪吃蛇，',
-    description: '你也可以玩一玩自己写的游戏',
-    icon: SparklesIcon,
+    name: '简单说说工作进展，一键扩写好周报',
+    description: '',
+    icon: NewspaperIcon,
   },
   {
-    name: '用Js打造个人主页，',
-    description: '你也可以展示自己的技术与风采',
-    icon: DevicePhoneMobileIcon,
+    name: '告别反复来回检查，一键纠错与润色',
+    description: '',
+    icon: AcademicCapIcon,
   },
 ];
 </script>
