@@ -1,11 +1,8 @@
 <template>
   <div class="flex flex-col w-full h-full">
     <main class="flex-1 overflow-hidden">
-      <div
-        id="scrollRef"
-        ref="scrollRef"
-        :class="[isMobile ? 'p-2' : 'p-4', 'h-full', 'overflow-hidden', 'overflow-y-auto']"
-      >
+      <!-- <n-scrollbar id="newScrollRef" ref="newScrollRef" class="h-full p-4 overflow-hidden overflow-y-auto"> -->
+      <div id="scrollRef" ref="scrollRef" class="'p-4 m-2 h-full overflow-hidden myScroll">
         <div class="w-full max-w-screen-xl m-auto">
           <template v-if="!dataSources.length">
             <div class="flex items-center justify-center mt-4 text-center text-neutral-200">
@@ -26,29 +23,30 @@
                 @regenerate="onRegenerate(index)"
                 @delete="handleDelete(index)"
               />
-              <div class="sticky bottom-0 left-0 flex justify-center">
+              <!-- <div class="sticky bottom-0 left-0 flex justify-center">
                 <n-button v-if="loading" type="warning" @click="handleStop">
                   <template #icon>
                     <SvgIcon icon="ri:stop-circle-line" />
                   </template>
                   终止请求
                 </n-button>
-              </div>
+              </div> -->
             </div>
           </template>
         </div>
       </div>
+      <!-- </n-scrollbar> -->
     </main>
     <footer :class="footerClass">
       <div class="w-full max-w-screen-xl m-auto">
         <div class="flex items-center justify-between space-x-2">
-          <n-button tertiary type="error" @click="handleClear">
+          <!-- <n-button tertiary type="error" @click="handleClear">
             <template #icon>
               <span class="text-xl">
                 <SvgIcon icon="eva:trash-2-outline" />
               </span>
             </template>
-          </n-button>
+          </n-button> -->
 
           <n-input
             v-model:value="prompt"
@@ -76,23 +74,37 @@ import { useRoute } from 'vue-router';
 import { useChatStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { SvgIcon } from '@/components/common';
-import { useScroll } from './hooks/useScroll';
-import { useChat } from './hooks/useChat';
-import { useCopyCode } from './hooks/useCopyCode';
+import { useScroll } from '@/views/saas/chat/hooks/useScroll';
+import { useChat } from '@/views/saas/chat/hooks/useChat';
+import { useUserStore } from '@/store';
+import { useCopyCode } from '@/views/saas/chat/hooks/useCopyCode';
 import { NButton, NInput, useDialog } from 'naive-ui';
+import { getToken } from '@/utils';
 
-import { Message } from './components';
+import { EventSourcePolyfill } from 'event-source-polyfill';
+
+import { Message } from '@/views/saas/chat/components';
 
 import api from '@/views/saas/api';
-import { onMounted } from 'vue';
+import { onMounted, nextTick, ref } from 'vue';
+import { formatDateTime } from '@/utils';
 
 let controller = new AbortController();
 
+const newScrollRef = ref(null);
+
 const route = useRoute();
+const router = useRouter();
 const dialog = useDialog();
+
+const userStore = useUserStore();
 
 const chatStore = useChatStore();
 useCopyCode();
+
+const userInfo = computed(() => userStore.userInfo);
+
+const count = ref(0);
 
 const { isMobile } = useBasicLayout();
 
@@ -103,6 +115,8 @@ const id = route.params.id;
 
 const dataSources = computed(() => chatStore.getChatById(Number(id)));
 
+const chatList = computed(() => chatStore.history);
+
 const conversationList = computed(() => dataSources.value.filter((item) => !item.inversion && !item.error));
 
 const prompt = ref('');
@@ -112,20 +126,64 @@ function handleSubmit() {
   onConversation();
 }
 
+const newScrollToBottom = async () => {
+  await nextTick();
+  if (newScrollRef.value) newScrollRef.value.scrollTop = newScrollRef.value.scrollHeight;
+};
+
 onMounted(async () => {
-  console.log('id');
-  console.log(id);
-  // await api.getMessageListApi({ conversation_id: id });
-  console.log('参数');
-  console.log(id);
-  console.log('聊天内容');
-  console.log(dataSources.value);
+  try {
+    const res = await api.getMessageListApi({ conversation_id: id });
+    const index = chatStore.chat.findIndex((item) => item.id === Number(id));
+    chatStore.chat[index].data = [];
+    for (let i = 0; i < res.length; i++) {
+      // 添加聊天记录
+      addChat(Number(id), {
+        dateTime: formatDateTime(res[i].created_at),
+        text: res[i].user_content,
+        inversion: true,
+        error: false,
+        conversationOptions: null,
+        requestOptions: { options: { prompt: res[i].user_content } },
+      });
+      addChat(Number(id), {
+        dateTime: formatDateTime(res[i].created_at),
+        text: res[i].assistant_content,
+        inversion: false,
+        error: false,
+        conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
+        requestOptions: { options: { prompt: res[i].user_content } },
+      });
+    }
+    await userStore.getUserInfo();
+    count.value = userInfo.value.balance;
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // 发送消息
 async function onConversation() {
-  console.log('发送消息');
-  console.log(id);
+  if (chatList.value.length === 0) {
+    dialog.warning({
+      title: '温馨提示',
+      content: '请在侧边栏创建新的对话，开启您的创作',
+    });
+    return;
+  }
+
+  if (count.value <= 0) {
+    dialog.warning({
+      title: '提示',
+      content: '余额不足，请充值',
+      positiveText: '去充值',
+      negativeText: '取消',
+      onPositiveClick: () => {
+        router.push('/cost');
+      },
+    });
+    return;
+  }
   const message = prompt.value;
 
   if (loading.value) return;
@@ -133,6 +191,8 @@ async function onConversation() {
   if (!message || message.trim() === '') return;
 
   controller = new AbortController();
+
+  count.value = count.value - 1;
 
   addChat(Number(id), {
     dateTime: new Date().toLocaleString(),
@@ -143,6 +203,7 @@ async function onConversation() {
     requestOptions: { prompt: message, options: null },
   });
   scrollToBottom();
+  newScrollToBottom();
 
   loading.value = true;
   prompt.value = '';
@@ -162,22 +223,48 @@ async function onConversation() {
     requestOptions: { prompt: message, options: { ...options } },
   });
   scrollToBottom();
+  newScrollToBottom();
 
   try {
-    const res = await api.postMessageApi({ content: message, conversation_id: Number(id) });
-    console.log('res', res.assistant_content);
-    updateChat(Number(id), dataSources.value.length - 1, {
-      dateTime: new Date().toLocaleString(),
-      text: res.assistant_content ?? '',
-      inversion: false,
-      error: false,
-      loading: false,
-      conversationOptions: { conversationId: id, parentMessageId: res.id },
-      requestOptions: { prompt: message, options: { ...options } },
+    const url = `https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`;
+    const token = getToken();
+    let es = new EventSourcePolyfill(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        withCredentials: true,
+      },
     });
-    scrollToBottom();
+
+    es.onopen = (event) => {
+      console.log('链接成功', event);
+    };
+
+    es.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      scrollToBottom();
+      newScrollToBottom();
+
+      try {
+        updateChat(Number(id), dataSources.value.length - 1, {
+          dateTime: new Date().toLocaleString(),
+          text: data.content ?? '',
+          inversion: false,
+          error: false,
+          loading: false,
+          conversationOptions: { conversationId: id, parentMessageId: id },
+          requestOptions: { prompt: message, options: { ...options } },
+        });
+        scrollToBottom();
+        newScrollToBottom();
+      } catch (err) {}
+    };
+
+    es.onerror = (error) => {
+      console.log('链接失败', error);
+      loading.value = false;
+      es.close();
+    };
   } catch (error) {
-    console.log('err', error);
     const errorMessage = error?.message ?? '好像出了什么错误，请稍后重试';
 
     if (error.message === 'canceled') {
@@ -185,6 +272,8 @@ async function onConversation() {
         loading: false,
       });
       scrollToBottom();
+      newScrollToBottom();
+
       return;
     }
 
@@ -209,8 +298,7 @@ async function onConversation() {
       requestOptions: { prompt: message, options: { ...options } },
     });
     scrollToBottom();
-  } finally {
-    loading.value = false;
+    newScrollToBottom();
   }
 }
 
@@ -240,17 +328,40 @@ async function onRegenerate(index) {
   });
 
   try {
-    const res = await api.postMessageApi({ content: message, conversation_id: Number(id) });
-    console.log('res', res.assistant_content);
-    updateChat(Number(id), index, {
-      dateTime: new Date().toLocaleString(),
-      text: res.assistant_content ?? '',
-      inversion: false,
-      error: false,
-      loading: false,
-      conversationOptions: { conversationId: id, parentMessageId: res.id },
-      requestOptions: { prompt: message, ...options },
+    const url = `https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`;
+    const token = getToken();
+    let es = new EventSourcePolyfill(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        withCredentials: true,
+      },
     });
+
+    es.onopen = (event) => {
+      console.log('链接成功', event);
+    };
+
+    es.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      try {
+        updateChat(Number(id), index, {
+          dateTime: new Date().toLocaleString(),
+          text: data.content ?? '',
+          inversion: false,
+          error: false,
+          loading: false,
+          conversationOptions: { conversationId: id, parentMessageId: res.id },
+          requestOptions: { prompt: message, ...options },
+        });
+        newScrollToBottom();
+      } catch (err) {}
+    };
+
+    es.onerror = (error) => {
+      console.log('链接失败', error);
+      es.close();
+    };
   } catch (error) {
     if (error.message === 'canceled') {
       updateChatSome(Number(id), index, {
@@ -270,6 +381,7 @@ async function onRegenerate(index) {
       conversationOptions: null,
       requestOptions: { prompt: message, ...options },
     });
+    newScrollToBottom();
   } finally {
     loading.value = false;
   }
@@ -289,20 +401,20 @@ function handleDelete(index) {
   });
 }
 
-function handleClear() {
-  if (loading.value) return;
+// function handleClear() {
+//   if (loading.value) return;
 
-  console.log('dddddddddd');
-  dialog.warning({
-    title: '清空会话',
-    content: '是否清空会话?',
-    positiveText: '确认',
-    negativeText: '取消',
-    onPositiveClick: () => {
-      chatStore.clearChatByUuid(Number(id));
-    },
-  });
-}
+//   console.log('dddddddddd');
+//   dialog.warning({
+//     title: '清空会话',
+//     content: '是否清空会话?',
+//     positiveText: '确认',
+//     negativeText: '取消',
+//     onPositiveClick: () => {
+//       chatStore.clearChatByUuid(Number(id));
+//     },
+//   });
+// }
 
 function handleEnter(event) {
   if (!isMobile.value) {
@@ -313,12 +425,12 @@ function handleEnter(event) {
   }
 }
 
-function handleStop() {
-  if (loading.value) {
-    controller.abort();
-    loading.value = false;
-  }
-}
+// function handleStop() {
+//   if (loading.value) {
+//     controller.abort();
+//     loading.value = false;
+//   }
+// }
 
 const placeholder = computed(() => {
   if (isMobile.value) return '来说点什么...';
@@ -337,9 +449,16 @@ const footerClass = computed(() => {
 
 onMounted(() => {
   scrollToBottom();
+  newScrollToBottom();
 });
 
 onUnmounted(() => {
   if (loading.value) controller.abort();
 });
 </script>
+
+<style lang="css" scoped>
+.myScroll {
+  overflow-y: auto !important;
+}
+</style>

@@ -54,7 +54,7 @@
     <div class="px-6 pt-6 lg:px-8">
       <nav class="flex items-center justify-between" aria-label="Global">
         <div class="flex lg:flex-1">
-          <a href="#" class="-m-1.5 p-1.5">
+          <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5">
             <span class="sr-only">Your Company</span>
             <IconLogo class="text-xl text-teal-400" />
           </a>
@@ -79,13 +79,23 @@
           >
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-          <RouterLink to="Login" class="text-sm font-semibold leading-6 text-gray-900">登录 </RouterLink>
+          <RouterLink v-if="userInfo.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
+            <div class="flex items-center justify-center">
+              <div>
+                <img class="inline-block w-8 h-8 rounded-full" src="@/assets/avatar.jpg" alt="" />
+              </div>
+
+              <p class="ml-2 text-lg">{{ userInfo.username }}</p>
+            </div>
+          </RouterLink>
+
+          <RouterLink v-else to="Login" class="text-sm font-semibold leading-6 text-gray-900"> 登录 </RouterLink>
         </div>
       </nav>
       <Dialog as="div" :open="mobileMenuOpen" @close="mobileMenuOpen = false">
         <DialogPanel class="fixed inset-0 z-10 px-6 py-6 overflow-y-auto bg-white lg:hidden">
           <div class="flex items-center justify-between">
-            <a href="#" class="-m-1.5 p-1.5">
+            <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5">
               <span class="sr-only">Your Company</span>
               <IconLogo class="text-xl text-teal-400" />
             </a>
@@ -106,7 +116,17 @@
                 >
               </div>
               <div class="py-6">
+                <RouterLink v-if="userInfo.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
+                  <div class="flex items-center justify-start">
+                    <div>
+                      <img class="inline-block w-8 h-8 rounded-full" src="@/assets/avatar.jpg" alt="" />
+                    </div>
+
+                    <p class="ml-2 text-lg">{{ userInfo.username }}</p>
+                  </div>
+                </RouterLink>
                 <RouterLink
+                  v-else
                   to="Login"
                   class="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-6 text-gray-900 hover:bg-gray-400/10"
                   >登录
@@ -132,11 +152,11 @@
           <a href="https://chat.openai.com" class="text-teal-400 hover:text-teal-300">ChatGPT</a>
         </p>
         <div class="flex items-center mt-10 gap-x-6">
-          <a
-            href="#"
+          <div
             class="rounded-md bg-teal-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            ><router-link to="/saas">{{ start }}</router-link></a
           >
+            <router-link to="/chat">{{ start }}</router-link>
+          </div>
         </div>
       </div>
 
@@ -153,6 +173,13 @@ import { Dialog, DialogPanel } from '@headlessui/vue';
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import HeroSvg from '@/assets/svg/hero.svg';
 import IconLogo from '@/components/icons/IconLogo.vue';
+import { useUserStore } from '@/store';
+
+const userStore = useUserStore();
+
+const userInfo = computed(() => userStore.userInfo);
+console.log('userInfo');
+console.log(userInfo);
 
 const navigation = [
   // { name: 'Product', href: '#' },

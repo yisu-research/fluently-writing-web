@@ -3,7 +3,6 @@ import { setupRouterGuard } from './guard';
 import { basicRoutes, EMPTY_ROUTE } from './routes';
 import { getToken, isNullOrWhitespace } from '@/utils';
 import { useUserStore } from '@/store';
-import { useChatStore } from '../store/modules/chat';
 
 const isHash = import.meta.env.VITE_USE_HASH === 'true';
 
@@ -44,9 +43,9 @@ export async function addDynamicRoutes() {
   try {
     const userStore = useUserStore();
     // 获取用户信息
-    !userStore.userId && (await userStore.getUserInfo());
-    const charStore = useChatStore();
-    await charStore.getChatList();
+    await userStore.getUserInfo();
+    // const charStore = useChatStore();
+    // await charStore.getChatList();
     router.addRoute(EMPTY_ROUTE);
   } catch (error) {
     console.error(error);

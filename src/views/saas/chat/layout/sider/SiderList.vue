@@ -3,6 +3,7 @@ import { useAppStore, useChatStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import api from '@/views/saas/api';
 import { onMounted } from 'vue';
+import { router } from '@/router';
 
 const appStore = useAppStore();
 const chatStore = useChatStore();
@@ -14,6 +15,7 @@ const dataSources = computed(() => chatStore.history);
 
 // 处理选择对话
 async function handleSelect({ id }) {
+  console.log(id);
   if (isActive(id)) return;
 
   if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
@@ -28,6 +30,7 @@ onMounted(async () => {
     await chatStore.setActive(dataSources.value[0].id);
     if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
   }
+  await router.push({ path: `/chat/${chatStore.active}` });
 });
 
 async function handleEdit({ id, name }, isEdit, event) {
@@ -69,7 +72,7 @@ function isActive(id) {
       </template>
       <template v-else>
         <div v-for="(item, index) of dataSources" :key="index">
-          <a
+          <div
             class="relative z-50 flex items-center gap-3 px-3 py-3 break-all border rounded-md cursor-pointer hover:text-teal-500 hover:border-teal-500 hover:scale-98 hover:shadow-md group"
             :class="isActive(item.id) && ['border-teal-500', 'bg-teal-50/[0.4]', 'text-teal-500', 'pr-14']"
             @click="handleSelect(item)"
@@ -106,7 +109,7 @@ function isActive(id) {
                 </n-popconfirm>
               </template>
             </div>
-          </a>
+          </div>
         </div>
       </template>
     </div>

@@ -4,14 +4,14 @@
       <div class="grid grid-cols-1 gap-y-16 gap-x-8 sm:gap-y-20 lg:grid-cols-7 lg:items-start">
         <div class="col-span-3 px-6 lg:px-0 lg:pt-4 lg:pr-4">
           <div class="max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
-            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助力备考</p>
+            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-400 sm:text-4xl">助力备考</p>
             <p class="mt-6 text-lg leading-8 text-gray-400">帮您高效准备各类学科考试</p>
             <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-white">
                   <component
                     :is="feature.icon"
-                    class="absolute w-5 h-5 text-teal-600 top-1 left-1"
+                    class="absolute w-5 h-5 text-teal-400 top-1 left-1"
                     aria-hidden="true"
                   />
                   {{ feature.name }}
@@ -62,22 +62,22 @@
 
 <script setup>
 import { NewspaperIcon, AcademicCapIcon, LanguageIcon } from '@heroicons/vue/20/solid';
-import EnglishWritingImg from '@/assets/images/english_writing.png';
+import EnglishWritingImg from '@/assets/images/exam.png';
 
 const features = [
   {
-    name: '雅思作文批改，给分数还给建议',
-    description: '',
+    name: '雅思作文批改，',
+    description: '给分数还给建议',
     icon: LanguageIcon,
   },
   {
-    name: '类似习题生成，错题就多多联系',
-    description: '',
+    name: '类似习题生成，',
+    description: '错题就多多联系',
     icon: NewspaperIcon,
   },
   {
-    name: '疑难答案详解，帮助你彻底搞懂',
-    description: '',
+    name: '疑难答案详解，',
+    description: '帮助你彻底搞懂',
     icon: AcademicCapIcon,
   },
 ];

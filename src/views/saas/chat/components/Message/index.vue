@@ -22,7 +22,7 @@ const textRef = ref();
 
 const options = [
   {
-    label: '复制代码',
+    label: '复制',
     key: 'copyText',
     icon: iconRender({ icon: 'ri:file-copy-2-line' }),
   },
@@ -43,9 +43,9 @@ function handleSelect(key) {
   }
 }
 
-function handleRegenerate() {
-  emit('regenerate');
-}
+// function handleRegenerate() {
+//   emit('regenerate');
+// }
 </script>
 
 <template>
@@ -64,15 +64,15 @@ function handleRegenerate() {
       <div class="flex items-end gap-1 mt-2" :class="[inversion ? 'flex-row-reverse' : 'flex-row']">
         <TextComponent ref="textRef" :inversion="inversion" :error="error" :text="text" :loading="loading" />
         <div class="flex flex-col">
-          <button
+          <!-- <button
             v-if="!inversion"
-            class="mb-2 transition text-neutral-300 hover:text-neutral-800"
+            class="mb-2 text-gray-300 transition bg-transparent hover:text-neutral-800"
             @click="handleRegenerate"
           >
             <SvgIcon icon="ri:restart-line" />
-          </button>
+          </button> -->
           <NDropdown :placement="!inversion ? 'right' : 'left'" :options="options" @select="handleSelect">
-            <button class="transition text-neutral-300 hover:text-neutral-800">
+            <button class="transition bg-transparent text-neutral-300 hover:text-neutral-800">
               <SvgIcon icon="ri:more-2-fill" />
             </button>
           </NDropdown>

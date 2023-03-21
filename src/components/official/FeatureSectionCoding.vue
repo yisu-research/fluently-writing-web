@@ -13,14 +13,14 @@
         </div>
         <div class="col-span-4 px-6 lg:px-0 lg:pt-4 lg:pl-4 lg:col-start-5">
           <div class="flex flex-col items-end justify-end max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
-            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助写代码</p>
+            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-400 sm:text-4xl">助写代码</p>
             <p class="mt-6 text-lg leading-8 text-gray-600">人人都是程序员，给出需求，立刻帮您码好代码</p>
             <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-gray900">
                   <component
                     :is="feature.icon"
-                    class="absolute w-5 h-5 text-teal-600 top-1 left-1"
+                    class="absolute w-5 h-5 text-teal-400 top-1 left-1"
                     aria-hidden="true"
                   />
                   {{ feature.name }}

@@ -34,25 +34,25 @@
               <dt class="flex-none">
                 <ChatBubbleBottomCenterTextIcon class="w-6 text-gray-400 h-7" aria-hidden="true" />
               </dt>
-              <dd>- 用得不爽来反馈</dd>
+              <dd>用得不爽来反馈</dd>
             </div>
             <div class="flex gap-x-4">
               <dt class="flex-none">
                 <FireIcon class="w-6 text-gray-400 h-7" aria-hidden="true" />
               </dt>
-              <dd><a class="hover:text-gray-900">-感觉好用来分享</a></dd>
+              <dd><a class="hover:text-gray-900">感觉好用来分享</a></dd>
             </div>
             <div class="flex gap-x-4">
               <dt class="flex-none">
                 <ChatBubbleLeftRightIcon class="w-6 text-gray-400 h-7" aria-hidden="true" />
               </dt>
-              <dd><a class="hover:text-gray-900">- 交个朋友来聊天</a></dd>
+              <dd><a class="hover:text-gray-900">交个朋友来聊天</a></dd>
             </div>
           </dl>
         </div>
       </div>
-      <div class="px-6 pt-20 pb-24 w-60 sm:pb-32 lg:py-48 lg:px-8 h-60">
-        <img :src="QrCodeImg" alt="Product screenshot" class="bg-gray-300 sm:rounded-3xl ring-13 ring-white/10" />
+      <div class="px-6 pt-20 pb-24 w-72 sm:pb-32 lg:py-48 lg:px-8 h-72">
+        <img :src="QrCodeImg" alt="Product screenshot" class="p-4 sm:rounded-3xl ring-12 ring-teal-400" />
       </div>
     </div>
   </div>

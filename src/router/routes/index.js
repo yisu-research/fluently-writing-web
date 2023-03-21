@@ -29,9 +29,9 @@ export const basicRoutes = [
   },
   {
     name: 'Chat',
-    path: '/saas',
+    path: '/',
     component: Layout,
-    redirect: '/saas/chat',
+    redirect: '/chat',
     children: [
       {
         name: 'Chat',
@@ -56,9 +56,9 @@ export const basicRoutes = [
 
   {
     name: 'userCenter',
-    path: '/saas',
+    path: '/',
     component: Layout,
-    redirect: 'saas/user-center',
+    redirect: '/user-center',
     children: [
       {
         name: 'UserCenter',
@@ -75,17 +75,32 @@ export const basicRoutes = [
 
   {
     name: 'Cost',
-    path: '/saas',
+    path: '/cost',
     component: Layout,
-    redirect: '/saas/cost',
+    redirect: '/cost/tokens',
+    meta: {
+      title: '费用中心',
+      icon: 'uil:receipt-alt',
+      order: 0,
+    },
     children: [
       {
-        name: 'Cost',
-        path: 'cost',
-        component: () => import('@/views/saas/cost/index.vue'),
+        name: 'Tokens',
+        path: 'tokens',
+        component: () => import('@/views/saas/cost/tokens/index.vue'),
         meta: {
-          title: '费用中心',
-          icon: 'uil:receipt-alt',
+          title: '套餐余额',
+          icon: 'uil:shop',
+          order: 0,
+        },
+      },
+      {
+        name: 'Record',
+        path: 'record',
+        component: () => import('@/views/saas/cost/record/index.vue'),
+        meta: {
+          title: '消费记录',
+          icon: 'uil:notes',
           order: 0,
         },
       },
@@ -94,9 +109,9 @@ export const basicRoutes = [
 
   {
     name: '帮助中心',
-    path: '/saas',
+    path: '/',
     component: Layout,
-    redirect: '/saas/help',
+    redirect: '/help',
     children: [
       {
         name: 'Help',

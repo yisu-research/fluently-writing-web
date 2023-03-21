@@ -16,13 +16,15 @@
 
           <!-- 登录表单 -->
           <div class="flex flex-col items-center justify-between sm:px-6 sm:w-96 flex-2">
-            <div class="flex items-center justify-center my-4">
-              <img class="w-auto h-12 mr-4" :src="LogoSvg" alt="Your Company" />
-              <h2 class="text-3xl font-bold tracking-tight text-center text-gray-900">一粟创作助手</h2>
-            </div>
-            <div class="w-full mt-12">
-              <n-tabs default-value="signin-username" size="large" justify-content="space-evenly">
-                <n-tab-pane name="signin-username" tab="用户名登录">
+            <RouterLink to="/" class="text-sm font-semibold leading-6 text-gray-900">
+              <div class="flex items-center justify-center my-4">
+                <img class="w-auto h-12 mr-4" :src="LogoSvg" alt="Your Company" />
+                <h2 class="text-3xl font-bold tracking-tight text-center text-gray-900">一粟创作助手</h2>
+              </div>
+            </RouterLink>
+            <div class="w-full mt-4">
+              <n-tabs default-value="signin-username" size="large" justify-content="center">
+                <n-tab-pane name="signin-username" tab="登录">
                   <n-form ref="formUserRef" :model="formUser" :rules="rulesForUser">
                     <n-form-item-row label="用户名" path="username">
                       <n-input v-model:value="formUser.username" placeholder="请输入用户名" />
@@ -31,9 +33,11 @@
                       <n-input v-model:value="formUser.password" placeholder="请输入密码" type="password" />
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong @click.prevent="onSignupForUser"> 登录 </n-button>
+                  <n-button class="mt-4" type="primary" block secondary strong @click.prevent="onSignupForUser">
+                    登录
+                  </n-button>
                 </n-tab-pane>
-                <n-tab-pane name="signin-phone" tab="手机号登录">
+                <!-- <n-tab-pane name="signin-phone" tab="手机号登录">
                   <n-form ref="formPhoneRef" :model="formPhone" :rules="rulesForPhone">
                     <n-form-item-row label="手机号" path="phone_number">
                       <n-input v-model:value="formPhone.phone_number" placeholder="请输入手机号" />
@@ -46,7 +50,7 @@
                     </n-form-item-row>
                   </n-form>
                   <n-button type="primary" block secondary strong @click.prevent="onSignupForPhone"> 登录 </n-button>
-                </n-tab-pane>
+                </n-tab-pane> -->
               </n-tabs>
               <div class="flex items-center justify-end">
                 <n-button text class="my-4 sm:mb-0"><router-link to="/signup">没有账号？去注册</router-link> </n-button>
@@ -71,7 +75,7 @@
                 version="1.1"
                 fill="#ffffff"
                 viewBox="0 0 300 300"
-                class="mr-2 text-indigo-400 text-primary-color"
+                class="mr-2 text-teal-500 text-primary-color"
               >
                 <metadata id="metadata26">
                   <rdf:RDF
@@ -137,7 +141,6 @@
 <script setup>
 import LogoSvg from '@/assets/svg/logo.svg';
 import NatureSvg from '@/assets/svg/nature.svg';
-import { useIntervalFn } from '@vueuse/core';
 import { setToken } from '@/utils';
 import api from './api';
 import { useMessage } from 'naive-ui';
@@ -145,15 +148,7 @@ import { ref } from 'vue';
 
 const router = useRouter();
 
-/// 定时器
-const timer = ref(0);
-
-/// 禁用按钮
-const disabled = ref(false);
-
 const formUserRef = ref(null);
-
-const formPhoneRef = ref(null);
 
 const message = useMessage();
 
@@ -161,12 +156,6 @@ const formUser = ref({
   username: '',
   password: '',
   login_type: 'username',
-});
-
-const formPhone = ref({
-  phone_number: '',
-  code: '',
-  login_type: 'phone_number',
 });
 
 const rulesForUser = {
@@ -182,19 +171,6 @@ const rulesForUser = {
   },
 };
 
-const rulesForPhone = {
-  phone_number: {
-    required: true,
-    message: '请输入手机号',
-    trigger: 'blur',
-  },
-  code: {
-    required: true,
-    message: '请输入验证码',
-    trigger: ['input'],
-  },
-};
-
 async function onSignupForUser() {
   formUserRef.value?.validate(async (errors) => {
     if (!errors) {
@@ -203,28 +179,7 @@ async function onSignupForUser() {
         console.log(res);
 
         setToken(res.token);
-        router.push('/saas');
-        $message.success('登录成功');
-      } catch (error) {
-        console.log(error);
-        $message.error(error);
-      }
-    } else {
-      console.log(errors);
-      message.error('无效的数据');
-    }
-  });
-}
-
-async function onSignupForPhone() {
-  formPhoneRef.value?.validate(async (errors) => {
-    if (!errors) {
-      try {
-        let res = await api.loginApi(formPhone.value);
-        console.log(res);
-
-        setToken(res.token);
-        router.push('/saas');
+        router.push('/chat');
         $message.success('登录成功');
       } catch (error) {
         console.log(error.error.error);
@@ -236,50 +191,4 @@ async function onSignupForPhone() {
     }
   });
 }
-
-const { pause, resume } = useIntervalFn(
-  () => {
-    /// 每次定时任务 控制时间递减
-    if (timer.value <= 0) {
-      // 恢复按钮
-      disabled.value = false;
-      // 停止递减： 停止定时器
-      pause();
-    } else {
-      timer.value -= 1;
-    }
-  },
-  1000,
-  {
-    // 首次是否自动启动定时任务：true（默认值，自动启动），false，不需要自动启动
-    immediate: false,
-    // 是否延时执行定时任务（false(默认值)，不延时；true表示延时）
-    immediateCallback: false,
-  },
-);
-
-const sendCode = async () => {
-  console.log({ phone_number: formPhone.value.phone_number });
-  if (formPhone.value.phone_number === '') {
-    message.error('无效的手机号');
-    return;
-  }
-  try {
-    await api.sendCodeApi({ phone_number: formPhone.value.phone_number });
-    message.success('发送成功！');
-    // 开启定时效果
-    if (timer.value === 0) {
-      // 禁用按钮
-      disabled.value = true;
-      timer.value = 60;
-      // 重启定时器
-      resume();
-    } else {
-      return;
-    }
-  } catch (error) {
-    console.log(error);
-    message.error('验证码发送失败');
-  }
-};
 </script>

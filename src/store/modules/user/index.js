@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import { resetRouter } from '@/router';
-import { useTagsStore, usePermissionStore } from '@/store';
 import { removeToken, toLogin } from '@/utils';
 import api from '@/views/saas/api';
+import { clearLocalState } from '@/store/modules/chat/helper';
 
 export const useUserStore = defineStore('user', {
   state() {
     return {
-      userInfo: { username: '一粟创作助手', phone_number: '激发灵感，提高效率' },
+      userInfo: { username: '一粟创作助手', phone_number: '激发灵感，提高效率', balance: 0, id: 0, isLogin: false },
     };
   },
   getters: {
@@ -17,42 +17,35 @@ export const useUserStore = defineStore('user', {
     name() {
       return this.userInfo?.username;
     },
-    phone() {
-      return this.userInfo?.phone_number;
-    },
     avatar() {
       return this.userInfo?.avatar;
     },
-    maxTokens() {
-      return this.userInfo?.max_tokens;
+    balance() {
+      return this.userInfo?.balance;
     },
-    role() {
-      return this.userInfo?.role || [];
+    isLogin() {
+      return this.userInfo?.isLogin;
     },
   },
   actions: {
     async getUserInfo() {
       try {
         const res = await api.getUserInfoApi();
-        console.log('getUserInfo');
-        console.log(res);
-        const { id, username, phone_number, max_tokens } = res;
-        this.userInfo = { id, username, phone_number, max_tokens };
+        const { id, username, balance } = res;
+        this.userInfo = { id, username, balance, isLogin: true };
         return Promise.resolve(res.data);
       } catch (error) {
         return Promise.reject(error);
       }
     },
     async logout() {
-      const { resetTags } = useTagsStore();
-      const { resetPermission } = usePermissionStore();
       removeToken();
-      resetTags();
-      resetPermission();
       resetRouter();
+      clearLocalState();
       this.$reset();
       toLogin();
     },
+
     setUserInfo(userInfo = {}) {
       this.userInfo = { ...this.userInfo, ...userInfo };
     },

@@ -13,14 +13,14 @@
         </div>
         <div class="col-span-4 px-6 lg:px-0 lg:pt-4 lg:pl-4 lg:col-start-5">
           <div class="flex flex-col items-end justify-end max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
-            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助力生活</p>
+            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-400 sm:text-4xl">助力生活</p>
             <p class="mt-6 text-lg leading-8 text-gray-600">生活中的各种琐事都可以来试试</p>
             <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-gray900">
                   <component
                     :is="feature.icon"
-                    class="absolute w-5 h-5 text-teal-600 top-1 left-1"
+                    class="absolute w-5 h-5 text-teal-400 top-1 left-1"
                     aria-hidden="true"
                   />
                   {{ feature.name }}
@@ -62,22 +62,22 @@
 
 <script setup>
 import { TableCellsIcon, SparklesIcon, DevicePhoneMobileIcon } from '@heroicons/vue/20/solid';
-import CodingImage from '@/assets/images/coding.png';
+import CodingImage from '@/assets/images/life.png';
 
 const features = [
   {
-    name: '您的心理医生，在线给你正能量',
-    description: '',
+    name: '您的心理医生，',
+    description: '在线给你正能量',
     icon: TableCellsIcon,
   },
   {
-    name: '您的资深导游，吃喝玩乐都很懂',
-    description: '',
+    name: '您的资深导游，',
+    description: '吃喝玩乐都很懂',
     icon: SparklesIcon,
   },
   {
-    name: '您的穿搭顾问，时尚搭配不错过',
-    description: '',
+    name: '您的穿搭顾问，',
+    description: '时尚搭配不错过',
     icon: DevicePhoneMobileIcon,
   },
 ];

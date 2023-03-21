@@ -48,7 +48,7 @@ const text = computed(() => {
 });
 
 function highlightBlock(str, lang) {
-  return `<pre class="code-block-wrapper"><div class="code-block-header"><span class="code-block-header__lang">${lang}</span><span class="code-block-header__copy">复制代码</span></div><code class="hljs code-block-body ${lang}">${str}</code></pre>`;
+  return `<pre class="code-block-wrapper"><div class="code-block-header"><span class="code-block-header__lang">${lang}</span><span class="code-block-header__copy">复制</span></div><code class="hljs code-block-body ${lang}">${str}</code></pre>`;
 }
 
 defineExpose({ textRef });
@@ -70,5 +70,69 @@ defineExpose({ textRef });
 </template>
 
 <style lang="less">
-@import url(./style.less);
+.markdown-body {
+  background-color: transparent;
+  font-size: 14px;
+
+  p {
+    white-space: pre-wrap;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  pre code,
+  pre tt {
+    line-height: 1.65;
+  }
+
+  .highlight pre,
+  pre {
+    background-color: #fff;
+  }
+
+  code.hljs {
+    padding: 0;
+  }
+
+  .code-block {
+    &-wrapper {
+      position: relative;
+      padding-top: 24px;
+    }
+
+    &-header {
+      position: absolute;
+      top: 5px;
+      right: 0;
+      width: 100%;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      color: #b3b3b3;
+
+      &__copy {
+        cursor: pointer;
+        margin-left: 0.5rem;
+        user-select: none;
+        &:hover {
+          color: #65a665;
+        }
+      }
+    }
+  }
+}
+
+html.dark {
+  .highlight pre,
+  pre {
+    background-color: #282c34;
+  }
+}
 </style>

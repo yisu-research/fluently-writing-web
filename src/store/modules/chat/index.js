@@ -26,13 +26,23 @@ export const useChatStore = defineStore('chat-store', {
   actions: {
     // 获取服务端对话列表
     async getChatList() {
+      let chatList = [];
+      for (const item of this.chat) {
+        chatList.push(item.id);
+      }
       try {
-        const res = await api.getChatListApi();
+        const res = await api.getChatListApi({ state: 'active', page: 1, limit: 10 });
+        console.log(res);
+        const { conversations } = res;
         this.history = [];
-        for (const item of res) {
+        // if (conversations === 0) return Promise.resolve(res);
+        for (const item of conversations) {
           const { id, name } = item;
           this.history.unshift({ id, name, isEdit: false });
+          if (chatList.includes(id)) continue;
+          this.chat.unshift({ id, data: [] });
         }
+        this.recordState();
         return Promise.resolve(res);
       } catch (error) {
         return Promise.reject(error);
@@ -208,7 +218,7 @@ export const useChatStore = defineStore('chat-store', {
       if (!id) {
         await router.push({ name: 'Chat' });
       } else {
-        await router.push({ path: `/saas/chat/${id}` });
+        await router.push({ path: `/chat/${id}` });
       }
     },
 

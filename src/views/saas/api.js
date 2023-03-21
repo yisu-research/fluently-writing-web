@@ -14,10 +14,10 @@ export default {
   postChatApi: (data) => request.post('/api/conversations', data, { noNeedTip: true }),
 
   // 获取对话列表
-  getChatListApi: (data) => request.get('/api/conversations', data, { noNeedTip: true }),
+  getChatListApi: (data) => request.get('/api/conversations', { noNeedTip: true, params: data }),
 
   // 删除对话
-  deleteChatApi: (id) => request.delete(`/api/conversations/${id}`, { noNeedTip: true }),
+  deleteChatApi: (id) => request.put(`/api/conversations/${id}/inactive`, { noNeedTip: true }),
 
   // 更新对话
   updateChatApi: (id, data) => request.put(`/api/conversations/${id}`, data, { noNeedTip: true }),
@@ -25,24 +25,27 @@ export default {
   // 发送消息
   postMessageApi: (data) => request.post('/api/messages', data, { noNeedTip: true }),
 
+  // 消息流
+  getMessageStreamApi: (data) => request.get('/api/messages/stream', { noNeedTip: true, data: data, params: data }),
+
   // 获取消息列表
   getMessageListApi: (data) => request.get('/api/messages', { noNeedTip: true, params: data, data: data }),
 
   // 用户详情
-  getUserInfoApi: () => request.get('/api/user', { noNeedTip: true, noNeedToken: false }),
+  getUserInfoApi: () => request.get('/api/users/current', { noNeedTip: true, noNeedToken: false }),
 
   // 产品列表
   getProductListApi: (data) => request.get('/api/products', data, { noNeedTip: true }),
 
   // 订单列表
-  getOrderListApi: (data) => request.get('/api/orders', data, { noNeedTip: true }),
+  getOrderListApi: (data) => request.get('/api/orders', { noNeedTip: true, params: data }),
 
   // 创建订单
   postOrderApi: (data) => request.post('/api/orders', data, { noNeedTip: true }),
 
   // 取消未支付订单
-  cancelOrderApi: (data) => request.delete('/api/orders/:id', data, { noNeedTip: true }),
+  cancelOrderApi: (id) => request.post(`/api/orders/${id}/cancel`, { noNeedTip: true }),
 
   // 订单详情
-  getOrderDetailApi: (data) => request.get('/api/orders/:id', data, { noNeedTip: true }),
+  getOrderDetailApi: (id) => request.get(`/api/orders/${id}`, { noNeedTip: true }),
 };

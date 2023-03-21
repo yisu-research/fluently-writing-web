@@ -19,3 +19,7 @@ export function getLocalState() {
 export function setLocalState(state) {
   lStorage.set(LOCAL_NAME, state);
 }
+
+export function clearLocalState() {
+  lStorage.remove(LOCAL_NAME);
+}

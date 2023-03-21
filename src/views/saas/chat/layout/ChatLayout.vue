@@ -3,13 +3,13 @@
   <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
     <div class="h-full overflow-hidden" :class="getMobileClass">
       <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
-        <Sider />
         <!-- <Header v-if="isMobile" /> -->
         <NLayoutContent class="h-full">
           <RouterView v-slot="{ Component, route }">
             <component :is="Component" :key="route.fullPath" />
           </RouterView>
         </NLayoutContent>
+        <Sider />
       </NLayout>
     </div>
   </div>

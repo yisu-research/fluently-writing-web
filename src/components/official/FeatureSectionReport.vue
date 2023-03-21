@@ -62,7 +62,7 @@
 
 <script setup>
 import { BookOpenIcon, DocumentTextIcon, ClipboardDocumentListIcon } from '@heroicons/vue/20/solid';
-import PracticeReportImage from '@/assets/images/practice_report.png';
+import PracticeReportImage from '@/assets/images/report.png';
 
 const features = [
   {

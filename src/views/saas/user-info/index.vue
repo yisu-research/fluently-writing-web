@@ -13,7 +13,6 @@
             <div class="pt-1 text-center spa1ce-y-4 md:p-8 md:text-left">
               <figcaption class="font-medium">
                 <div class="mb-2 text-teal-500">用户名：{{ userStore.name }}</div>
-                <div class="text-slate-700 dark:text-slate-500">手机号：{{ userStore.phone }}</div>
               </figcaption>
             </div>
           </figure>

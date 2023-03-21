@@ -14,27 +14,20 @@
             <img :src="WelcomeSvg" alt="Product screenshot" class="mx-10 w-80" />
           </div>
 
-          <!-- 登录表单 -->
+          <!-- 注册表单 -->
           <div class="flex flex-col items-center justify-between w-full sm:px-6 lg:w-1/2 flex-2">
-            <div class="flex items-center justify-center my-4">
-              <img class="w-auto h-12 mr-4" :src="LogoSvg" alt="Your Company" />
-              <h2 class="text-3xl font-bold tracking-tight text-center text-gray-900">一粟创作助手</h2>
-            </div>
+            <RouterLink to="/" class="text-sm font-semibold leading-6 text-gray-900">
+              <div class="flex items-center justify-center my-4">
+                <img class="w-auto h-12 mr-4" :src="LogoSvg" alt="Your Company" />
+                <h2 class="text-3xl font-bold tracking-tight text-center text-gray-900">一粟创作助手</h2>
+              </div>
+            </RouterLink>
             <div class="w-full mt-12">
-              <n-tabs default-value="signin-username" size="large" justify-content="start">
+              <n-tabs default-value="signin-username" size="large" justify-content="center">
                 <n-tab-pane name="signin-username" tab="注册">
                   <n-form ref="formRef" :model="formValue" :rules="rules">
                     <n-form-item-row label="用户名" path="username">
                       <n-input v-model:value="formValue.username" placeholder="请输入用户名" />
-                    </n-form-item-row>
-                    <n-form-item-row label="手机号" path="phone_number">
-                      <n-input v-model:value="formValue.phone_number" placeholder="请输入手机号" />
-                    </n-form-item-row>
-                    <n-form-item-row label="验证码" path="code">
-                      <n-input v-model:value="formValue.code" placeholder="请输入验证码" />
-                      <n-button strong secondary type="primary" class="ml-4" :disabled="disabled" @click="sendCode"
-                        >{{ timer === 0 ? '发送验证码' : `${timer}秒后重新发送` }}
-                      </n-button>
                     </n-form-item-row>
                     <n-form-item-row label="密码" path="password">
                       <n-input v-model:value="formValue.password" placeholder="请输入密码" type="password" />
@@ -66,7 +59,7 @@
                 version="1.1"
                 fill="#ffffff"
                 viewBox="0 0 300 300"
-                class="mr-2 text-indigo-400 text-primary-color"
+                class="mr-2 text-teal-500 text-primary-color"
               >
                 <metadata id="metadata26">
                   <rdf:RDF
@@ -133,18 +126,11 @@
 import LogoSvg from '@/assets/svg/logo.svg';
 import WelcomeSvg from '@/assets/svg/welcome.svg';
 import { setToken } from '@/utils';
-import { useIntervalFn } from '@vueuse/core';
 import api from './api';
 import { useMessage } from 'naive-ui';
 
 import { ref } from 'vue';
 const router = useRouter();
-
-/// 定时器
-const timer = ref(0);
-
-/// 禁用按钮
-const disabled = ref(false);
 
 const formRef = ref(null);
 
@@ -163,16 +149,6 @@ const rules = {
     message: '请输入姓名',
     trigger: 'blur',
   },
-  phone_number: {
-    required: true,
-    message: '请输入电话号码',
-    trigger: ['input'],
-  },
-  code: {
-    required: true,
-    message: '请输入验证码',
-    trigger: ['input'],
-  },
   password: {
     required: true,
     message: '请输入密码',
@@ -183,15 +159,13 @@ const rules = {
 async function onSignup() {
   formRef.value?.validate(async (errors) => {
     if (!errors) {
-      message.success('Valid');
-      console.log(formValue.value);
       try {
         let res = await api.signupApi(formValue.value);
         console.log(res);
         $message.success('注册成功');
-
+        $message.success('已免费获得三次体验机会');
         setToken(res.token);
-        router.push('/saas');
+        router.push('/');
       } catch (error) {
         console.log(error.error.error);
         $message.error(error.error.error);
@@ -202,51 +176,4 @@ async function onSignup() {
     }
   });
 }
-
-const { pause, resume } = useIntervalFn(
-  () => {
-    /// 每次定时任务 控制时间递减
-    if (timer.value <= 0) {
-      // 恢复按钮
-      disabled.value = false;
-      // 停止递减： 停止定时器
-      pause();
-    } else {
-      timer.value -= 1;
-    }
-  },
-  1000,
-  {
-    // 首次是否自动启动定时任务：true（默认值，自动启动），false，不需要自动启动
-    immediate: false,
-    // 是否延时执行定时任务（false(默认值)，不延时；true表示延时）
-    immediateCallback: false,
-  },
-);
-
-// 发送验证码
-const sendCode = async () => {
-  console.log({ phone_number: formValue.value.phone_number });
-  if (formValue.value.phone_number === '') {
-    message.error('无效的手机号');
-    return;
-  }
-  try {
-    await api.sendCodeApi({ phone_number: formValue.value.phone_number });
-    message.success('发送成功！');
-    // 开启定时效果
-    if (timer.value === 0) {
-      // 禁用按钮
-      disabled.value = true;
-      timer.value = 60;
-      // 重启定时器
-      resume();
-    } else {
-      return;
-    }
-  } catch (error) {
-    console.log(error);
-    message.error('验证码发送失败');
-  }
-};
 </script>

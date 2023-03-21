@@ -4,14 +4,14 @@
       <div class="grid grid-cols-1 gap-y-16 gap-x-8 sm:gap-y-20 lg:grid-cols-7 lg:items-start">
         <div class="col-span-3 px-6 lg:px-0 lg:pt-4 lg:pr-4">
           <div class="max-w-2xl mx-auto lg:mx-0 lg:max-w-lg">
-            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-600 sm:text-4xl">助写作业</p>
+            <p class="mt-2 text-3xl font-bold tracking-tight text-teal-400 sm:text-4xl">助写作业</p>
             <p class="mt-6 text-lg leading-8 text-gray-400">依托海量知识储备，帮助您快速完成各科作业</p>
             <dl class="max-w-xl mt-10 space-y-8 text-base leading-7 text-gray-400 lg:max-w-none">
               <div v-for="feature in features" :key="feature.name" class="relative pl-9">
                 <dt class="inline font-semibold text-white">
                   <component
                     :is="feature.icon"
-                    class="absolute w-5 h-5 text-teal-600 top-1 left-1"
+                    class="absolute w-5 h-5 text-teal-400 top-1 left-1"
                     aria-hidden="true"
                   />
                   {{ feature.name }}
