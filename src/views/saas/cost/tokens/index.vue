@@ -322,7 +322,8 @@ onMounted(async () => {
           isDiscount,
           mostPopular,
         };
-      });
+      })
+      .sort((a, b) => a.price - b.price);
   } catch (err) {
     console.error(err);
   }

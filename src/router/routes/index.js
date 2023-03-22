@@ -108,7 +108,7 @@ export const basicRoutes = [
   },
 
   {
-    name: '帮助中心',
+    name: '模版中心',
     path: '/',
     component: Layout,
     redirect: '/help',
@@ -118,7 +118,7 @@ export const basicRoutes = [
         path: 'help',
         component: () => import('@/views/saas/help/index.vue'),
         meta: {
-          title: '帮助中心',
+          title: '模版中心',
           icon: 'uil:comment-image',
           order: 0,
         },
