@@ -21,49 +21,45 @@
           <!-- 购买字符 -->
           <div class="sm:py-8">
             <div class="px-6 mx-auto max-w-7xl lg:px-8">
+              <!-- 购买套餐 -->
               <div class="max-w-4xl mx-auto text-center">
                 <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">购买套餐</p>
-                <div :class="['animate-pulse', 'text-teal-500', 'text-2xl font-bold leading-8 mt-4']">
-                  早期尝鲜价格!
-                </div>
+                <div class="animate-pulse text-teal-500 text-2xl font-bold leading-8 mt-4">早期尝鲜价格!</div>
               </div>
+
+              <!-- 套餐列表 -->
               <div
-                class="grid max-w-md grid-cols-1 mx-auto mt-10 gap-9 isolate md:max-w-2xl lg:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3"
+                class="grid max-w-md grid-cols-1 mx-auto mt-10 gap-9 isolate md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-4"
               >
                 <div
                   v-for="tier in state.products"
                   :key="tier.id"
                   :class="[
                     tier.mostPopular
-                      ? 'ring-4 ring-teal-400 bg-teal-50 hover:shadow-lg delay-100 duration-200 hover:scale-105'
+                      ? 'ring-4 ring-teal-400 hover:shadow-lg delay-100 duration-200 hover:scale-105'
                       : 'ring-1 ring-gray-200 hover:ring-2 hover:ring-teal-400 hover:shadow-lg delay-100 duration-200 hover:scale-105',
-                    'rounded-2xl p-8',
+                    'rounded-2xl p-4 lg:p-8',
                   ]"
                 >
                   <div class="flex items-center justify-between gap-x-4">
-                    <h3
-                      v-if="tier.isDiscount"
-                      :id="tier.id"
-                      :class="['text-teal-400', 'text-xl font-semibold leading-8']"
-                    >
+                    <h3 v-if="tier.isDiscount" :id="tier.id" class="text-teal-500 text-xl font-semibold leading-8">
                       {{ tier.isDiscount ? `${tier.description * 10} 折` : '' }}
                     </h3>
-                    <h3 v-else :id="tier.id" :class="['text-transparent', 'text-xl font-semibold leading-8']">
+                    <h3 v-else :id="tier.id" class="text-transparent text-xl font-semibold leading-8">
                       {{ `${tier.description * 10}折` }}
                     </h3>
                     <p
                       v-if="tier.isDiscount"
-                      class="rounded-full bg-teal-400/10 py-1 px-2.5 text-md font-semibold leading-5 text-teal-400"
+                      class="rounded-full bg-teal-500/10 py-1 px-2.5 text-md font-semibold leading-5 text-teal-500"
                     >
-                      优惠
+                      {{ tier.mostPopular ? '热门优惠' : '优惠' }}
                     </p>
                   </div>
                   <div class="flex items-center justify-center mt-8">
-                    <h3 :id="tier.id" :class="['text-gray-900', 'text-3xl font-semibold leading-8']">
+                    <h3 :id="tier.id" class="text-gray-900 text-3xl font-semibold leading-8">
                       {{ `${tier.callCount} 次` }}
                     </h3>
                   </div>
-
                   <div class="flex items-baseline justify-center mt-6 gap-x-1">
                     <div>
                       <span class="text-xl font-bold tracking-tight text-gray-900">￥</span>
@@ -80,12 +76,13 @@
                     :class="[
                       tier.mostPopular
                         ? 'bg-teal-400 text-white shadow-sm hover:bg-teal-500'
-                        : 'text-teal-400 ring-1 ring-inset ring-gray-200',
-                      'mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+                        : 'text-teal-500 ring-2 ring-inset ring-gray-200 hover:bg-gray-100',
+                      'mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer',
                     ]"
                     @click="handleOrder(tier.id)"
-                    >立即购买</a
                   >
+                    立即购买
+                  </a>
                   <n-modal
                     v-model:show="state.showModal"
                     class="custom-card"
@@ -149,6 +146,35 @@
                   </n-modal>
                 </div>
               </div>
+
+              <!-- 套餐说明 -->
+              <div class="mt-4 text-sm text-slate-600">
+                <p>
+                  <n-icon size="20">
+                    <icon-ic:baseline-attach-money />
+                  </n-icon>
+                  <span class="ml-1">支付满 500 元可联系</span>
+                  <n-popover trigger="hover">
+                    <template #trigger>
+                      <span class="underline">客服</span>
+                    </template>
+                    <img :src="QrCodeImg" alt="Contact Us" class="w-40 h-40" />
+                  </n-popover>
+                  <span>开具发票</span>
+                </p>
+                <p>
+                  <n-icon size="20">
+                    <icon-mdi:api />
+                  </n-icon>
+                  <span class="ml-1">我们提供大规模 API 调用服务，详情可咨询</span>
+                  <n-popover trigger="hover">
+                    <template #trigger>
+                      <span class="underline">客服</span>
+                    </template>
+                    <img :src="QrCodeImg" alt="Contact Us" class="w-40 h-40" />
+                  </n-popover>
+                </p>
+              </div>
             </div>
           </div>
         </NLayoutContent>
@@ -166,6 +192,7 @@ import { formatDateTime } from '@/utils';
 
 import api from '../../api';
 import { useQRCode } from '@vueuse/integrations/useQRCode';
+import QrCodeImg from '@/assets/images/qrcode.jpg';
 
 const state = reactive({
   products: [],
