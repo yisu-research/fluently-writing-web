@@ -65,14 +65,13 @@
           </a>
         </div>
         <div class="flex lg:hidden">
-          <button
-            type="button"
+          <div
             class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
             @click="mobileMenuOpen = true"
           >
             <span class="sr-only">Open main menu</span>
-            <Bars3Icon class="w-6 h-6" aria-hidden="true" />
-          </button>
+            <SvgIcon class="text-2xl" icon="uil:align" />
+          </div>
         </div>
         <div class="hidden lg:flex lg:gap-x-12">
           <a
@@ -100,14 +99,19 @@
       <Dialog as="div" :open="mobileMenuOpen" @close="mobileMenuOpen = false">
         <DialogPanel class="fixed inset-0 z-10 px-6 py-6 overflow-y-auto bg-white lg:hidden">
           <div class="flex items-center justify-between">
-            <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5">
+            <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5 flex justify-start items-center">
               <span class="sr-only">Your Company</span>
               <IconLogo class="text-xl text-teal-400" />
+              <span
+                class="ml-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-500"
+              >
+                一粟科研
+              </span>
             </a>
-            <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
+            <div class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
               <span class="sr-only">Close menu</span>
-              <XMarkIcon class="w-6 h-6" aria-hidden="true" />
-            </button>
+              <SvgIcon class="text-2xl" icon="uil:times" />
+            </div>
           </div>
           <div class="flow-root mt-6">
             <div class="-my-6 divide-y divide-gray-500/10">
@@ -158,7 +162,7 @@
         </p>
         <div class="flex items-center mt-10 gap-x-6">
           <div
-            class="rounded-md bg-teal-400 px-4 py-3 text-lg tracking-wider font-semibold text-white shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-lg font-semibold tracking-wider text-white bg-teal-400 rounded-md shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <router-link to="/chat">{{ start }}</router-link>
           </div>
@@ -175,7 +179,6 @@
 <script setup>
 import { ref } from 'vue';
 import { Dialog, DialogPanel } from '@headlessui/vue';
-import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import HeroSvg from '@/assets/svg/hero.svg';
 import IconLogo from '@/components/icons/IconLogo.vue';
 import { useUserStore } from '@/store';

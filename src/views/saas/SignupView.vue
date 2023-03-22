@@ -127,12 +127,15 @@ import LogoSvg from '@/assets/svg/logo.svg';
 import WelcomeSvg from '@/assets/svg/welcome.svg';
 import { setToken } from '@/utils';
 import api from './api';
+import { useRoute } from 'vue-router';
 import { useMessage } from 'naive-ui';
 
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 const router = useRouter();
 
 const formRef = ref(null);
+
+const route = useRoute();
 
 const message = useMessage();
 
@@ -141,6 +144,7 @@ const formValue = ref({
   phone_number: '',
   code: '',
   password: '',
+  invite_code: '',
 });
 
 const rules = {
@@ -155,6 +159,14 @@ const rules = {
     trigger: ['input'],
   },
 };
+
+onMounted(() => {
+  console.log('mounted');
+  console.log(route.path);
+  console.log(route.query);
+  formValue.value.invite_code = route.query.invite_code ?? '';
+  console.log(formValue.value);
+});
 
 async function onSignup() {
   formRef.value?.validate(async (errors) => {

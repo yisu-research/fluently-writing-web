@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col w-full h-full">
-    <main class="flex-1 overflow-hidden">
+    <main class="flex-1 overflow-hidden" :class="isMobile ? 'mt-16' : ''">
       <!-- <n-scrollbar id="newScrollRef" ref="newScrollRef" class="h-full p-4 overflow-hidden overflow-y-auto"> -->
       <div id="scrollRef" ref="scrollRef" class="'p-4 m-2 h-full overflow-hidden myScroll">
         <div class="w-full max-w-screen-xl m-auto">
@@ -137,23 +137,25 @@ onMounted(async () => {
     const index = chatStore.chat.findIndex((item) => item.id === Number(id));
     chatStore.chat[index].data = [];
     for (let i = 0; i < res.length; i++) {
-      // 添加聊天记录
-      addChat(Number(id), {
-        dateTime: formatDateTime(res[i].created_at),
-        text: res[i].user_content,
-        inversion: true,
-        error: false,
-        conversationOptions: null,
-        requestOptions: { options: { prompt: res[i].user_content } },
-      });
-      addChat(Number(id), {
-        dateTime: formatDateTime(res[i].created_at),
-        text: res[i].assistant_content,
-        inversion: false,
-        error: false,
-        conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
-        requestOptions: { options: { prompt: res[i].user_content } },
-      });
+      if (res[i] !== null) {
+        // 添加聊天记录
+        addChat(Number(id), {
+          dateTime: formatDateTime(res[i].created_at),
+          text: res[i].user_content,
+          inversion: true,
+          error: false,
+          conversationOptions: null,
+          requestOptions: { options: { prompt: res[i].user_content } },
+        });
+        addChat(Number(id), {
+          dateTime: formatDateTime(res[i].created_at),
+          text: res[i].assistant_content,
+          inversion: false,
+          error: false,
+          conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
+          requestOptions: { options: { prompt: res[i].user_content } },
+        });
+      }
     }
     await userStore.getUserInfo();
     count.value = userInfo.value.balance;
@@ -223,7 +225,16 @@ async function onConversation() {
     requestOptions: { prompt: message, options: { ...options } },
   });
   scrollToBottom();
-  newScrollToBottom();
+  updateChat(Number(id), dataSources.value.length - 1, {
+    dateTime: new Date().toLocaleString(),
+    text: '回答正在飞奔而来...\n\n 三十秒后如无响应，请重新发送',
+    inversion: false,
+    error: false,
+    loading: false,
+    conversationOptions: { conversationId: id, parentMessageId: id },
+    requestOptions: { prompt: message, options: { ...options } },
+  });
+  scrollToBottom();
 
   try {
     const url = `https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`;

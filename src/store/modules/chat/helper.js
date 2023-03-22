@@ -6,9 +6,7 @@ import { lStorage } from '@/utils/storage';
 const LOCAL_NAME = 'chatStorage';
 
 export function defaultState() {
-  const name = 'New Chat';
-  const id = 1;
-  return { active: id, history: [{ id, name: name, isEdit: false }], chat: [{ id, data: [] }] };
+  return { active: null, history: [], chat: [] };
 }
 
 export function getLocalState() {

@@ -11,6 +11,7 @@ export const useAppStore = defineStore('app', {
       aliveKeys: {},
       isDark,
       siderCollapsed: false,
+      isChat: true,
     };
   },
   actions: {
@@ -30,6 +31,9 @@ export const useAppStore = defineStore('app', {
     },
     switchCollapsed() {
       this.collapsed = !this.collapsed;
+    },
+    setChat(isChat) {
+      this.isChat = isChat;
     },
     setCollapsed(collapsed) {
       this.collapsed = collapsed;

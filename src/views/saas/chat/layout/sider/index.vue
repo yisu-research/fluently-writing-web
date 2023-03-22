@@ -6,6 +6,7 @@ import { useAppStore, useChatStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import api from '@/views/saas/api';
 import day from 'dayjs';
+import { SvgIcon } from '@/components/common';
 
 const appStore = useAppStore();
 const chatStore = useChatStore();
@@ -76,10 +77,12 @@ watch(
       :style="getMobileClass"
       @update-collapsed="handleUpdateCollapsed"
     >
-      <div class="flex flex-col h-full" :style="mobileSafeArea">
+      <div class="flex flex-col h-full" :class="isMobile ? 'mt-16' : ''" :style="mobileSafeArea">
         <main class="flex flex-col flex-1 min-h-0">
           <div class="p-4">
-            <NButton dashed block @click="handleAdd"> 新的对话 </NButton>
+            <NButton dashed block @click="handleAdd"
+              ><SvgIcon class="mr-2 text-lg bg-transparent" icon="uil:plus-circle" /> <span>新的对话</span>
+            </NButton>
           </div>
           <div class="flex-1 min-h-0 pb-4 overflow-hidden">
             <SiderList />
@@ -98,5 +101,9 @@ watch(
 <style lang="css" scoped>
 .my-sider .n-layout-sider .n-layout-toggle-button {
   background-color: #04b2b2 !important;
+}
+
+.my-sider {
+  z-index: 999999;
 }
 </style>

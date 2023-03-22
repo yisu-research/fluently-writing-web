@@ -15,8 +15,6 @@ export const useChatStore = defineStore('chat-store', {
 
     getChatById(state) {
       return (id) => {
-        console.log('chat');
-        console.log(state.chat);
         if (id) return state.chat.find((item) => item.id === id)?.data ?? [];
         return state.chat.find((item) => item.id === state.active)?.data ?? [];
       };
@@ -32,7 +30,6 @@ export const useChatStore = defineStore('chat-store', {
       }
       try {
         const res = await api.getChatListApi({ state: 'active', page: 1, limit: 10 });
-        console.log(res);
         const { conversations } = res;
         this.history = [];
         // if (conversations === 0) return Promise.resolve(res);

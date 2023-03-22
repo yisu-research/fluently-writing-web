@@ -1,13 +1,15 @@
 <template>
-  <n-layout has-sider class="w-full h-screen">
+  <n-layout has-sider class="z-40 w-full h-screen transition">
+    <Header v-if="isMobile" class="z-50" />
     <n-layout-sider
       bordered
       collapse-mode="width"
-      :collapsed-width="64"
+      :collapsed-width="isMobile ? 0 : 64"
       :width="220"
       :native-scrollbar="false"
-      show-trigger="arrow-circle"
+      :show-trigger="isMobile ? false : 'arrow-circle'"
       :on-update:collapsed="handleUpdate"
+      :collapsed="appStore.collapsed"
     >
       <SideBar />
     </n-layout-sider>
@@ -33,15 +35,23 @@
 // import AppHeader from './components/header/index.vue';
 import SideBar from './components/sidebar/index.vue';
 import AppMain from './components/AppMain.vue';
+import { useBasicLayout } from '@/hooks/useBasicLayout';
+import { useAppStore } from '@/store';
+import { onMounted } from 'vue';
+import Header from './components/header/index.vue';
+
+const { isMobile } = useBasicLayout();
 
 // import AppTags from './components/tags/index.vue';
 
-import { useAppStore } from '@/store';
 // import { header, tags } from '~/settings';
 const appStore = useAppStore();
 
 const handleUpdate = (collapsed) => {
-  console.log('handleUpdate');
   appStore.switchCollapsed(collapsed);
 };
+
+onMounted(() => {
+  appStore.switchCollapsed(isMobile);
+});
 </script>
