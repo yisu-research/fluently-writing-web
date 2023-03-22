@@ -54,9 +54,14 @@
     <div class="px-6 pt-6 lg:px-8">
       <nav class="flex items-center justify-between" aria-label="Global">
         <div class="flex lg:flex-1">
-          <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5">
-            <span class="sr-only">Your Company</span>
+          <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5 flex items-center">
+            <span class="sr-only">一粟科研</span>
             <IconLogo class="text-xl text-teal-400" />
+            <span
+              class="ml-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-500"
+            >
+              一粟科研
+            </span>
           </a>
         </div>
         <div class="flex lg:hidden">
@@ -153,7 +158,7 @@
         </p>
         <div class="flex items-center mt-10 gap-x-6">
           <div
-            class="rounded-md bg-teal-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="rounded-md bg-teal-400 px-4 py-3 text-lg tracking-wider font-semibold text-white shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <router-link to="/chat">{{ start }}</router-link>
           </div>
