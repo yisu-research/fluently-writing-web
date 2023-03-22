@@ -27,26 +27,26 @@
               <rect width="100%" height="100%" stroke-width="0" fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)" />
             </svg>
           </div>
-          <h2 class="text-3xl font-bold tracking-tight text-gray-900">加入社区</h2>
-          <p class="mt-6 text-lg leading-8 text-gray-600">成为早期用户，帮助我们一起完善</p>
+          <h2 class="text-3xl font-bold tracking-tight text-gray-900">联系我们</h2>
+          <p class="mt-6 text-lg leading-8 text-gray-600">走进智能创作新时代，与我们一同完善一粟创作助手</p>
           <dl class="mt-10 space-y-4 text-base leading-7 text-gray-600">
             <div class="flex gap-x-4">
               <dt class="flex-none">
                 <ChatBubbleBottomCenterTextIcon class="w-6 text-gray-400 h-7" aria-hidden="true" />
               </dt>
-              <dd>用得不爽来反馈</dd>
+              <dd>遇到任何创作问题？随时向我们反馈！</dd>
             </div>
             <div class="flex gap-x-4">
               <dt class="flex-none">
                 <FireIcon class="w-6 text-gray-400 h-7" aria-hidden="true" />
               </dt>
-              <dd><a class="hover:text-gray-900">感觉好用来分享</a></dd>
+              <dd>对我们的服务感到满意？欢迎分享给朋友们！</dd>
             </div>
             <div class="flex gap-x-4">
               <dt class="flex-none">
                 <ChatBubbleLeftRightIcon class="w-6 text-gray-400 h-7" aria-hidden="true" />
               </dt>
-              <dd><a class="hover:text-gray-900">交个朋友来聊天</a></dd>
+              <dd>想进一步支持我们？更多优惠与专属福利等你来！</dd>
             </div>
           </dl>
         </div>

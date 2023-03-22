@@ -305,28 +305,27 @@ onMounted(async () => {
     const products = await api.getProductListApi();
     await userStore.getUserInfo();
 
-    for (let i = 0; i < products.length; i++) {
-      const item = products[i];
-      if (item.price === 100 || item.price === 1000 || item.price === 10000) {
-        item.price = item.price / 100;
-        let obj = {};
-        obj['id'] = item.id;
-        obj['name'] = item.name;
-        obj['price'] = item.price;
-        obj['description'] = item.description;
-        obj['callCount'] = item.call_count;
-        obj['originalPrice'] = item.price / Number(item.description);
-        obj['isDiscount'] = item.description === '1' ? false : true;
+    state.products = products
+      .filter((item) => [100, 1000, 5000, 10000].includes(item.price))
+      .map((item) => {
+        const price = item.price / 100;
+        const isDiscount = item.description !== '1';
+        const mostPopular = price === 100;
 
-        if (item.price === 100) {
-          obj.mostPopular = true;
-        } else {
-          obj.mostPopular = false;
-        }
-        state.products.push(obj);
-      }
-    }
-  } catch (err) {}
+        return {
+          id: item.id,
+          name: item.name,
+          price,
+          description: item.description,
+          callCount: item.call_count,
+          originalPrice: price / Number(item.description),
+          isDiscount,
+          mostPopular,
+        };
+      });
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 const getMobileClass = computed(() => {
