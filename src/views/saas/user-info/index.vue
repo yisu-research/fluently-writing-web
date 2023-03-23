@@ -6,7 +6,7 @@
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
       <div class="grid grid-cols-12 gap-4">
-        <n-card title="账号设置" class="col-span-12 lg:col-span-8 order-2 lg:order-1">
+        <n-card title="账号设置" class="col-span-12 lg:col-span-8 order-2 lg:order-1 hidden">
           <div class="setting-item">
             <div>
               <div class="text-base font-bold">邮箱地址</div>
@@ -58,7 +58,7 @@
             </div>
           </template>
         </n-card>
-        <n-card title="邀请新用户" class="col-span-12 lg:col-span-8 order-3">
+        <n-card title="邀请新用户" class="col-span-12 lg:col-span-8 order-3 hidden">
           <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！具体方案为：</p>
           <p>
             每成功邀请一位新用户完成注册并绑定邮箱，您和新用户都将<span class="text-teal-600 font-bold"
@@ -103,7 +103,7 @@
             <n-button strong secondary>生成邀请码</n-button>
           </template>
         </n-card>
-        <n-card title="邀请奖励记录" class="col-span-12 lg:col-span-8 order-4">
+        <n-card title="邀请奖励记录" class="col-span-12 lg:col-span-8 order-4 hidden">
           <template #header-extra>
             <n-button strong secondary>奖励提现</n-button>
           </template>
@@ -112,31 +112,6 @@
           <template #action> #action </template>
         </n-card>
       </div>
-
-      <!-- <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
-    <div class="h-full overflow-hidden" :class="getMobileClass">
-      <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
-        <NLayoutContent class="h-full">
-          <figure class="p-8 m-4 lg:w-1/2 md:flex md:justify-start bg-slate-100 rounded-xl md:p-0 dark:bg-slate-900">
-          
-            <div class="pt-1 text-center spa1ce-y-4 md:p-8 md:text-left">
-              <figcaption class="font-medium">
-                <div class="mb-2 text-teal-500">用户名：{{ userStore.name }}</div>
-              </figcaption>
-            </div>
-          </figure>
-          <div class="flex justify-center m-4 lg:w-1/2">
-            <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
-              <template #trigger>
-                <n-button type="error" dashed block> 退出账号 </n-button>
-              </template>
-              确定退出?
-            </n-popconfirm>
-          </div>
-        </NLayoutContent>
-      </NLayout>
-    </div>
-  </div> -->
     </n-layout>
   </div>
 </template>
