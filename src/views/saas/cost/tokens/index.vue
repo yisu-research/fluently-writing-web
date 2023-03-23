@@ -134,7 +134,7 @@
                         稍后支付
                       </n-button>
                     </div>
-                    <div class="flex justify-start mt-6 md:hidden">
+                    <div v-if="isMobile" class="flex justify-start mt-6">
                       <n-icon class="mr-1" size="16">
                         <icon-material-symbols:qr-code-scanner />
                       </n-icon>
