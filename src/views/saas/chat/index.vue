@@ -251,11 +251,8 @@ async function onConversation() {
     };
 
     es.onmessage = (event) => {
-      console.log(event.data);
       if (event.data === '[DONE]') {
-        console.log('结束');
         loading.value = false;
-        es.close();
         return;
       }
       if (event.data.search('[ERROR]') !== -1) {
@@ -270,7 +267,6 @@ async function onConversation() {
           requestOptions: { prompt: message, options: { ...options } },
         });
         scrollToBottom();
-        es.close();
         return;
       }
       const data = JSON.parse(event.data);
