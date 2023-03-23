@@ -256,8 +256,8 @@ const onSignupForUser = useDebounceFn(async () => {
         router.push('/chat');
         $message.success('登录成功');
       } catch (error) {
-        console.log(error.error.error);
-        $message.error(error.error.error);
+        console.log(error.error.message);
+        $message.error(error.error.message);
       } finally {
         state.loading = false;
       }

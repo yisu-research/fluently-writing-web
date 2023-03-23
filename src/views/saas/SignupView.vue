@@ -2,7 +2,7 @@
   <div class="bg-teal-50/[0.3] w-full">
     <div class="flex flex-col items-center justify-center h-screen px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div
-        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-lg sm:h-auto"
+        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-sm ring-slate-100 ring-1 sm:h-auto"
       >
         <div class="px-4 sm:p-6 sm:flex sm:justify-center">
           <!-- Content goes here -->
@@ -23,7 +23,7 @@
               </div>
             </RouterLink>
             <div class="w-full mt-12">
-              <n-tabs default-value="signin-username" size="large" justify-content="center">
+              <n-tabs default-value="signin-username" size="large" justify-content="start">
                 <n-tab-pane name="signin-username" tab="注册">
                   <n-form ref="formRef" :model="formValue" :rules="rules">
                     <n-form-item-row label="用户名" path="username">
@@ -33,7 +33,9 @@
                       <n-input v-model:value="formValue.password" placeholder="请输入密码" type="password" />
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong @click.prevent="onSignup"> 注册 </n-button>
+                  <n-button type="primary" block secondary strong :disabled="state.loading" @click.prevent="onSignup">
+                    注册
+                  </n-button>
                 </n-tab-pane>
               </n-tabs>
               <div class="flex items-center justify-end">
@@ -129,9 +131,14 @@ import { setToken } from '@/utils';
 import api from './api';
 import { useRoute } from 'vue-router';
 import { useMessage } from 'naive-ui';
+import { useDebounceFn } from '@vueuse/core';
 
 import { ref, onMounted } from 'vue';
 const router = useRouter();
+
+const state = reactive({
+  loading: false,
+});
 
 const formRef = ref(null);
 
@@ -150,42 +157,51 @@ const formValue = ref({
 const rules = {
   username: {
     required: true,
-    message: '请输入姓名',
+    validator(rule, value) {
+      if (!value) {
+        return new Error('请输入用户名');
+      } else if (!/^.{6,24}$/.test(value)) {
+        return new Error('用户名长度显示为6-24个字符');
+      }
+      return true;
+    },
     trigger: 'blur',
   },
   password: {
     required: true,
-    message: '请输入密码',
+    validator(rule, value) {
+      if (!value) {
+        return new Error('请填写密码');
+      } else if (!/^(?!([^(0-9a-zA-Z)])+$).{8,32}$/.test(value)) {
+        return new Error('密码长度8-32位');
+      }
+      return true;
+    },
     trigger: ['input'],
   },
 };
 
 onMounted(() => {
-  console.log('mounted');
-  console.log(route.path);
-  console.log(route.query);
   formValue.value.invite_code = route.query.invite_code ?? '';
-  console.log(formValue.value);
 });
 
-async function onSignup() {
+const onSignup = useDebounceFn(async () => {
   formRef.value?.validate(async (errors) => {
     if (!errors) {
       try {
         let res = await api.signupApi(formValue.value);
-        console.log(res);
+        setToken(res.token);
         $message.success('注册成功');
         $message.success('已免费获得三次体验机会');
-        setToken(res.token);
         router.push('/');
       } catch (error) {
-        console.log(error.error.error);
-        $message.error(error.error.error);
+        console.log(error.error.message);
+        $message.error(error.error.message);
       }
     } else {
       console.log(errors);
-      message.error('无效的数据');
+      message.error('请按要求填写注册信息');
     }
   });
-}
+});
 </script>

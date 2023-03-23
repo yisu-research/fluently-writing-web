@@ -81,7 +81,7 @@ watch(
         <main class="flex flex-col flex-1 min-h-0">
           <div class="p-4">
             <NButton dashed block @click="handleAdd"
-              ><SvgIcon class="mr-2 text-lg bg-transparent" icon="uil:plus-circle" /> <span>新的对话</span>
+              ><SvgIcon class="mr-2 text-lg bg-transparent" icon="uil:plus-circle" /> <span>创建新对话</span>
             </NButton>
           </div>
           <div class="flex-1 min-h-0 pb-4 overflow-hidden">
