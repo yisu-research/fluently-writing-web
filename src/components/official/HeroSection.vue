@@ -56,7 +56,7 @@
         <div class="flex lg:flex-1">
           <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5 flex items-center">
             <span class="sr-only">一粟科研</span>
-            <IconLogo class="text-xl text-teal-400" />
+            <IconLogo class="text-xl text-teal-500" />
             <span
               class="ml-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-500"
             >
@@ -101,7 +101,7 @@
           <div class="flex items-center justify-between">
             <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5 flex justify-start items-center">
               <span class="sr-only">一粟科研</span>
-              <IconLogo class="text-xl text-teal-400" />
+              <IconLogo class="text-xl text-teal-500" />
               <span
                 class="ml-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-500"
               >
@@ -150,7 +150,7 @@
       <div class="max-w-2xl mx-auto lg:mx-0 lg:flex-auto">
         <!-- 渐变色标题 -->
         <h1
-          class="max-w-lg mt-10 text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-teal-300 sm:text-7xl"
+          class="max-w-lg mt-10 text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-teal-400 sm:text-7xl"
         >
           {{ title }}
         </h1>
@@ -158,11 +158,11 @@
         <p class="mt-6 text-2xl leading-8 text-gray-600">{{ slogan }}</p>
         <p class="mt-6 text-lg leading-8 text-gray-600">
           {{ footnote }}
-          <a href="https://chat.openai.com" class="text-teal-400 hover:text-teal-300">ChatGPT</a>
+          <a href="https://chat.openai.com" class="text-teal-500 hover:text-teal-400">ChatGPT</a>
         </p>
         <div class="flex items-center mt-10 gap-x-6">
           <div
-            class="px-4 py-3 text-lg font-semibold tracking-wider text-white bg-teal-400 rounded-md shadow-sm hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-lg font-semibold tracking-wider text-white bg-teal-500 rounded-md shadow-sm hover:bg-teal-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <router-link to="/chat">{{ start }}</router-link>
           </div>

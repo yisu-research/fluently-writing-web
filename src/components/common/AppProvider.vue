@@ -25,7 +25,6 @@ import { defineComponent, h } from 'vue';
 import { zhCN, dateZhCN, lightTheme, useLoadingBar, useDialog, useMessage, useNotification } from 'naive-ui';
 import { useCssVar } from '@vueuse/core';
 import { kebabCase } from 'lodash-es';
-import { setupMessage, setupDialog } from '@/utils';
 import { naiveThemeOverrides } from '~/settings';
 // import { useAppStore } from '@/store';
 
@@ -44,10 +43,9 @@ function setupCssVar() {
 // 挂载naive组件的方法至window, 以便在全局使用
 function setupNaiveTools() {
   window.$loadingBar = useLoadingBar();
+  window.$dialog = useDialog();
+  window.$message = useMessage();
   window.$notification = useNotification();
-
-  window.$message = setupMessage(useMessage());
-  window.$dialog = setupDialog(useDialog());
 }
 
 const NaiveProviderContent = defineComponent({
