@@ -5,7 +5,10 @@
       :native-scrollbar="false"
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
-      <div class="flex justify-center items-center pt-10 pb-8 px-6">
+      <div class="text-center text-4xl tracking-wide pt-10 pb-6">
+        <span class="fancy-underline">随时随地，自由创作</span>
+      </div>
+      <div class="flex justify-center items-center py-8 px-6">
         <div class="image-container">
           <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500" />
           <div class="ripples">
@@ -128,7 +131,7 @@ $n: 3;
 
       @for $i from 1 through $n {
         &:nth-of-type(#{$i}) {
-          animation-delay: 1s * $i;
+          animation-delay: 1s * ($i - 1);
         }
       }
     }
@@ -143,6 +146,24 @@ $n: 3;
   100% {
     opacity: 0;
     transform: scale(1);
+  }
+}
+
+.fancy-underline {
+  position: relative;
+  white-space: nowrap;
+  &:after {
+    --deco-height: 20px;
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--deco-height) * -1.2);
+    height: var(--deco-height);
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23a)'%3E%3Cpath d='M-17 30.5C-1 22 72-4 54 13 37.9 28.2-2.5 57.5 16 55.5s72-29 104-40' stroke='%2314b8a6' stroke-width='10'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Cpath fill='%23fff' d='M0 0h100v64H0z'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+    background-size: auto 100%;
+    background-repeat: round;
+    background-position: 0em;
   }
 }
 </style>
