@@ -193,7 +193,7 @@ const onSignup = useDebounceFn(async () => {
         setToken(res.token);
         $message.success('注册成功');
         $message.success('已免费获得三次体验机会');
-        router.push('/');
+        router.push('/chat');
       } catch (error) {
         console.log(error.error.message);
         $message.error(error.error.message);
