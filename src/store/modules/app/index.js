@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
-import { useDark } from '@vueuse/core';
+// import { useDark } from '@vueuse/core';
 
-const isDark = useDark();
+// wsf - 目前界面强制浅色模式
+// const isDark = useDark();
+const isDark = false;
 export const useAppStore = defineStore('app', {
   state() {
     return {

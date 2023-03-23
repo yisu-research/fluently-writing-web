@@ -1,55 +1,148 @@
 <template>
   <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
-    <div class="h-full overflow-hidden" :class="getMobileClass">
-      <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
-        <NLayoutContent class="h-full">
-          <figure class="p-8 m-4 lg:w-1/2 md:flex md:justify-start bg-slate-100 rounded-xl md:p-0 dark:bg-slate-900">
-            <img
-              class="w-24 h-24 mx-auto rounded-full md:mx-0 md:w-30 md:h-auto md:rounded-r-none md:rounded-l-xl"
-              src="@/assets/avatar.jpg"
-              alt=""
-            />
-            <div class="pt-1 text-center spa1ce-y-4 md:p-8 md:text-left">
-              <figcaption class="font-medium">
-                <div class="mb-2 text-teal-500">用户名：{{ userStore.name }}</div>
-              </figcaption>
-            </div>
-          </figure>
-          <div class="flex justify-center m-4 lg:w-1/2">
-            <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
-              <template #trigger>
-                <n-button type="error" dashed block> 退出账号 </n-button>
-              </template>
-              确定退出?
-            </n-popconfirm>
+    <n-layout
+      class="h-full"
+      :native-scrollbar="false"
+      :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
+    >
+      <div class="flex justify-center items-center pt-10 pb-8 px-6">
+        <div class="image-container">
+          <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500" />
+          <div class="ripples">
+            <div class="ripple"></div>
+            <div class="ripple"></div>
+            <div class="ripple"></div>
           </div>
-        </NLayoutContent>
-      </NLayout>
-    </div>
+        </div>
+        <img :src="ScreenImg" alt="Screenshot" class="h-[400px] lg:h-[600px] drop-shadow-xl hidden md:block" />
+      </div>
+      <div class="flex justify-center px-4">
+        <div class="mt-4 text-sm text-slate-600">
+          <p>
+            <n-icon size="20">
+              <icon-mdi:web-check />
+            </n-icon>
+            <span class="ml-1">手机扫描上方二维码，或浏览器直接访问</span>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <span class="hover:text-teal-500 cursor-copy" @click="copyToClipboard('https://ai.yisukeyan.com/chat')">
+                  <span class="mx-1">https://ai.yisukeyan.com/chat</span>
+                  <n-icon size="16">
+                    <icon-ic:baseline-content-copy />
+                  </n-icon>
+                </span>
+              </template>
+              点击以复制链接
+            </n-tooltip>
+          </p>
+          <p>
+            <n-icon size="20">
+              <icon-ic:round-star />
+            </n-icon>
+            <span class="ml-1">在微信中收藏网址，或添加至浏览器书签，下次使用更方便</span>
+          </p>
+          <p>
+            <n-icon size="20">
+              <icon-ic:twotone-security-update-warning />
+            </n-icon>
+            <span class="ml-1">若遇到界面错乱的问题，请尝试清空</span>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <span class="underline">浏览器</span>
+              </template>
+              按下 CTRL+F5，或参照各浏览器使用手册
+            </n-tooltip>
+            <span>或</span>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <span class="underline">微信</span>
+              </template>
+              我 -> 设置 -> 通用 -> 存储空间 -> 清理缓存
+            </n-tooltip>
+            <span>的缓存</span>
+          </p>
+        </div>
+      </div>
+    </n-layout>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { NLayout, NLayoutContent } from 'naive-ui';
+import ChatImg from '@/assets/images/chat.png';
+import ScreenImg from '@/assets/images/screenshot.png';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { useUserStore } from '@/store';
-
-const userStore = useUserStore();
+import { useMessage } from 'naive-ui';
 
 const { isMobile } = useBasicLayout();
+const message = useMessage();
 
-const getMobileClass = computed(() => {
-  if (isMobile.value) return ['rounded-none', 'shadow-none'];
-  return ['border', 'rounded-md', 'shadow-md'];
-});
-
-const handleLogout = (event) => {
-  event?.stopPropagation();
-  userStore.logout();
-};
-
-const getContainerClass = computed(() => {
-  return ['h-full'];
-});
+function copyToClipboard(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      console.log('Copied to clipboard');
+      message.success('链接已复制到剪贴板');
+    })
+    .catch((err) => {
+      console.error('Error copying to clipboard:', err);
+      message.error('链接复制失败，请重试到');
+    });
+}
 </script>
+
+<style lang="scss">
+$n: 3;
+
+.image-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+
+  img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    z-index: 1;
+  }
+
+  .ripples {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    z-index: 0;
+
+    .ripple {
+      position: absolute;
+      animation: ripple 3s infinite ease-out;
+      background-color: teal;
+      border-radius: 50%;
+      height: 100%;
+      width: 100%;
+      opacity: 0;
+
+      @for $i from 1 through $n {
+        &:nth-of-type(#{$i}) {
+          animation-delay: 1s * $i;
+        }
+      }
+    }
+  }
+}
+
+@keyframes ripple {
+  0% {
+    opacity: 0.5;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+</style>

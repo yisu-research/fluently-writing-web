@@ -1,20 +1,19 @@
 <template>
   <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
-    <div class="h-full overflow-hidden" :class="getMobileClass">
-      <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
-        <NLayoutContent class="h-full">
-          <div class="p-4 bg-gray-100/[0.5]">
-            <div class="markdown-body" v-html="text" />
-          </div>
-        </NLayoutContent>
-      </NLayout>
-    </div>
+    <n-layout
+      class="h-full"
+      :native-scrollbar="false"
+      :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
+    >
+      <div class="p-4 bg-gray-100/[0.5]">
+        <div class="markdown-body" v-html="text" />
+      </div>
+    </n-layout>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-import { NLayout, NLayoutContent } from 'naive-ui';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import MarkdownIt from 'markdown-it';
 import mdKatex from '@traptitech/markdown-it-katex';
@@ -22,11 +21,6 @@ import hljs from 'highlight.js';
 import helpString from '@/assets/markdown/help.md?raw';
 
 const { isMobile } = useBasicLayout();
-
-const getMobileClass = computed(() => {
-  if (isMobile.value) return ['rounded-none', 'shadow-none'];
-  return ['border', 'rounded-md', 'shadow-md'];
-});
 
 const text = computed(() => {
   return mdi.render(helpString);
@@ -49,10 +43,6 @@ const mdi = new MarkdownIt({
 });
 
 mdi.use(mdKatex, { blockClass: 'katexmath-block rounded-md p-[10px]', errorColor: ' #ED2940' });
-
-const getContainerClass = computed(() => {
-  return ['h-full'];
-});
 </script>
 
 <style lang="less">

@@ -332,7 +332,7 @@ onMounted(async () => {
     await userStore.getUserInfo();
 
     state.products = products
-      .filter((item) => [100, 1000, 5000, 10000].includes(item.price))
+      .filter((item) => [100, 1000, 10000].includes(item.price))
       .map((item) => {
         const price = item.price / 100;
         const isDiscount = item.description !== '1';

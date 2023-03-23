@@ -1,5 +1,5 @@
 <template>
-  <n-layout has-sider class="z-40 w-full h-screen transition">
+  <n-layout has-sider class="z-40 w-full h-screen transition" :class="{ 'pt-14': isMobile }">
     <Header v-if="isMobile" class="z-50" />
     <n-layout-sider
       bordered

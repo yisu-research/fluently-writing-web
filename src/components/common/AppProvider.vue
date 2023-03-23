@@ -3,7 +3,7 @@
     wh-full
     :locale="zhCN"
     :date-locale="dateZhCN"
-    :theme="appStore.isDark ? lightTheme : undefined"
+    :theme="lightTheme"
     :theme-overrides="naiveThemeOverrides"
     preflight-style-disabled
   >
@@ -27,9 +27,10 @@ import { useCssVar } from '@vueuse/core';
 import { kebabCase } from 'lodash-es';
 import { setupMessage, setupDialog } from '@/utils';
 import { naiveThemeOverrides } from '~/settings';
-import { useAppStore } from '@/store';
+// import { useAppStore } from '@/store';
 
-const appStore = useAppStore();
+// wsf - 目前界面强制浅色模式
+// const appStore = useAppStore();
 
 function setupCssVar() {
   const common = naiveThemeOverrides.common;
