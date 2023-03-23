@@ -1,8 +1,9 @@
 <template>
-  <div class="bg-teal-50/[0.3] w-full">
+  <div></div>
+  <div class="bg-teal-50/[0.3] w-full overflow-hidden h-screen">
     <div class="flex flex-col items-center justify-center h-screen px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div
-        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-lg sm:h-auto"
+        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-sm sm:h-auto ring-slate-100 ring-1"
       >
         <div class="px-4 sm:p-6 sm:flex sm:justify-center">
           <!-- Content goes here -->
@@ -23,8 +24,8 @@
               </div>
             </RouterLink>
             <div class="w-full mt-4">
-              <n-tabs default-value="signin-username" size="large" justify-content="center">
-                <n-tab-pane name="signin-username" tab="登录">
+              <n-tabs default-value="signin-username" size="large" justify-content="start">
+                <n-tab-pane name="signin-username" tab="用户名登录">
                   <n-form ref="formUserRef" :model="formUser" :rules="rulesForUser">
                     <n-form-item-row label="用户名" path="username">
                       <n-input v-model:value="formUser.username" placeholder="请输入用户名" />
@@ -32,24 +33,55 @@
                     <n-form-item-row label="密码" path="password">
                       <n-input v-model:value="formUser.password" placeholder="请输入密码" type="password" />
                     </n-form-item-row>
+                    <div class="flex flex-row-reverse"><n-button text @click="handleForget">忘记密码？</n-button></div>
+                    <n-modal v-model:show="state.showModal">
+                      <n-card
+                        style="width: 600px"
+                        title="温馨提示"
+                        :bordered="false"
+                        size="huge"
+                        preset="dialog"
+                        aria-modal="true"
+                      >
+                        <template #header-extra
+                          ><SvgIcon icon="uil:times" class="text-2xl text-slate-800" @click="handleClose"
+                        /></template>
+                        <p class="py-4 text-lg">请您联系客服找回密码</p>
+                        <div class="py-2 mx-auto w-50 sm:w-60 lg:py-4 lg:px-8">
+                          <img
+                            :src="QrCodeImg"
+                            alt="Product screenshot"
+                            class="p-4 rounded-xl sm:rounded-lg ring-2 ring-teal-400"
+                          />
+                        </div>
+                      </n-card>
+                    </n-modal>
                   </n-form>
-                  <n-button class="mt-4" type="primary" block secondary strong @click.prevent="onSignupForUser">
+                  <n-button
+                    class="mt-8"
+                    type="primary"
+                    :disabled="state.loading"
+                    block
+                    secondary
+                    strong
+                    @click.prevent="onSignupForUser"
+                  >
                     登录
                   </n-button>
                 </n-tab-pane>
-                <!-- <n-tab-pane name="signin-phone" tab="手机号登录">
-                  <n-form ref="formPhoneRef" :model="formPhone" :rules="rulesForPhone">
-                    <n-form-item-row label="手机号" path="phone_number">
-                      <n-input v-model:value="formPhone.phone_number" placeholder="请输入手机号" />
+                <!-- <n-tab-pane name="signin-email" tab="邮箱登录">
+                  <n-form ref="formEmailRef" :model="formEmail" :rules="rulesForEmail">
+                    <n-form-item-row label="邮箱" path="email">
+                      <n-input v-model:value="formEmail.email" placeholder="请输入邮箱地址" />
                     </n-form-item-row>
                     <n-form-item-row label="验证码" path="code">
-                      <n-input v-model:value="formPhone.code" placeholder="请输入验证码" />
+                      <n-input v-model:value="formEmail.code" placeholder="请输入验证码" />
                       <n-button strong secondary type="primary" class="ml-4" :disabled="disabled" @click="sendCode"
                         >{{ timer === 0 ? '发送验证码' : `${timer}秒后重新发送` }}
                       </n-button>
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong @click.prevent="onSignupForPhone"> 登录 </n-button>
+                  <n-button type="primary" block secondary strong @click.prevent="onSignupForEmail"> 登录 </n-button>
                 </n-tab-pane> -->
               </n-tabs>
               <div class="flex items-center justify-end">
@@ -144,11 +176,20 @@ import NatureSvg from '@/assets/svg/nature.svg';
 import { setToken } from '@/utils';
 import api from './api';
 import { useMessage } from 'naive-ui';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
+import QrCodeImg from '@/assets/images/qrcode.jpg';
+
+const state = reactive({
+  loading: false,
+  showModal: false,
+});
 
 const router = useRouter();
 
 const formUserRef = ref(null);
+
+// const formEmailRef = ref(null);
 
 const message = useMessage();
 
@@ -158,6 +199,12 @@ const formUser = ref({
   login_type: 'username',
 });
 
+// const formEmail = ref({
+//   email: '',
+//   code: '',
+//   login_type: 'email',
+// });
+
 const rulesForUser = {
   username: {
     required: true,
@@ -166,29 +213,59 @@ const rulesForUser = {
   },
   password: {
     required: true,
-    message: '请输入密码',
     trigger: ['input'],
+    validator(rule, value) {
+      if (!value) {
+        return new Error('请填写密码');
+      } else if (!/^(?!([^(0-9a-zA-Z)])+$).{8,32}$/.test(value)) {
+        return new Error('密码长度8-32位');
+      }
+      return true;
+    },
   },
 };
 
-async function onSignupForUser() {
+// const rulesForEmail = {
+//   email: {
+//     required: true,
+//     message: '请输入邮箱',
+//     trigger: 'blur',
+//   },
+//   code: {
+//     required: true,
+//     message: '请输入验证码',
+//     trigger: ['input'],
+//   },
+// }
+
+const handleForget = useDebounceFn(() => {
+  state.showModal = true;
+}, 500);
+
+const handleClose = () => {
+  state.showModal = false;
+};
+
+const onSignupForUser = useDebounceFn(async () => {
+  state.loading = true;
   formUserRef.value?.validate(async (errors) => {
     if (!errors) {
       try {
         let res = await api.loginApi(formUser.value);
-        console.log(res);
-
         setToken(res.token);
         router.push('/chat');
         $message.success('登录成功');
       } catch (error) {
         console.log(error.error.error);
         $message.error(error.error.error);
+      } finally {
+        state.loading = false;
       }
     } else {
       console.log(errors);
-      message.error('无效的数据');
+      state.loading = false;
+      message.error('请按要求填写账号信息');
     }
   });
-}
+}, 600);
 </script>
