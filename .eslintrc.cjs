@@ -24,6 +24,13 @@ module.exports = {
         ignores: ['index', '401', '404'],
       },
     ],
+    'vue/no-duplicate-attributes': [
+      'error',
+      {
+        allowCoexistClass: true,
+        allowCoexistStyle: true,
+      },
+    ],
     'no-undef': 'off',
   },
 };

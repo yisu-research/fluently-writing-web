@@ -55,7 +55,6 @@ defineExpose({ textRef });
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-duplicate-attributes -->
   <div class="" :class="wrapClass">
     <template v-if="loading">
       <span class="w-[4px] h-[20px] block animate-blink" />

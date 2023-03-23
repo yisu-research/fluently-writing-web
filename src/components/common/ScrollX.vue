@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-duplicate-attributes -->
 <template>
   <div ref="wrapper" class="wrapper" @mousewheel.prevent="handleMouseWheel">
     <template v-if="showArrow && isOverflow">

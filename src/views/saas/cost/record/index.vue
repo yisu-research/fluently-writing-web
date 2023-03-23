@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/no-duplicate-attributes -->
-<!-- eslint-disable vue/no-useless-mustaches -->
 <template>
   <div class="h-screen p-4 transition-all">
     <div class="flex flex-col h-full overflow-hidden bg-white divide-y divide-gray-200 rounded-lg shadow">

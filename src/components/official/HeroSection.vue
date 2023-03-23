@@ -100,7 +100,7 @@
         <DialogPanel class="fixed inset-0 z-10 px-6 py-6 overflow-y-auto bg-white lg:hidden">
           <div class="flex items-center justify-between">
             <a href="https://yisukeyan.com/" class="-m-1.5 p-1.5 flex justify-start items-center">
-              <span class="sr-only">Your Company</span>
+              <span class="sr-only">一粟科研</span>
               <IconLogo class="text-xl text-teal-400" />
               <span
                 class="ml-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-500"

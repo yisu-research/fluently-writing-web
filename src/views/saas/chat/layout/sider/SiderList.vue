@@ -61,7 +61,6 @@ function isActive(id) {
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-duplicate-attributes -->
   <n-scrollbar class="px-4">
     <div class="flex flex-col h-20 gap-2 text-sm">
       <template v-if="!dataSources.length">

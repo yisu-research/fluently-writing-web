@@ -49,7 +49,6 @@ function handleSelect(key) {
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-duplicate-attributes -->
   <div class="flex w-full mb-6 overflow-hidden" :class="[{ 'flex-row-reverse': inversion }]">
     <div
       class="flex items-center justify-center flex-shrink-0 h-8 overflow-hidden rounded-full basis-8"

@@ -101,14 +101,14 @@ export const basicRoutes = [
         meta: {
           title: '消费记录',
           icon: 'uil:notes',
-          order: 0,
+          order: 1,
         },
       },
     ],
   },
 
   {
-    name: '模版中心',
+    name: 'Help',
     path: '/',
     component: Layout,
     redirect: '/help',
@@ -118,8 +118,27 @@ export const basicRoutes = [
         path: 'help',
         component: () => import('@/views/saas/help/index.vue'),
         meta: {
-          title: '模版中心',
+          title: '模板中心',
           icon: 'uil:comment-image',
+          order: 0,
+        },
+      },
+    ],
+  },
+
+  {
+    name: 'Mobile',
+    path: '/',
+    component: Layout,
+    redirect: '/mobile',
+    children: [
+      {
+        name: 'Mobile',
+        path: 'mobile',
+        component: () => import('@/views/saas/mobile/index.vue'),
+        meta: {
+          title: '手机访问',
+          icon: 'uil:mobile-vibrate',
           order: 0,
         },
       },

@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-duplicate-attributes -->
 <template>
   <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
     <div class="h-full overflow-hidden" :class="getMobileClass">
