@@ -1,190 +1,193 @@
 <template>
   <div class="h-full transition-all" :class="[isMobile ? 'p-0' : 'p-4']">
-    <div class="h-full overflow-hidden" :class="getMobileClass">
-      <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
-        <NLayoutContent class="h-full bg-blue-50/[0.3]">
-          <!-- 剩余字符数 -->
-          <div class="py-20 bg-teal-500/[0.9] sm:py-16">
-            <div class="max-w-4xl px-6 mx-auto lg:px-8">
-              <dl class="grid grid-cols-1 text-center gap-y-16 gap-x-8">
-                <div class="flex flex-col max-w-xs mx-auto gap-y-4">
-                  <dt class="text-base leading-7 text-gray-100">剩余次数</dt>
-                  <dd class="order-first text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                    {{ userInfo.balance }}
-                  </dd>
-                </div>
-              </dl>
+    <n-layout
+      class="h-full"
+      :native-scrollbar="false"
+      :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
+    >
+      <!-- 剩余字符数 -->
+      <div class="py-20 bg-teal-500/[0.9] sm:py-16">
+        <div class="max-w-4xl px-6 mx-auto lg:px-8">
+          <dl class="grid grid-cols-1 text-center gap-y-16 gap-x-8">
+            <div class="flex flex-col max-w-xs mx-auto gap-y-4">
+              <dt class="text-base leading-7 text-gray-100">剩余次数</dt>
+              <dd class="order-first text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                {{ userInfo.balance }}
+              </dd>
             </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- 购买字符 -->
+      <div class="sm:py-8">
+        <div class="px-6 mx-auto max-w-7xl lg:px-8">
+          <!-- 购买套餐 -->
+          <div class="max-w-4xl mx-auto text-center">
+            <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">购买套餐</p>
+            <div class="animate-pulse text-teal-500 text-2xl font-bold leading-8 mt-4">早期尝鲜价格</div>
           </div>
 
-          <!-- 购买字符 -->
-          <div class="sm:py-8">
-            <div class="px-6 mx-auto max-w-7xl lg:px-8">
-              <!-- 购买套餐 -->
-              <div class="max-w-4xl mx-auto text-center">
-                <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">购买套餐</p>
-                <div class="animate-pulse text-teal-500 text-2xl font-bold leading-8 mt-4">早期尝鲜价格!</div>
-              </div>
-
-              <!-- 套餐列表 -->
-              <div
-                class="grid max-w-md grid-cols-1 mx-auto mt-10 gap-9 isolate md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3"
-              >
-                <div
-                  v-for="tier in state.products"
-                  :key="tier.id"
-                  :class="[
-                    tier.mostPopular
-                      ? 'ring-4 ring-teal-400 hover:shadow-lg delay-100 duration-200 hover:scale-105'
-                      : 'ring-1 ring-gray-200 hover:ring-2 hover:ring-teal-400 hover:shadow-lg delay-100 duration-200 hover:scale-105',
-                    'rounded-2xl p-4 lg:p-8',
-                  ]"
+          <!-- 套餐列表 -->
+          <div
+            class="grid max-w-md grid-cols-1 mx-auto mt-10 gap-6 isolate md:max-w-2xl md:grid-cols-2 lg:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none"
+          >
+            <div
+              v-for="tier in state.products"
+              :key="tier.id"
+              :class="[
+                tier.mostPopular
+                  ? 'ring-4 ring-teal-500 hover:shadow-lg delay-100 duration-200 hover:scale-105'
+                  : 'ring-1 ring-gray-200 hover:ring-2 hover:ring-teal-500 hover:shadow-lg delay-100 duration-200 hover:scale-105',
+                'rounded-2xl p-4 lg:p-8',
+              ]"
+            >
+              <div class="flex items-center justify-between gap-x-4">
+                <h3 v-if="tier.isDiscount" :id="tier.id" class="text-teal-500 text-xl font-semibold leading-8">
+                  {{ tier.isDiscount ? `${tier.description * 10} 折` : '' }}
+                </h3>
+                <h3 v-else :id="tier.id" class="text-transparent text-xl font-semibold leading-8">
+                  {{ `${tier.description * 10}折` }}
+                </h3>
+                <p
+                  v-if="tier.isDiscount"
+                  class="rounded-full bg-teal-500/10 py-1 px-2.5 text-md font-semibold leading-5 text-teal-500"
                 >
-                  <div class="flex items-center justify-between gap-x-4">
-                    <h3 v-if="tier.isDiscount" :id="tier.id" class="text-teal-500 text-xl font-semibold leading-8">
-                      {{ tier.isDiscount ? `${tier.description * 10} 折` : '' }}
-                    </h3>
-                    <h3 v-else :id="tier.id" class="text-transparent text-xl font-semibold leading-8">
-                      {{ `${tier.description * 10}折` }}
-                    </h3>
-                    <p
-                      v-if="tier.isDiscount"
-                      class="rounded-full bg-teal-500/10 py-1 px-2.5 text-md font-semibold leading-5 text-teal-500"
-                    >
-                      {{ tier.mostPopular ? '热门优惠' : '优惠' }}
-                    </p>
-                  </div>
-                  <div class="flex items-center justify-center mt-8">
-                    <h3 :id="tier.id" class="text-gray-900 text-3xl font-semibold leading-8">
-                      {{ `${tier.callCount} 次` }}
-                    </h3>
-                  </div>
-                  <div class="flex items-baseline justify-center mt-6 gap-x-1">
-                    <div>
-                      <span class="text-xl font-bold tracking-tight text-gray-900">￥</span>
-                      <span class="text-4xl font-bold tracking-tight text-gray-900">{{ ` ${tier.price}` }}</span>
-                    </div>
-                    <span
-                      v-if="tier.isDiscount"
-                      class="ml-2 text-lg font-normal leading-6 text-gray-400 line-through"
-                      >{{ `${tier.originalPrice}` }}</span
-                    >
-                  </div>
-                  <a
-                    :aria-describedby="tier.id"
-                    :class="[
-                      tier.mostPopular
-                        ? 'bg-teal-400 text-white shadow-sm hover:bg-teal-500'
-                        : 'text-teal-500 ring-2 ring-inset ring-gray-200 hover:bg-gray-100',
-                      'mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer',
-                    ]"
-                    @click="handleOrder(tier.id)"
-                  >
-                    立即购买
-                  </a>
-                  <n-modal
-                    v-model:show="state.showModal"
-                    class="custom-card"
-                    preset="card"
-                    :showIcon="false"
-                    aria-modal="true"
-                    :style="bodyStyle"
-                    size="huge"
-                    title="订单支付"
-                    :closable="false"
-                    :bordered="false"
-                    :mask-closable="false"
-                  >
-                    <!-- <template #header-extra> 订单支付 </template> -->
-                    <n-spin :show="state.orderLoading" stroke="10BA9B">
-                      <div v-if="state.orderLoading" class="h-40"></div>
-                      <div v-else class="mt-4">
-                        <div class="flex flex-col justify-between md:flex-row lg:flex-row">
-                          <div class="flex md:base-2/3">
-                            <div class="flex flex-col items-start justify-start">
-                              <div v-for="item in orderData" :key="item.title" class="mt-2">
-                                <div class="flex flex-col justify-start sm:flex-row">
-                                  <p class="text-md">{{ `${item.title}：` }}</p>
-                                  <p class="text-teal-500">{{ ` ${item.value}` }}</p>
-                                </div>
-                              </div>
+                  {{ tier.mostPopular ? '热门优惠' : '优惠' }}
+                </p>
+              </div>
+              <div class="flex items-center justify-center mt-8">
+                <h3 :id="tier.id" class="text-gray-900 text-3xl font-semibold leading-8">
+                  {{ `${tier.callCount} 次` }}
+                </h3>
+              </div>
+              <div class="flex items-baseline justify-center mt-6 gap-x-1">
+                <div>
+                  <span class="text-xl font-bold tracking-tight text-gray-900">￥</span>
+                  <span class="text-4xl font-bold tracking-tight text-gray-900">{{ ` ${tier.price}` }}</span>
+                </div>
+                <span v-if="tier.isDiscount" class="ml-2 text-lg font-normal leading-6 text-gray-400 line-through">{{
+                  `${tier.originalPrice}`
+                }}</span>
+              </div>
+              <a
+                :aria-describedby="tier.id"
+                :class="[
+                  tier.mostPopular
+                    ? 'bg-teal-500 text-white shadow-sm hover:bg-teal-400'
+                    : 'text-teal-500 ring-2 ring-inset ring-gray-200 hover:bg-gray-100',
+                  'mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer',
+                ]"
+                @click="handleOrder(tier.id)"
+              >
+                立即购买
+              </a>
+              <n-modal
+                v-model:show="state.showModal"
+                class="custom-card"
+                preset="card"
+                :showIcon="false"
+                aria-modal="true"
+                :style="bodyStyle"
+                size="huge"
+                title="订单支付"
+                :closable="false"
+                :bordered="false"
+                :mask-closable="false"
+              >
+                <!-- <template #header-extra> 订单支付 </template> -->
+                <n-spin :show="state.orderLoading" stroke="10BA9B">
+                  <div v-if="state.orderLoading" class="h-40"></div>
+                  <div v-else class="mt-4">
+                    <div class="flex flex-col justify-between md:flex-row lg:flex-row">
+                      <div class="flex md:base-2/3">
+                        <div class="flex flex-col items-start justify-start">
+                          <div v-for="item in orderData" :key="item.title" class="mt-2">
+                            <div class="flex flex-col justify-start sm:flex-row">
+                              <p class="text-md">{{ `${item.title}：` }}</p>
+                              <p class="text-teal-600">{{ ` ${item.value}` }}</p>
                             </div>
                           </div>
-                          <div class="flex flex-col items-center justify-center md:base-2/3">
-                            <div class="">
-                              <img :src="qrcode.value" alt="QR Code" class="w-40 h-40" />
-                            </div>
-                            <div class="flex">
-                              <p>使用微信扫一扫支付</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="flex items-end justify-end mt-8">
-                          <n-popconfirm
-                            v-if="state.orderDetail.state === 'pending'"
-                            placement="bottom"
-                            @positive-click="handlePayCancel()"
-                          >
-                            <template #trigger>
-                              <n-button strong secondary round type="warning" class="mr-8"> 取消订单 </n-button>
-                            </template>
-                            确定取消订单?
-                          </n-popconfirm>
-                          <n-button strong secondary round type="success" class="mr-4" @click="handleClose">
-                            稍后支付
-                          </n-button>
                         </div>
                       </div>
+                      <div class="flex flex-col items-center justify-center md:base-2/3 mt-6 md:mt-0">
+                        <div class="">
+                          <img :src="qrcode.value" alt="QR Code" class="w-40 h-40" />
+                        </div>
+                        <div class="flex">
+                          <p>使用微信扫一扫支付</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex items-end justify-end mt-8">
+                      <n-popconfirm
+                        v-if="state.orderDetail.state === 'pending'"
+                        placement="bottom"
+                        @positive-click="handlePayCancel()"
+                      >
+                        <template #trigger>
+                          <n-button strong secondary round type="warning" class="mr-8"> 取消订单 </n-button>
+                        </template>
+                        确定取消订单?
+                      </n-popconfirm>
+                      <n-button strong secondary round type="success" class="mr-4" @click="handleClose">
+                        稍后支付
+                      </n-button>
+                    </div>
+                    <div class="flex justify-start mt-6 md:hidden">
+                      <n-icon class="mr-1" size="16">
+                        <icon-material-symbols:qr-code-scanner />
+                      </n-icon>
+                      <span>手机用户请长按图片或截屏，再使用微信的「扫一扫 -> 相册」来完成支付</span>
+                    </div>
+                  </div>
 
-                      <template #description>
-                        <n-tag :bordered="false" type="success">
-                          <p class="text-lg font-medium">正在下单...</p>
-                        </n-tag>
-                      </template>
-                    </n-spin>
-                  </n-modal>
-                </div>
-              </div>
-
-              <!-- 套餐说明 -->
-              <div class="mt-4 text-sm text-slate-600">
-                <p>
-                  <n-icon size="20">
-                    <icon-ic:baseline-attach-money />
-                  </n-icon>
-                  <span class="ml-1">支付满 500 元可联系</span>
-                  <n-popover trigger="hover">
-                    <template #trigger>
-                      <span class="underline">客服</span>
-                    </template>
-                    <img :src="QrCodeImg" alt="Contact Us" class="w-40 h-40" />
-                  </n-popover>
-                  <span>开具发票</span>
-                </p>
-                <p>
-                  <n-icon size="20">
-                    <icon-mdi:api />
-                  </n-icon>
-                  <span class="ml-1">我们提供大规模 API 调用服务，详情可咨询</span>
-                  <n-popover trigger="hover">
-                    <template #trigger>
-                      <span class="underline">客服</span>
-                    </template>
-                    <img :src="QrCodeImg" alt="Contact Us" class="w-40 h-40" />
-                  </n-popover>
-                </p>
-              </div>
+                  <template #description>
+                    <n-tag :bordered="false" type="success">
+                      <p class="text-lg font-medium">正在下单...</p>
+                    </n-tag>
+                  </template>
+                </n-spin>
+              </n-modal>
             </div>
           </div>
-        </NLayoutContent>
-      </NLayout>
-    </div>
+
+          <!-- 套餐说明 -->
+          <div class="text-sm text-slate-600 mt-8">
+            <p>
+              <n-icon size="20">
+                <icon-ic:baseline-attach-money />
+              </n-icon>
+              <span class="ml-1">支付满 500 元可联系</span>
+              <n-popover trigger="hover">
+                <template #trigger>
+                  <span class="underline">客服</span>
+                </template>
+                <img :src="QrCodeImg" alt="Contact Us" class="w-40 h-40" />
+              </n-popover>
+              <span>开具发票</span>
+            </p>
+            <p>
+              <n-icon size="20">
+                <icon-mdi:api />
+              </n-icon>
+              <span class="ml-1">我们提供大规模 API 调用服务，详情可咨询</span>
+              <n-popover trigger="hover">
+                <template #trigger>
+                  <span class="underline">客服</span>
+                </template>
+                <img :src="QrCodeImg" alt="Contact Us" class="w-40 h-40" />
+              </n-popover>
+            </p>
+          </div>
+        </div>
+      </div>
+    </n-layout>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive } from 'vue';
-import { NLayout, NLayoutContent, NButton } from 'naive-ui';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { useUserStore } from '@/store';
 import { formatDateTime } from '@/utils';
@@ -353,14 +356,5 @@ onMounted(async () => {
   } catch (err) {
     console.error(err);
   }
-});
-
-const getMobileClass = computed(() => {
-  if (isMobile.value) return ['rounded-none', 'shadow-none'];
-  return ['border', 'rounded-md', 'shadow-md'];
-});
-
-const getContainerClass = computed(() => {
-  return ['h-full'];
 });
 </script>

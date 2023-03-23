@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class="mx-auto w-50 sm:pt-20 sm:w-72 sm:pb-32 lg:py-48 lg:px-8 h-72">
-        <img :src="QrCodeImg" alt="Product screenshot" class="p-4 rounded-xl sm:rounded-3xl ring-12 ring-teal-400" />
+        <img :src="QrCodeImg" alt="Product screenshot" class="p-4 rounded-xl sm:rounded-3xl ring-12 ring-teal-500" />
       </div>
     </div>
   </div>

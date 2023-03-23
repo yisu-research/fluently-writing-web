@@ -5,10 +5,10 @@
       :native-scrollbar="false"
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
-      <div class="text-center text-4xl tracking-wide pt-10 pb-6">
+      <div class="text-center text-4xl tracking-wide pt-10">
         <span class="fancy-underline">随时随地，自由创作</span>
       </div>
-      <div class="flex justify-center items-center py-8 px-6">
+      <div class="flex justify-center items-center pt-12 lg:pt-16">
         <div class="image-container">
           <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500" />
           <div class="ripples">
@@ -17,9 +17,13 @@
             <div class="ripple"></div>
           </div>
         </div>
-        <img :src="ScreenImg" alt="Screenshot" class="h-[400px] lg:h-[600px] drop-shadow-xl hidden md:block" />
+        <img
+          :src="ScreenImg"
+          alt="Screenshot"
+          class="h-[400px] lg:h-[500px] xl:h-[600px] drop-shadow-xl hidden md:block pr-4"
+        />
       </div>
-      <div class="flex justify-center px-4">
+      <div class="flex justify-center pt-4 lg:pt-8 px-4">
         <div class="mt-4 text-sm text-slate-600">
           <p>
             <n-icon size="20">
@@ -28,7 +32,10 @@
             <span class="ml-1">手机扫描上方二维码，或浏览器直接访问</span>
             <n-tooltip trigger="hover">
               <template #trigger>
-                <span class="hover:text-teal-500 cursor-copy" @click="copyToClipboard('https://ai.yisukeyan.com/chat')">
+                <span
+                  class="hover:text-teal-500 cursor-pointer"
+                  @click="copyToClipboard('https://ai.yisukeyan.com/chat')"
+                >
                   <span class="mx-1">https://ai.yisukeyan.com/chat</span>
                   <n-icon size="16">
                     <icon-ic:baseline-content-copy />
@@ -74,23 +81,9 @@
 import ChatImg from '@/assets/images/chat.png';
 import ScreenImg from '@/assets/images/screenshot.png';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { useMessage } from 'naive-ui';
+import { copyToClipboard } from '@/utils';
 
 const { isMobile } = useBasicLayout();
-const message = useMessage();
-
-function copyToClipboard(text) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      console.log('Copied to clipboard');
-      message.success('链接已复制到剪贴板');
-    })
-    .catch((err) => {
-      console.error('Error copying to clipboard:', err);
-      message.error('链接复制失败，请重试到');
-    });
-}
 </script>
 
 <style lang="scss">

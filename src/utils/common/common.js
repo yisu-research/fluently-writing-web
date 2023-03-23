@@ -77,3 +77,16 @@ export function debounce(method, wait, immediate) {
     }
   };
 }
+
+export function copyToClipboard(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      console.log('Copied to clipboard');
+      window.$message.success('链接已复制到剪贴板');
+    })
+    .catch((err) => {
+      console.error('Error while copying to Clipboard: ', err);
+      window.$message.error('链接复制失败，请重试');
+    });
+}
