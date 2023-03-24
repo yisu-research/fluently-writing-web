@@ -5,12 +5,12 @@
       :native-scrollbar="false"
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
-      <div class="text-center text-4xl tracking-wide pt-10">
+      <div class="text-center text-2xl md:text-4xl tracking-wide pt-10">
         <span class="fancy-underline">随时随地，自由创作</span>
       </div>
       <div class="flex justify-center items-center pt-12 lg:pt-16">
         <div class="image-container">
-          <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500" />
+          <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500 h-[200px] md:h-[300px]" />
           <div class="ripples">
             <div class="ripple"></div>
             <div class="ripple"></div>
@@ -99,8 +99,6 @@ $n: 3;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px;
-    height: 300px;
     z-index: 1;
   }
 
