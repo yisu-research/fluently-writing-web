@@ -70,12 +70,14 @@
             >
           </p>
           <p>
-            当您邀请的新用户首次充值时，您将<span class="text-teal-600 font-bold">获得&thinsp;20%&thinsp;的奖励！</span>
+            当您邀请的新用户首次充值时，您将<span class="text-teal-600 font-bold"
+              >获得&thinsp;20%&thinsp;的现金奖励！</span
+            >
           </p>
           <p>
-            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的奖励，<span
+            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的现金奖励。<span
               class="text-teal-600 font-bold"
-              >奖励累积到&thinsp;50&thinsp;元即可提现！</span
+              >现金奖励累积到&thinsp;50&thinsp;元即可提现！</span
             >
           </p>
           <p>感谢您的推广与支持，让最先进的&thinsp;AI&thinsp;触达更多的人。</p>
