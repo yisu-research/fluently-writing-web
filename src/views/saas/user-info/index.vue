@@ -114,10 +114,12 @@
             <span v-else>点击<span class="underline font-bold">下方按钮</span>以生成邀请链接</span>
           </div>
           <template #action>
-            <n-button :disabled="!!user.invite_code" type="info" @click="handleGetInviteCode">生成邀请码</n-button>
-            <n-button :disabled="!user.invite_code" type="info" class="ml-4" @click="handleCopyInviteText"
-              >复制邀请文案</n-button
-            >
+            <n-button :disabled="!!user.invite_code" type="info" :loading="loadInviteCode" @click="handleGetInviteCode">
+              生成邀请码
+            </n-button>
+            <n-button :disabled="!user.invite_code" type="info" class="ml-4" @click="handleCopyInviteText">
+              复制邀请文案
+            </n-button>
           </template>
         </n-card>
         <n-card v-if="false" title="邀请奖励记录" class="col-span-12 lg:col-span-8 order-4">
@@ -226,9 +228,11 @@ const handleLogout = (event) => {
   userStore.logout();
 };
 
+const loadInviteCode = ref(false);
 const handleGetInviteCode = async () => {
+  loadInviteCode.value = true;
   const res = await api.getUserInviteCodeApi();
-  console.log(res);
+  loadInviteCode.value = false;
   userStore.setUserInfo(res);
 };
 
