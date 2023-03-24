@@ -34,6 +34,9 @@ export default {
   // 用户详情
   getUserInfoApi: () => request.get('/api/users/current', { noNeedTip: true, noNeedToken: false }),
 
+  // 生成邀请码
+  getUserInviteCodeApi: (data) => request.post('/api/users/invite', data, { noNeedTip: true }),
+
   // 产品列表
   getProductListApi: (data) => request.get('/api/products', data, { noNeedTip: true }),
 

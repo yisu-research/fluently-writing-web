@@ -31,8 +31,7 @@ export const useUserStore = defineStore('user', {
     async getUserInfo() {
       try {
         const res = await api.getUserInfoApi();
-        const { id, username, balance, created_at } = res;
-        this.userInfo = { id, username, balance, created_at, isLogin: true };
+        this.userInfo = { ...res, isLogin: true };
         return Promise.resolve(res.data);
       } catch (error) {
         return Promise.reject(error);
