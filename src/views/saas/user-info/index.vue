@@ -145,23 +145,39 @@
               <icon-ic:sharp-close />
             </n-button>
           </template>
-          <n-form ref="formEmailBindRef" :model="formEmailBind" :rules="formEmailBindRules">
+          <n-form ref="refEmailBind" :model="modelEmailBind" :rules="ruleEmailBind">
             <n-form-item-row label="邮箱地址" path="email">
-              <n-input v-model:value="formEmailBind.email" placeholder="请输入邮箱地址" />
+              <n-input v-model:value="modelEmailBind.email" placeholder="请输入邮箱地址" />
             </n-form-item-row>
             <n-form-item-row label="验证码" path="code">
-              <n-input v-model:value="formEmailBind.code" placeholder="请输入验证码" />
-              <n-button type="primary" dashed class="ml-2">获取验证码</n-button>
+              <n-input
+                v-model:value="modelEmailBind.code"
+                placeholder="请输入验证码"
+                :disabled="!modelEmailBind.email"
+              />
+              <n-button
+                type="primary"
+                dashed
+                class="ml-2"
+                :disabled="!modelEmailBind.email || freezeEmailCode"
+                :loading="loadEmailCode"
+                @click="handleSendEmailCode(modelEmailBind.email)"
+              >
+                <span v-if="freezeEmailCode">{{ countDown }}&thinsp;秒后再发送</span>
+                <span v-else>获取验证码</span>
+              </n-button>
             </n-form-item-row>
           </n-form>
           <template #footer>
-            <n-button
-              :disabled="formEmailBind.email === null || formEmailBind.code === null"
-              type="primary"
-              @click="handleEmailBindClick"
-            >
-              {{ user.email ? '更改' : '绑定' }}
-            </n-button>
+            <div class="flex justify-end">
+              <n-button
+                :disabled="!modelEmailBind.email || !modelEmailBind.code"
+                type="primary"
+                @click="handleEmailBindClick"
+              >
+                {{ user.email ? '更改' : '绑定' }}
+              </n-button>
+            </div>
           </template>
         </n-card>
       </n-modal>
@@ -172,32 +188,50 @@
               <icon-ic:sharp-close />
             </n-button>
           </template>
-          <n-form ref="formPassChangeRef" :model="formPassChangeBind" :rules="formPassChangeRules">
+          <n-form ref="refPassChange" :model="modelPassChange" :rules="formPassChangeRules">
             <n-form-item-row label="验证码" path="code">
-              <n-input v-model:value="formPassChangeBind.code" placeholder="请输入验证码" />
-              <n-button type="primary" dashed class="ml-2">获取验证码</n-button>
+              <n-input v-model:value="modelPassChange.code" placeholder="请输入验证码" />
+              <n-button
+                type="primary"
+                dashed
+                class="ml-2"
+                :disabled="freezeEmailCode"
+                :loading="loadEmailCode"
+                @click="handleSendEmailCode(user.email)"
+              >
+                <span v-if="freezeEmailCode">{{ countDown }}&thinsp;秒后再发送</span>
+                <span v-else>获取验证码</span>
+              </n-button>
             </n-form-item-row>
             <n-form-item-row label="新密码" path="password">
               <n-input
-                v-model:value="formPassChangeBind.password"
+                v-model:value="modelPassChange.password"
                 placeholder="请输入新密码"
                 type="password"
                 @input="handlePasswordInput"
                 @keydown.enter.prevent
               />
             </n-form-item-row>
-            <n-form-item-row ref="formPassConfirmRef" label="确认新密码" path="confirmedPassword" first>
+            <n-form-item-row ref="refPassConfirm" label="确认新密码" path="confirmedPassword" first>
               <n-input
-                v-model:value="formPassChangeBind.confirmedPassword"
+                v-model:value="modelPassChange.confirmedPassword"
                 placeholder="请再次输入新密码"
-                :disabled="!formPassChangeBind.password"
+                :disabled="!modelPassChange.password"
+                type="password"
+                @keydown.enter.prevent
               />
             </n-form-item-row>
           </n-form>
           <template #footer>
-            <n-button :disabled="formPassChangeBind.code === null" type="primary" @click="handlePassChangeClick">
-              更改
-            </n-button>
+            <div class="flex justify-end">
+              <n-button
+                :disabled="!modelPassChange.code || !modelPassChange.password"
+                type="primary"
+                @click="handlePassChangeClick"
+              >
+                更改
+              </n-button>
+            </div>
           </template>
         </n-card>
       </n-modal>
@@ -241,12 +275,12 @@ const handleCopyInviteText = () => {
   copyToClipboard(text);
 };
 
-const formEmailBindRef = ref(null);
-const formEmailBind = ref({
+const refEmailBind = ref(null);
+const modelEmailBind = ref({
   email: null,
   code: null,
 });
-const formEmailBindRules = {
+const ruleEmailBind = {
   email: [
     {
       required: true,
@@ -278,7 +312,7 @@ const formEmailBindRules = {
 
 const handleEmailBindClick = async (e) => {
   e.preventDefault();
-  formEmailBindRef.value?.validate((err) => {
+  refEmailBind.value?.validate((err) => {
     if (!err) {
       message.success('验证成功');
     } else {
@@ -288,27 +322,27 @@ const handleEmailBindClick = async (e) => {
   });
 };
 
-const formPassChangeRef = ref(null);
-const formPassChangeBind = ref({
+const refPassChange = ref(null);
+const modelPassChange = ref({
   code: null,
   password: null,
   confirmedPassword: null,
 });
-const formPassConfirmRef = ref(null);
+const refPassConfirm = ref(null);
 
 const validatePasswordStartWith = (rule, value) => {
   return (
-    !!formPassChangeRef.value.password &&
-    formPassChangeRef.value.password.startsWith(value) &&
-    formPassChangeRef.value.password.length >= value.length
+    !!modelPassChange.value.password &&
+    modelPassChange.value.password.startsWith(value) &&
+    modelPassChange.value.password.length >= value.length
   );
 };
 const validatePasswordSame = (rule, value) => {
-  return value === formPassChangeRef.value.password;
+  return value === modelPassChange.value.password;
 };
 const handlePasswordInput = () => {
-  if (formPassChangeRef.value.confirmedPassword) {
-    formPassConfirmRef.value?.validate({ trigger: 'password-input' });
+  if (modelPassChange.value.reenteredPassword) {
+    refPassConfirm.value?.validate({ trigger: 'password-input' });
   }
 };
 
@@ -360,7 +394,7 @@ const formPassChangeRules = {
 
 const handlePassChangeClick = async (e) => {
   e.preventDefault();
-  formEmailBindRef.value?.validate((err) => {
+  refPassChange.value?.validate((err) => {
     if (!err) {
       message.success('验证成功');
     } else {
@@ -368,6 +402,29 @@ const handlePassChangeClick = async (e) => {
       message.error('验证失败');
     }
   });
+};
+
+const loadEmailCode = ref(false);
+const freezeEmailCode = ref(false);
+const countDown = ref(30);
+const handleSendEmailCode = async (email) => {
+  if (!isValidEmail(email)) {
+    message.error('邮箱地址不合法');
+    return;
+  }
+  loadEmailCode.value = true;
+  // const res = await api.getUserInviteCodeApi();
+  loadEmailCode.value = false;
+  message.success('验证码已发送，请注意查收');
+  freezeEmailCode.value = true;
+  const timer = setInterval(() => {
+    countDown.value--;
+    if (countDown.value === 0) {
+      clearInterval(timer);
+      freezeEmailCode.value = false;
+      countDown.value = 30;
+    }
+  }, 1000);
 };
 
 const isValidEmail = (email) => {
