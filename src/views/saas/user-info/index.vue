@@ -40,7 +40,7 @@
             </div>
             <div v-if="user.created_at">
               <div class="text-md font-bold">创建日期</div>
-              <div class="text-sm">{{ new Date(user.created_at).toLocaleDateString() }}</div>
+              <div class="text-sm">{{ formatDate(new Date(user.created_at)) }}</div>
             </div>
             <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
               <div class="text-md font-bold">邀请人数</div>
@@ -122,13 +122,35 @@
             </n-button>
           </template>
         </n-card>
-        <n-card v-if="false" title="邀请奖励记录" class="col-span-12 lg:col-span-8 order-4">
+        <n-card title="邀请奖励记录" class="col-span-12 lg:col-span-8 order-4">
           <template #header-extra>
-            <n-button strong secondary type="info">奖励提现</n-button>
+            <n-button strong secondary type="info" @click="handleIncomeWithdraw">我要提现</n-button>
           </template>
-          卡片内容
-          <template #footer> #footer </template>
-          <template #action> #action </template>
+          <h2 class="text-lg mb-2">统计</h2>
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
+              <div class="text-md font-bold">邀请人数</div>
+              <div class="text-sm">{{ user.invitation_count.invitee_count }}</div>
+            </div>
+            <div v-if="Number.isFinite(user.invitation_count?.call_count)">
+              <div class="text-md font-bold">奖励体验次数</div>
+              <div class="text-sm">{{ user.invitation_count.call_count }}</div>
+            </div>
+            <div v-if="Number.isFinite(user.invitation_count?.total_income)">
+              <div class="text-md font-bold">累计现金奖励</div>
+              <div class="text-sm">{{ user.invitation_count.total_income }}</div>
+            </div>
+          </div>
+          <h2 class="text-lg mb-2">明细</h2>
+          <n-data-table
+            remote
+            :columns="columnIncome"
+            :data="dataIncome"
+            :loading="loadInviteIncome"
+            :pagination="pageIncome"
+            :bordered="false"
+            @update:page="handleGetInviteIncome"
+          />
         </n-card>
       </div>
       <n-modal v-model:show="showEmailModal">
@@ -235,16 +257,33 @@
           </template>
         </n-card>
       </n-modal>
+      <n-modal v-model:show="showWithdrawModal">
+        <n-card style="width: 600px" title="奖励提现" :bordered="false" size="huge" role="dialog" aria-modal="true">
+          <template #header-extra>
+            <n-button strong secondary class="text-md" @click="showWithdrawModal = false">
+              <icon-ic:sharp-close />
+            </n-button>
+          </template>
+          <div class="flex flex-col items-center">
+            <p>感谢您的支持与推广！</p>
+            <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p>
+            <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500 h-[200px] w-[200px] my-4" />
+            <p>微信扫描上方二维码</p>
+            <p>联系客服即可提现</p>
+          </div>
+        </n-card>
+      </n-modal>
     </n-layout>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { copyToClipboard } from '@/utils';
+import { formatDate, formatDateTime, copyToClipboard } from '@/utils';
 import { useMessage } from 'naive-ui';
+import ChatImg from '@/assets/images/chat.png';
 import api from '@/views/saas/api';
 
 const userStore = useUserStore();
@@ -273,6 +312,64 @@ const handleGetInviteCode = async () => {
 const handleCopyInviteText = () => {
   const text = `向大家强烈推荐一个方便好用的 ChatGPT 工具，叫一粟创作助手。写作业、写材料、写代码，都能轻松搞定！助力工作、学习、生活，创作无极限！海量模板，迸发灵感，提升效率！详情可见：https://ai.yisukeyan.com/。通过下方链接注册还可获赠 10 次免费体验：${inviteLink.value}`;
   copyToClipboard(text);
+};
+
+const dataIncome = ref([]);
+const columnIncome = [
+  {
+    title: '时间',
+    key: 'time',
+  },
+  {
+    title: '来源',
+    key: 'action',
+  },
+  {
+    title: '奖励',
+    key: 'income',
+  },
+];
+const pageIncome = reactive({
+  page: 1,
+  pageCount: 1,
+  pageSize: 10,
+  prefix({ itemCount }) {
+    return `共 ${itemCount} 条`;
+  },
+});
+const loadInviteIncome = ref(false);
+const handleGetInviteIncome = async (currentPage = 1) => {
+  loadInviteIncome.value = true;
+  try {
+    const res = await api.getInviteIncomeApi({ limit: pageIncome.pageSize, page: currentPage });
+    dataIncome.value = res.incomes.map((item) => {
+      return {
+        key: item.id,
+        time: formatDateTime(new Date(item.created_at)),
+        action: item.action,
+        income: item.description,
+      };
+    });
+    pageIncome.page = currentPage;
+    pageIncome.itemCount = res.total_count;
+    pageIncome.pageCount = Math.ceil(res.total_count / pageIncome.pageSize);
+  } catch (err) {
+    console.error(err);
+  }
+  loadInviteIncome.value = false;
+};
+
+onMounted(() => {
+  handleGetInviteIncome();
+});
+
+const showWithdrawModal = ref(false);
+const handleIncomeWithdraw = () => {
+  if (!user.value.invitation_count?.total_income || user.value.invitation_count?.total_income < 50) {
+    message.error('现金奖励累计不满 50 元，暂时无法提现');
+    return;
+  }
+  showWithdrawModal.value = true;
 };
 
 const refEmailBind = ref(null);

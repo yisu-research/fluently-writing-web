@@ -51,4 +51,7 @@ export default {
 
   // 订单详情
   getOrderDetailApi: (id) => request.get(`/api/orders/${id}`, { noNeedTip: true }),
+
+  // 邀请奖励
+  getInviteIncomeApi: (data) => request.get('/api/incomes', data, { noNeedTip: true }),
 };
