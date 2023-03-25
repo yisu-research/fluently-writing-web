@@ -25,10 +25,10 @@
             </RouterLink>
             <div class="w-full mt-4">
               <n-tabs default-value="signin-username" size="large" justify-content="center">
-                <n-tab-pane name="signin-username" tab="用户名登录">
+                <n-tab-pane name="signin-username" tab="密码登录">
                   <n-form ref="formUserRef" :model="formUser" :rules="rulesForUser">
                     <n-form-item-row label="用户名" path="username">
-                      <n-input v-model:value="formUser.username" placeholder="请输入用户名" />
+                      <n-input v-model:value="formUser.username" placeholder="请输入用户名或邮箱" />
                     </n-form-item-row>
                     <n-form-item-row label="密码" path="password">
                       <n-input v-model:value="formUser.password" placeholder="请输入密码" type="password" />
@@ -69,7 +69,7 @@
                     登录
                   </n-button>
                 </n-tab-pane>
-                <n-tab-pane name="signin-email" tab="邮箱登录">
+                <n-tab-pane name="signin-email" tab="验证码登录">
                   <n-form ref="formEmailRef" :model="formEmail" :rules="rulesForEmail">
                     <n-form-item-row label="邮箱" path="email">
                       <n-input v-model:value="formEmail.email" placeholder="请输入邮箱地址" />

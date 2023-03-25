@@ -14,6 +14,7 @@ export const useAppStore = defineStore('app', {
       isDark,
       siderCollapsed: false,
       isChat: true,
+      isSignup: false,
     };
   },
   actions: {
@@ -34,6 +35,11 @@ export const useAppStore = defineStore('app', {
     switchCollapsed() {
       this.collapsed = !this.collapsed;
     },
+
+    setIsSignup(value) {
+      this.isSignup = value;
+    },
+
     setChat(isChat) {
       this.isChat = isChat;
     },

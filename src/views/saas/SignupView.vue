@@ -27,13 +27,24 @@
                 <n-tab-pane name="signin-username" tab="注册">
                   <n-form ref="formRef" :model="formValue" :rules="rules">
                     <n-form-item-row label="用户名" path="username">
-                      <n-input v-model:value="formValue.username" placeholder="请输入用户名" />
+                      <n-input v-model:value="formValue.username" placeholder="用户名由数字和字母组成，长度6-24位" />
+                    </n-form-item-row>
+                    <n-form-item-row label="邀请码" path="invite_code">
+                      <n-input v-model:value="formValue.invite_code" placeholder="邀请码（可选）" />
                     </n-form-item-row>
                     <n-form-item-row label="密码" path="password">
-                      <n-input v-model:value="formValue.password" placeholder="请输入密码" type="password" />
+                      <n-input v-model:value="formValue.password" placeholder="有效密码长度为8-32位" type="password" />
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong :disabled="state.loading" @click.prevent="onSignup">
+                  <n-button
+                    type="primary"
+                    block
+                    secondary
+                    strong
+                    :disabled="state.loading"
+                    class="mt-8"
+                    @click.prevent="onSignup"
+                  >
                     注册
                   </n-button>
                 </n-tab-pane>
@@ -148,10 +159,8 @@ const message = useMessage();
 
 const formValue = ref({
   username: '',
-  phone_number: '',
-  code: '',
+  invite_code: null,
   password: '',
-  invite_code: '',
 });
 
 const rules = {
@@ -192,7 +201,6 @@ const onSignup = useDebounceFn(async () => {
         let res = await api.signupApi(formValue.value);
         setToken(res.token);
         $message.success('注册成功');
-        $message.success('已免费获得三次体验机会');
         router.push('/chat');
       } catch (error) {
         console.log(error.error.message);
@@ -203,5 +211,5 @@ const onSignup = useDebounceFn(async () => {
       message.error('请按要求填写注册信息');
     }
   });
-});
+}, 600);
 </script>

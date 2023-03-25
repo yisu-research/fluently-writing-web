@@ -37,21 +37,35 @@ import SideBar from './components/sidebar/index.vue';
 import AppMain from './components/AppMain.vue';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { useAppStore } from '@/store';
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import Header from './components/header/index.vue';
+import { useMessage } from 'naive-ui';
+import { useUserStore } from '@/store';
 
 const { isMobile } = useBasicLayout();
+const message = useMessage();
+const userStore = useUserStore();
+const userInfo = computed(() => userStore.userInfo);
 
-// import AppTags from './components/tags/index.vue';
-
-// import { header, tags } from '~/settings';
 const appStore = useAppStore();
+
+const isSignup = computed(() => appStore.isSignup);
 
 const handleUpdate = (collapsed) => {
   appStore.switchCollapsed(collapsed);
 };
 
-onMounted(() => {
+onMounted(async () => {
   appStore.switchCollapsed(isMobile);
+  if (isSignup.value) {
+    await userStore.getUserInfo();
+    message.success(
+      `欢迎您，${userInfo.value.username}，您的余额为${userInfo.value.balance}次 \n 「个人中心」绑定邮箱还可获赠10次体验次数`,
+      { duration: 5000 },
+    );
+    appStore.setIsSignup(false);
+  } else {
+    console.log('欢迎您，');
+  }
 });
 </script>

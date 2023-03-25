@@ -5,18 +5,26 @@ export function createPageLoadingGuard(router) {
 
   router.beforeEach((to, from) => {
     window.$loadingBar?.start();
+
+    if (from.name === 'Signup') {
+      console.log('from signup before');
+      appStore.setIsSignup(true);
+    }
   });
 
-  router.afterEach((to) => {
+  router.afterEach((to, from) => {
     setTimeout(() => {
       window.$loadingBar?.finish();
-      console.log(to.name);
       if (to.name === 'Chat') {
         appStore.setChat(true);
       } else {
         appStore.setChat(false);
       }
-      console.log('appStore', appStore.isChat);
+
+      if (from.name === 'Signup') {
+        console.log('from signup after');
+        appStore.setIsSignup(true);
+      }
     }, 200);
   });
 
