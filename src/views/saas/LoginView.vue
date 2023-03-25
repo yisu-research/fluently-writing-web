@@ -24,7 +24,7 @@
               </div>
             </RouterLink>
             <div class="w-full mt-4">
-              <n-tabs default-value="signin-username" size="large" justify-content="start">
+              <n-tabs default-value="signin-username" size="large" justify-content="center">
                 <n-tab-pane name="signin-username" tab="用户名登录">
                   <n-form ref="formUserRef" :model="formUser" :rules="rulesForUser">
                     <n-form-item-row label="用户名" path="username">
@@ -69,7 +69,7 @@
                     登录
                   </n-button>
                 </n-tab-pane>
-                <!-- <n-tab-pane name="signin-email" tab="邮箱登录">
+                <n-tab-pane name="signin-email" tab="邮箱登录">
                   <n-form ref="formEmailRef" :model="formEmail" :rules="rulesForEmail">
                     <n-form-item-row label="邮箱" path="email">
                       <n-input v-model:value="formEmail.email" placeholder="请输入邮箱地址" />
@@ -81,8 +81,19 @@
                       </n-button>
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block secondary strong @click.prevent="onSignupForEmail"> 登录 </n-button>
-                </n-tab-pane> -->
+
+                  <n-button
+                    type="primary"
+                    block
+                    secondary
+                    strong
+                    class="mt-8"
+                    :disabled="state.loading"
+                    @click.prevent="onSignupForEmail"
+                  >
+                    登录
+                  </n-button>
+                </n-tab-pane>
               </n-tabs>
               <div class="flex items-center justify-end">
                 <n-button text class="my-4 sm:mb-0"><router-link to="/signup">没有账号？去注册</router-link> </n-button>
@@ -179,6 +190,7 @@ import { useMessage } from 'naive-ui';
 import { ref, reactive } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import QrCodeImg from '@/assets/images/qrcode.jpg';
+import { useIntervalFn } from '@vueuse/core';
 
 const state = reactive({
   loading: false,
@@ -187,9 +199,15 @@ const state = reactive({
 
 const router = useRouter();
 
+/// 定时器
+const timer = ref(0);
+
+/// 禁用按钮
+const disabled = ref(false);
+
 const formUserRef = ref(null);
 
-// const formEmailRef = ref(null);
+const formEmailRef = ref(null);
 
 const message = useMessage();
 
@@ -199,11 +217,11 @@ const formUser = ref({
   login_type: 'username',
 });
 
-// const formEmail = ref({
-//   email: '',
-//   code: '',
-//   login_type: 'email',
-// });
+const formEmail = ref({
+  email: '',
+  code: '',
+  login_type: 'email_code',
+});
 
 const rulesForUser = {
   username: {
@@ -225,18 +243,25 @@ const rulesForUser = {
   },
 };
 
-// const rulesForEmail = {
-//   email: {
-//     required: true,
-//     message: '请输入邮箱',
-//     trigger: 'blur',
-//   },
-//   code: {
-//     required: true,
-//     message: '请输入验证码',
-//     trigger: ['input'],
-//   },
-// }
+const rulesForEmail = {
+  email: {
+    required: true,
+    validator(rule, value) {
+      if (!value) {
+        return new Error('请填写邮箱');
+      } else if (!isEmail(value)) {
+        return new Error('请填写正确的邮箱地址');
+      }
+      return true;
+    },
+    trigger: 'blur',
+  },
+  code: {
+    required: true,
+    message: '请输入验证码',
+    trigger: ['input'],
+  },
+};
 
 const handleForget = useDebounceFn(() => {
   state.showModal = true;
@@ -268,4 +293,79 @@ const onSignupForUser = useDebounceFn(async () => {
     }
   });
 }, 600);
+
+const onSignupForEmail = useDebounceFn(async () => {
+  state.loading = true;
+  formEmailRef.value?.validate(async (errors) => {
+    if (!errors) {
+      try {
+        let res = await api.loginApi(formEmail.value);
+        setToken(res.token);
+        router.push('/chat');
+        $message.success('登录成功');
+      } catch (error) {
+        console.log(error.error.message);
+        $message.error(error.error.message);
+      } finally {
+        state.loading = false;
+      }
+    } else {
+      console.log(errors);
+      state.loading = false;
+      message.error('请按要求填写账号信息');
+    }
+  });
+}, 600);
+
+const { pause, resume } = useIntervalFn(
+  () => {
+    /// 每次定时任务 控制时间递减
+    if (timer.value <= 0) {
+      // 恢复按钮
+      disabled.value = false;
+      // 停止递减： 停止定时器
+      pause();
+    } else {
+      timer.value -= 1;
+    }
+  },
+  1000,
+  {
+    // 首次是否自动启动定时任务：true（默认值，自动启动），false，不需要自动启动
+    immediate: false,
+    // 是否延时执行定时任务（false(默认值)，不延时；true表示延时）
+    immediateCallback: false,
+  },
+);
+
+// 校验邮箱地址是否合法
+const isEmail = (email) => {
+  return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+    email,
+  );
+};
+
+const sendCode = async () => {
+  if (formEmail.value.email === '' || !isEmail(formEmail.value.email)) {
+    message.error('无效的邮箱地址');
+    return;
+  }
+  try {
+    await api.sendCodeApi({ phone_number: formPhone.value.phone_number });
+    message.success('发送成功！');
+    // 开启定时效果
+    if (timer.value === 0) {
+      // 禁用按钮
+      disabled.value = true;
+      timer.value = 60;
+      // 重启定时器
+      resume();
+    } else {
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+    message.error('验证码发送失败');
+  }
+};
 </script>
