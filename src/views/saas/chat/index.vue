@@ -175,15 +175,33 @@ async function onConversation() {
   }
 
   if (count.value <= 0) {
-    dialog.warning({
-      title: '提示',
-      content: '余额不足，请充值',
-      positiveText: '去充值',
-      negativeText: '取消',
-      onPositiveClick: () => {
-        router.push('/cost');
-      },
-    });
+    console.log(userInfo.value.email);
+    if (userInfo.value.email === null) {
+      dialog.warning({
+        title: '提示',
+        content: '余额不足，去「个人中心」绑定邮箱可以继续获得5次体验',
+        positiveText: '去绑定',
+        negativeText: '去充值',
+        onPositiveClick: () => {
+          router.push('/user-center');
+        },
+        onNegativeClick: () => {
+          router.push('/cost');
+        },
+      });
+      return;
+    } else {
+      dialog.warning({
+        title: '提示',
+        content: '余额不足，请充值',
+        positiveText: '去充值',
+        negativeText: '取消',
+        onPositiveClick: () => {
+          router.push('/cost');
+        },
+      });
+    }
+
     return;
   }
   const message = prompt.value;

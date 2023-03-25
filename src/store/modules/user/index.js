@@ -7,7 +7,7 @@ import { clearLocalState } from '@/store/modules/chat/helper';
 export const useUserStore = defineStore('user', {
   state() {
     return {
-      userInfo: { username: '一粟创作助手', phone_number: '激发灵感，提高效率', balance: 0, id: 0, isLogin: false },
+      userInfo: { username: '一粟创作助手', balance: 0, id: 0, email: null, invite_code: null, isLogin: false },
     };
   },
   getters: {
