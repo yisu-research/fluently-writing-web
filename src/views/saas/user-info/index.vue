@@ -203,6 +203,7 @@
               <n-button
                 :disabled="!modelEmailBind.email || !modelEmailBind.code"
                 type="primary"
+                :loading="loadEmailBind"
                 @click="handleEmailBindClick"
               >
                 {{ user.email ? '更改' : '绑定' }}
@@ -272,8 +273,13 @@
           <template #footer>
             <div class="flex justify-end">
               <n-button
-                :disabled="!modelPassChange.code || !modelPassChange.confirmedPassword"
+                :disabled="
+                  !modelPassChange.newPassword ||
+                  !modelPassChange.confirmedPassword ||
+                  modelPassChange.newPassword !== modelPassChange.confirmedPassword
+                "
                 type="primary"
+                :loading="loadPassChange"
                 @click="handlePassChangeClick"
               >
                 更改
@@ -446,21 +452,28 @@ const ruleEmailBind = {
   ],
 };
 
+const loadEmailBind = ref(false);
 const handleEmailBindClick = (e) => {
   e.preventDefault();
   const action = user.value.email ? '更改' : '绑定';
-  try {
-    refEmailBind.value?.validate(async (err) => {
-      if (!err) {
+  refEmailBind.value?.validate(async (err) => {
+    if (!err) {
+      loadEmailBind.value = true;
+      try {
         await api.bindEmailApi({ email: modelEmailBind.value.email, code: modelEmailBind.value.code });
         message.success(`邮箱${action}成功`);
+      } catch (err) {
+        console.error(err);
+        message.success(`邮箱${action}失败，请重试`);
+      } finally {
+        loadEmailBind.value = false;
       }
+    } else {
+      console.error(err);
       message.error('请按提示正确填写内容');
-    });
-  } catch (err) {
-    console.error(err);
-    message.success(`邮箱${action}失败，请重试`);
-  }
+    }
+    showEmailModal.value = false;
+  });
 };
 
 const refPassChange = ref(null);
@@ -492,6 +505,7 @@ const handlePasswordInput = () => {
 const formPassChangeRules = {
   code: [
     {
+      key: 'code',
       required: true,
       message: '请输入验证码',
       trigger: 'blur',
@@ -499,6 +513,7 @@ const formPassChangeRules = {
   ],
   oldPassword: [
     {
+      key: 'old',
       required: true,
       message: '请输入旧密码',
       trigger: 'blur',
@@ -537,37 +552,49 @@ const formPassChangeRules = {
   ],
 };
 
+const loadPassChange = ref(false);
 const handlePassChangeClick = async (e) => {
   e.preventDefault();
   const useEmail = useEmail2ChangePass.value;
-  try {
-    refPassChange.value?.validate(async (err) => {
+  refPassChange.value?.validate(
+    async (err) => {
       if (!err) {
-        if (useEmail) {
-          await api.resetPasswordApi({
-            email: user.value.email,
-            code: modelPassChange.value.code,
-            password: modelPassChange.value.newPassword,
-          });
-          message.success(`密码重置成功`);
-        } else {
-          await api.updatePasswordApi({
-            old_password: modelPassChange.value.oldPassword,
-            new_password: modelPassChange.value.newPassword,
-          });
-          message.success(`密码更改成功`);
+        loadPassChange.value = true;
+        try {
+          if (useEmail) {
+            await api.resetPasswordApi({
+              email: user.value.email,
+              code: modelPassChange.value.code,
+              password: modelPassChange.value.newPassword,
+            });
+            message.success(`密码重置成功`);
+          } else {
+            await api.updatePasswordApi({
+              old_password: modelPassChange.value.oldPassword,
+              new_password: modelPassChange.value.newPassword,
+            });
+            message.success(`密码更改成功`);
+          }
+        } catch (_err) {
+          console.error(_err);
+          if (useEmail) {
+            message.error(`密码重置失败，请重试`);
+          } else {
+            message.error(`密码更改失败，请检查密码是否正确`);
+          }
+        } finally {
+          loadPassChange.value = false;
         }
+      } else {
+        console.error(err);
+        message.error('请按提示正确填写内容');
       }
-      message.error('请按提示正确填写内容');
-    });
-  } catch (err) {
-    console.error(err);
-    if (useEmail) {
-      message.error(`密码重置失败，请重试`);
-    } else {
-      message.error(`密码更改失败，请检查密码是否正确`);
-    }
-  }
+      showPasswordModal.value = false;
+    },
+    (rule) => {
+      return rule?.key !== (useEmail ? 'old' : 'code');
+    },
+  );
 };
 
 const loadEmailCode = ref(false);

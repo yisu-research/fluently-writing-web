@@ -221,7 +221,7 @@ const onSignupForUser = useDebounceFn(async () => {
         router.push('/chat');
         message.success('登录成功');
       } catch (err) {
-        console.error(err.error.message);
+        console.error(err);
         message.error(err.error.message);
       } finally {
         state.loading = false;
@@ -244,7 +244,7 @@ const onSignupForEmail = useDebounceFn(async () => {
         router.push('/chat');
         message.success('登录成功');
       } catch (err) {
-        console.error(err.error.message);
+        console.error(err);
         message.error(err.error.message);
       } finally {
         state.loading = false;
@@ -282,7 +282,8 @@ const handleSendEmailCode = async (email) => {
   } catch (err) {
     console.error(err);
     message.error(`验证码发送失败，请重试`);
+  } finally {
+    loadEmailCode.value = false;
   }
-  loadEmailCode.value = false;
 };
 </script>

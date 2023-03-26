@@ -186,8 +186,6 @@ import { useUserStore } from '@/store';
 const userStore = useUserStore();
 
 const userInfo = computed(() => userStore.userInfo);
-console.log('userInfo');
-console.log(userInfo);
 
 const navigation = [
   // { name: 'Product', href: '#' },
