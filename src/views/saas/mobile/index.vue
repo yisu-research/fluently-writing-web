@@ -10,12 +10,21 @@
       </div>
       <div class="flex items-center justify-center pt-12 lg:pt-16">
         <div class="image-container">
-          <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500 h-[200px] md:h-[300px]" />
+          <img
+            :src="ChatImg"
+            alt="QR Code"
+            class="ring-4 rounded-md ring-teal-500 h-[200px] md:h-[250px] lg:h-[300px]"
+          />
+          <div class="ripples">
+            <div class="ripple"></div>
+            <div class="ripple"></div>
+            <div class="ripple"></div>
+          </div>
         </div>
         <img
           :src="ScreenImg"
           alt="Screenshot"
-          class="h-[400px] lg:h-[500px] xl:h-[600px] drop-shadow-xl hidden md:block pr-4"
+          class="h-[400px] md:h-[500px] lg:h-[600px] drop-shadow-xl hidden md:block mr-6 rounded-md"
         />
       </div>
       <div class="flex justify-center px-4 pt-4 lg:pt-8">
@@ -86,8 +95,13 @@ $n: 3;
 
 .image-container {
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: 400px;
+  height: 400px;
+
+  @media (min-width: 768px) {
+    width: 600px;
+    height: 600px;
+  }
 
   img {
     position: absolute;
@@ -102,9 +116,14 @@ $n: 3;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
+    width: 400px;
+    height: 400px;
     z-index: 0;
+
+    @media (min-width: 768px) {
+      width: 600px;
+      height: 600px;
+    }
 
     .ripple {
       position: absolute;
