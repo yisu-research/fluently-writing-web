@@ -1,6 +1,8 @@
 <template>
-  <div class="h-screen p-4 transition-all">
-    <div class="flex flex-col h-full overflow-hidden bg-white divide-y divide-gray-200 rounded-lg shadow">
+  <div class="mt-16 transition-all h-2xl">
+    <div
+      class="flex flex-col h-full overflow-hidden bg-white divide-y divide-gray-200 rounded-lg shadow-sm ring-1 ring-slate-100"
+    >
       <div class="px-4 py-5 sm:px-6">
         <p class="text-lg font-bold">消费记录</p>
       </div>
@@ -106,10 +108,11 @@
             </template>
           </n-spin>
         </n-modal>
-
-        <div class="flex items-center justify-between px-4 py-3 my-4 bg-white sm:px-6">
+      </n-scrollbar>
+      <div class="px-4 py-5 sm:px-6">
+        <div class="flex items-center justify-between bg-white sm:px-6">
           <div class="flex justify-between flex-1 sm:hidden">
-            <router-link :to="{ path: '/cost/record', query: { page: prevPage() } }">
+            <router-link :to="{ path: '/cost', query: { page: prevPage() } }">
               <div
                 class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
@@ -118,7 +121,7 @@
               </div>
             </router-link>
 
-            <router-link :to="{ path: '/cost/record', query: { page: nextPage() } }">
+            <router-link :to="{ path: '/cost', query: { page: nextPage() } }">
               <div
                 class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
@@ -130,7 +133,7 @@
           <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end">
             <div>
               <nav class="inline-flex -space-x-px rounded-md shadow-sm isolate" aria-label="Pagination">
-                <router-link :to="{ path: '/cost/record', query: { page: prevPage() } }">
+                <router-link :to="{ path: '/cost', query: { page: prevPage() } }">
                   <div
                     class="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                   >
@@ -141,14 +144,14 @@
                 <router-link
                   v-for="page in state.page.total"
                   :key="page"
-                  :to="{ path: '/cost/record', query: { page: page } }"
+                  :to="{ path: '/cost', query: { page: page } }"
                   class="relative inline-flex items-center px-4 py-2 text-sm font-semibold"
                   :class="state.page.active === page ? state.currentStyle : state.defaultStyle"
                 >
                   {{ page }}
                 </router-link>
 
-                <router-link :to="{ path: '/cost/record', query: { page: nextPage() } }">
+                <router-link :to="{ path: '/cost', query: { page: nextPage() } }">
                   <div
                     class="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                   >
@@ -160,7 +163,7 @@
             </div>
           </div>
         </div>
-      </n-scrollbar>
+      </div>
     </div>
   </div>
 </template>

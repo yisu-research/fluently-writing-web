@@ -23,7 +23,7 @@ export default {
   updateChatApi: (id, data) => request.put(`/api/conversations/${id}`, data, { noNeedTip: true }),
 
   // 发送消息
-  postMessageApi: (data) => request.post('/api/messages', data, { noNeedTip: true }),
+  postMessageApi: (data) => request.post('/api/verifications', data, { noNeedTip: true }),
 
   // 消息流
   getMessageStreamApi: (data) => request.get('/api/messages/stream', { noNeedTip: true, data: data, params: data }),
@@ -51,4 +51,10 @@ export default {
 
   // 订单详情
   getOrderDetailApi: (id) => request.get(`/api/orders/${id}`, { noNeedTip: true }),
+
+  // 收益列表
+  getIncomeListApi: (data) => request.get('/api/incomes', { noNeedTip: true, params: data }),
+
+  // 绑定邮箱
+  bindEmailApi: (data) => request.post('/api/users/email', data, { noNeedTip: true }),
 };

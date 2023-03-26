@@ -6,7 +6,106 @@
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
       <div class="grid grid-cols-12 gap-4">
-        <n-card v-if="false" title="账号设置" class="col-span-12 lg:col-span-8 order-2 lg:order-1">
+        <n-card title="个人信息" class="order-1 col-span-12 lg:col-span-4">
+          <div class="flex flex-col items-center">
+            <img class="w-[100px] h-[100px] rounded-full" src="@/assets/avatar.jpg" alt="" />
+            <div v-if="user.username" class="mt-2 text-2xl font-bold">
+              {{ user.username ?? '一粟创作助手' }}
+            </div>
+          </div>
+          <div class="mt-8">
+            <div class="font-bold text-md">
+              邮箱:
+              <span class="text-sm font-normal">{{ user.email ? user.email : '未绑定（绑定可获取五次体验）' }}</span>
+            </div>
+          </div>
+          <div>
+            <div v-if="Number.isFinite(user.balance)" class="flex justify-start mt-2">
+              <div class="font-bold text-md">剩余次数:</div>
+              <div class="ml-2 text-sm">{{ user.balance.toLocaleString() }}</div>
+            </div>
+            <div v-if="user.created_at" class="flex justify-start mt-2">
+              <div class="font-bold text-md">创建日期:</div>
+              <div class="ml-2 text-sm">{{ new Date(user.created_at).toLocaleDateString() }}</div>
+            </div>
+          </div>
+          <template #action>
+            <div class="text-end">
+              <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
+                <template #trigger>
+                  <n-button quaternary type="error" class="text-rose-500">退出登录</n-button>
+                </template>
+                确认退出登录么？
+              </n-popconfirm>
+            </div>
+          </template>
+        </n-card>
+        <n-card title="邀请新用户" class="order-2 col-span-12 lg:col-span-8 lg:order-1">
+          <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！具体方案为：</p>
+          <p>
+            每成功邀请一位新用户完成注册并绑定邮箱，您和新用户都将<span class="font-bold text-teal-600"
+              >获得&thinsp;10&thinsp;次创作体验！</span
+            >
+          </p>
+          <p>
+            当您邀请的新用户首次充值时，您将<span class="font-bold text-teal-600"
+              >获得&thinsp;20%&thinsp;的现金奖励！</span
+            >
+          </p>
+          <p>
+            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的现金奖励。<span
+              class="font-bold text-teal-600"
+              >现金奖励累积到&thinsp;50&thinsp;元即可提现！</span
+            >
+          </p>
+          <p>感谢您的推广与支持，让最先进的&thinsp;AI&thinsp;触达更多的人。</p>
+          <div class="mt-4">
+            <span>邀请码：</span>
+            <span v-if="user.invite_code" class="ml-1">
+              <span>{{ user.invite_code }}</span>
+              <span
+                v-if="user.invite_code"
+                class="cursor-pointer hover:text-teal-500"
+                @click="copyToClipboard(user.invite_code)"
+              >
+                <n-icon class="ml-2 mr-0.5" size="16">
+                  <icon-ic:baseline-content-copy />
+                </n-icon>
+                <span>点击以复制邀请码</span>
+              </span>
+            </span>
+            <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请码</span>
+          </div>
+          <div>
+            <span>邀请链接：</span>
+            <span v-if="user.invite_code" class="ml-1">
+              <a :href="inviteLink" target="__blank" class="text-teal-600 hover:underline">
+                {{ inviteLink }}
+              </a>
+              <span class="cursor-pointer hover:text-teal-500" @click="copyToClipboard(inviteLink)">
+                <n-icon class="ml-2 mr-0.5" size="16">
+                  <icon-ic:baseline-content-copy />
+                </n-icon>
+                <span>点击以复制邀请链接</span>
+              </span>
+            </span>
+            <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请链接</span>
+          </div>
+          <template #action>
+            <n-button
+              :disabled="!!user.invite_code"
+              type="primary"
+              :loading="loadInviteCode"
+              @click="handleGetInviteCode"
+            >
+              生成邀请码
+            </n-button>
+            <n-button :disabled="!user.invite_code" type="primary" class="ml-4" @click="handleCopyInviteText">
+              复制邀请文案
+            </n-button>
+          </template>
+        </n-card>
+        <n-card title="账号设置" class="order-1 col-span-12 lg:col-span-12 lg:order-1">
           <div class="setting-item">
             <div>
               <div class="text-base font-bold">邮箱地址</div>
@@ -24,111 +123,87 @@
             </div>
             <n-button type="primary" ghost @click="showPasswordModal = true">更改</n-button>
           </div>
-          <div class="font-bold text-slate-500 mt-4">更多功能即将上线，敬请期待！</div>
+          <div class="mt-4 font-bold text-slate-500">更多功能即将上线，敬请期待！</div>
         </n-card>
-        <n-card title="个人简介" class="col-span-12 lg:col-span-4 order-1 lg:order-2">
-          <div class="flex flex-col items-center">
-            <img class="w-[100px] h-[100px] rounded-full" src="@/assets/avatar.jpg" alt="" />
-            <div v-if="user.username" class="font-bold text-2xl mt-2">
-              {{ user.username ?? '一粟创作助手' }}
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mt-6">
-            <div v-if="Number.isFinite(user.balance)">
-              <div class="text-md font-bold">剩余次数</div>
-              <div class="text-sm">{{ user.balance.toLocaleString() }}</div>
-            </div>
-            <div v-if="user.created_at">
-              <div class="text-md font-bold">创建日期</div>
-              <div class="text-sm">{{ new Date(user.created_at).toLocaleDateString() }}</div>
-            </div>
+        <n-card title="邀请奖励记录" class="order-4 col-span-12">
+          <template #header-extra>
+            <n-button strong secondary type="primary">奖励提现</n-button>
+          </template>
+          <div class="grid gap-4 mt-6 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5">
             <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
-              <div class="text-md font-bold">邀请人数</div>
+              <div class="font-bold text-md">累计邀请用户数</div>
               <div class="text-sm">{{ user.invitation_count.invitee_count }}</div>
             </div>
             <div v-if="Number.isFinite(user.invitation_count?.total_income)">
-              <div class="text-md font-bold">邀请奖励</div>
+              <div class="font-bold text-md">累计现金收益</div>
               <div class="text-sm">{{ user.invitation_count.total_income }}</div>
             </div>
+            <div v-if="Number.isFinite(user.invitation_count?.call_count)">
+              <div class="font-bold text-md">累计新增体验次数</div>
+              <div class="text-sm">{{ user.invitation_count.call_count }}</div>
+            </div>
+            <div v-if="Number.isFinite(user.invitation_count?.withdraw)">
+              <div class="font-bold text-md">累计提现收益</div>
+              <div class="text-sm">{{ user.invitation_count.withdraw }}</div>
+            </div>
+            <div v-if="Number.isFinite(user.invitation_count?.balance)">
+              <div class="font-bold text-md">未提现收益</div>
+              <div class="text-sm">{{ user.invitation_count.balance }}</div>
+            </div>
           </div>
-          <template #action>
-            <div class="text-center">
-              <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
-                <template #trigger>
-                  <n-button strong secondary type="error">退出登录</n-button>
-                </template>
-                确认退出登录么？
-              </n-popconfirm>
+          <template #footer>
+            <div class="px-4 py-5 sm:px-6">
+              <div class="flex items-center justify-between bg-white sm:px-6">
+                <div class="flex justify-between flex-1 sm:hidden">
+                  <div
+                    class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    @click="prevPage"
+                  >
+                    <span class="sr-only">上一页</span>
+                    <ChevronLeftIcon class="w-5 h-5" aria-hidden="true" />
+                  </div>
+
+                  <div
+                    class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    @click="nextPage"
+                  >
+                    <span class="sr-only">下一页</span>
+                    <ChevronRightIcon class="w-5 h-5" aria-hidden="true" />
+                  </div>
+                </div>
+                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end">
+                  <div>
+                    <nav class="inline-flex -space-x-px rounded-md shadow-sm isolate" aria-label="Pagination">
+                      <div
+                        class="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                        @click="prevPage"
+                      >
+                        <span class="sr-only">上一页</span>
+                        <ChevronLeftIcon class="w-5 h-5" aria-hidden="true" />
+                      </div>
+                      <div
+                        v-for="page in total"
+                        :key="page"
+                        class="relative inline-flex items-center px-4 py-2 text-sm font-semibold"
+                        :class="active === page ? state.currentStyle : state.defaultStyle"
+                        @click="goToPage(page)"
+                      >
+                        {{ page }}
+                      </div>
+
+                      <div
+                        class="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                        @click="nextPage"
+                      >
+                        <span class="sr-only">下一页</span>
+                        <ChevronRightIcon class="w-5 h-5" aria-hidden="true" />
+                      </div>
+                    </nav>
+                  </div>
+                </div>
+              </div>
             </div>
           </template>
-        </n-card>
-        <n-card title="邀请新用户" class="col-span-12 lg:col-span-8 order-2 lg:order-1">
-          <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！具体方案为：</p>
-          <p>
-            每成功邀请一位新用户完成注册并绑定邮箱，您和新用户都将<span class="text-teal-600 font-bold"
-              >获得&thinsp;10&thinsp;次创作体验！</span
-            >
-          </p>
-          <p>
-            当您邀请的新用户首次充值时，您将<span class="text-teal-600 font-bold"
-              >获得&thinsp;20%&thinsp;的现金奖励！</span
-            >
-          </p>
-          <p>
-            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的现金奖励。<span
-              class="text-teal-600 font-bold"
-              >现金奖励累积到&thinsp;50&thinsp;元即可提现！</span
-            >
-          </p>
-          <p>感谢您的推广与支持，让最先进的&thinsp;AI&thinsp;触达更多的人。</p>
-          <div class="mt-4">
-            <span>邀请码：</span>
-            <span v-if="user.invite_code" class="ml-1">
-              <span>{{ user.invite_code }}</span>
-              <span
-                v-if="user.invite_code"
-                class="hover:text-teal-500 cursor-pointer"
-                @click="copyToClipboard(user.invite_code)"
-              >
-                <n-icon class="ml-2 mr-0.5" size="16">
-                  <icon-ic:baseline-content-copy />
-                </n-icon>
-                <span>点击以复制邀请码</span>
-              </span>
-            </span>
-            <span v-else>点击<span class="underline font-bold">下方按钮</span>以生成邀请码</span>
-          </div>
-          <div>
-            <span>邀请链接：</span>
-            <span v-if="user.invite_code" class="ml-1">
-              <a :href="inviteLink" target="__blank" class="text-teal-600 hover:underline">
-                {{ inviteLink }}
-              </a>
-              <span class="hover:text-teal-500 cursor-pointer" @click="copyToClipboard(inviteLink)">
-                <n-icon class="ml-2 mr-0.5" size="16">
-                  <icon-ic:baseline-content-copy />
-                </n-icon>
-                <span>点击以复制邀请链接</span>
-              </span>
-            </span>
-            <span v-else>点击<span class="underline font-bold">下方按钮</span>以生成邀请链接</span>
-          </div>
-          <template #action>
-            <n-button :disabled="!!user.invite_code" type="info" :loading="loadInviteCode" @click="handleGetInviteCode">
-              生成邀请码
-            </n-button>
-            <n-button :disabled="!user.invite_code" type="info" class="ml-4" @click="handleCopyInviteText">
-              复制邀请文案
-            </n-button>
-          </template>
-        </n-card>
-        <n-card v-if="false" title="邀请奖励记录" class="col-span-12 lg:col-span-8 order-4">
-          <template #header-extra>
-            <n-button strong secondary type="info">奖励提现</n-button>
-          </template>
-          卡片内容
-          <template #footer> #footer </template>
-          <template #action> #action </template>
         </n-card>
       </div>
       <n-modal v-model:show="showEmailModal">
@@ -240,7 +315,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { copyToClipboard } from '@/utils';
@@ -298,28 +373,25 @@ const ruleEmailBind = {
   code: [
     {
       required: true,
-      validator(rule, value) {
-        if (!value) {
-          return new Error('需要验证码');
-        } else if (!isValidCode(value)) {
-          return new Error('验证码应为 5 位数字');
-        }
-        return true;
-      },
     },
   ],
 };
 
 const handleEmailBindClick = async (e) => {
   e.preventDefault();
-  refEmailBind.value?.validate((err) => {
-    if (!err) {
-      message.success('验证成功');
-    } else {
-      console.log(err);
-      message.error('验证失败');
-    }
-  });
+
+  try {
+    refEmailBind.value?.validate(async (err) => {
+      if (!err) {
+        await api.bindEmailApi(refEmailBind.value);
+        message.success('绑定成功');
+      }
+
+      message.error('请按提示填写正确信息');
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const refPassChange = ref(null);
@@ -350,14 +422,6 @@ const formPassChangeRules = {
   code: [
     {
       required: true,
-      validator(rule, value) {
-        if (!value) {
-          return new Error('需要验证码');
-        } else if (!isValidCode(value)) {
-          return new Error('验证码应为 5 位数字');
-        }
-        return true;
-      },
     },
   ],
   password: [
@@ -407,13 +471,14 @@ const handlePassChangeClick = async (e) => {
 const loadEmailCode = ref(false);
 const freezeEmailCode = ref(false);
 const countDown = ref(30);
+
 const handleSendEmailCode = async (email) => {
   if (!isValidEmail(email)) {
     message.error('邮箱地址不合法');
     return;
   }
   loadEmailCode.value = true;
-  // const res = await api.getUserInviteCodeApi();
+  await api.postMessageApi({ category: 'email', email: email });
   loadEmailCode.value = false;
   message.success('验证码已发送，请注意查收');
   freezeEmailCode.value = true;
@@ -432,15 +497,53 @@ const isValidEmail = (email) => {
   return regex.test(email);
 };
 
-const isValidCode = (code) => {
-  const regex = /^\d{5}$/;
-  return regex.test(code);
-};
+// const isValidCode = (code) => {
+//   const regex = /^\d{5}$/;
+//   return regex.test(code);
+// };
 
 const isValidPassword = (val) => {
   const regex = /^(?!([^(0-9a-zA-Z)])+$).{8,32}$/;
   return regex.test(val);
 };
+
+const active = ref(1);
+const page = ref(1);
+const limit = ref(10);
+const total = ref(0);
+const incomeList = ref([]);
+const pages = ref([]);
+const isStart = ref(false);
+const isEnd = ref(false);
+
+onMounted(async () => {
+  // 获取收益列表
+  const res = await api.getIncomeListApi({ page: page.value, limit: limit.value });
+
+  console.log(res);
+
+  total.value = Math.ceil(res.total / limit.value);
+
+  for (let i = 1; i <= total.value; i++) {
+    pages.value.push(i);
+  }
+
+  if (active.value === 1) {
+    isStart.value = true;
+  } else {
+    isStart.value = false;
+  }
+
+  if (active.value === total.value) {
+    isEnd.value = true;
+  } else {
+    isEnd.value = false;
+  }
+
+  for (const item of res.incomes) {
+    incomeList.value.push(item);
+  }
+});
 </script>
 
 <style lang="scss">
