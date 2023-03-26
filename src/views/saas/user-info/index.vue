@@ -305,7 +305,7 @@
               <span>&thinsp;元</span>
             </p>
             <!-- <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p> -->
-            <div class="image-container shadow-lg my-4">
+            <div class="rainbow-container shadow-lg my-4">
               <img :src="ChatImg" alt="QR Code" />
               <div class="rainbows">
                 <div class="rainbow"></div>
@@ -615,7 +615,7 @@ const handleSendEmailCode = async (email) => {
   }
 }
 
-.image-container {
+.rainbow-container {
   --color-first: #65587f;
   --color-second: #f18867;
   --color-third: #e85f99;

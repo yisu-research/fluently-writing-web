@@ -9,7 +9,7 @@
         <span class="fancy-underline">随时随地，自由创作</span>
       </div>
       <div class="flex items-center justify-center pt-12 lg:pt-16">
-        <div class="image-container">
+        <div class="ripple-container">
           <img
             :src="ChatImg"
             alt="QR Code"
@@ -93,7 +93,7 @@ const { isMobile } = useBasicLayout();
 <style lang="scss">
 $n: 3;
 
-.image-container {
+.ripple-container {
   position: relative;
   width: 400px;
   height: 400px;
