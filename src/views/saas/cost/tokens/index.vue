@@ -33,7 +33,7 @@
             class="grid max-w-md grid-cols-1 gap-6 mx-auto mt-10 isolate md:max-w-2xl md:grid-cols-2 lg:grid-cols-4 lg:max-w-4xl xl:mx-0 xl:max-w-none"
           >
             <div
-              v-for="tier in state.products.reverse()"
+              v-for="tier in state.products"
               :key="tier.id"
               :class="[
                 tier.mostPopular
@@ -336,10 +336,9 @@ const handleAfterLeave = async () => {
 onMounted(async () => {
   try {
     const products = await api.getProductListApi();
-    await userStore.getUserInfo();
+    // await userStore.getUserInfo();
 
     state.products = products
-
       .map((item) => {
         const price = item.price / 100;
         const isDiscount = item.description !== '1';
@@ -356,7 +355,8 @@ onMounted(async () => {
           mostPopular,
         };
       })
-      .sort((a, b) => a.price - b.price);
+      .sort((a, b) => a.price - b.price)
+      .reverse();
   } catch (err) {
     console.error(err);
   }
