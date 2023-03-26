@@ -6,29 +6,28 @@
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
       <div class="grid grid-cols-12 gap-4">
-        <n-card title="个人信息" class="order-1 col-span-12 lg:col-span-4">
+        <n-card title="个人信息" class="col-span-12 md:col-span-8 lg:col-span-5 xl:col-span-6 2xl:col-span-5 order-1">
           <div class="flex flex-col items-center">
             <img class="w-[100px] h-[100px] rounded-full" src="@/assets/avatar.jpg" alt="" />
             <div v-if="user.username" class="mt-2 text-2xl font-bold">
               {{ user.username ?? '一粟创作助手' }}
             </div>
           </div>
-          <div class="mt-8">
-            <div class="font-bold text-md">
-              邮箱:
+          <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-4">
+            <div class="col-span-2 ...">
+              <span class="font-bold text-md">邮箱:</span>
               <span class="text-sm font-normal">{{ user.email ? user.email : '未绑定（绑定可获取五次体验）' }}</span>
             </div>
-          </div>
-          <div>
-            <div v-if="Number.isFinite(user.balance)" class="flex justify-start mt-2">
+            <div v-if="Number.isFinite(user.balance)" class="flex justify-start">
               <div class="font-bold text-md">剩余次数:</div>
               <div class="ml-2 text-sm">{{ user.balance.toLocaleString() }}</div>
             </div>
-            <div v-if="user.created_at" class="flex justify-start mt-2">
+            <div v-if="user.created_at" class="flex justify-start">
               <div class="font-bold text-md">创建日期:</div>
-              <div class="ml-2 text-sm">{{ new Date(user.created_at).toLocaleDateString() }}</div>
+              <div class="ml-2 text-sm">{{ formatDate(new Date(user.created_at)) }}</div>
             </div>
           </div>
+
           <template #action>
             <div class="text-end">
               <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
@@ -40,7 +39,30 @@
             </div>
           </template>
         </n-card>
-        <n-card title="邀请新用户" class="order-2 col-span-12 lg:col-span-8 lg:order-1">
+        <n-card title="账号设置" class="col-span-12 md:col-span-10 lg:col-span-7 xl:col-span-6 2xl:col-span-5 order-2">
+          <div class="setting-item">
+            <div>
+              <div class="text-base font-bold">邮箱地址</div>
+              <div class="text-md">
+                <span v-if="user.email">{{ user.email }}</span>
+                <span v-else>暂未绑定邮箱（首次绑定可获赠&thinsp;5&thinsp;次创作体验）</span>
+              </div>
+            </div>
+            <n-button type="primary" ghost @click="showEmailModal = true">{{ user.email ? '更改' : '绑定' }}</n-button>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="text-base font-bold">更改密码</div>
+              <div class="text-md">密码必须至少为&thinsp;8&thinsp;个字符，最多为&thinsp;32&thinsp;个字符</div>
+            </div>
+            <n-button type="primary" ghost @click="showPasswordModal = true">更改</n-button>
+          </div>
+          <div class="font-bold text-slate-500 mt-4">更多功能即将上线，敬请期待！</div>
+        </n-card>
+        <n-card
+          title="邀请新用户"
+          class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-3"
+        >
           <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！具体方案为：</p>
           <p>
             每成功邀请一位新用户完成注册并绑定邮箱，您和新用户都将<span class="font-bold text-teal-600"
@@ -105,12 +127,15 @@
             </n-button>
           </template>
         </n-card>
-        <n-card title="邀请奖励记录" class="order-4 col-span-12 lg:col-span-8">
+        <n-card
+          title="邀请奖励记录"
+          class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-4"
+        >
           <template #header-extra>
             <n-button strong secondary type="info" @click="handleIncomeWithdraw">我要提现</n-button>
           </template>
-          <h2 class="mb-2 text-lg">统计</h2>
-          <div class="grid grid-cols-3 gap-4 mb-4">
+          <h2 class="text-lg mb-2">统计</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
               <div class="font-bold text-md">邀请人数</div>
               <div class="text-sm">{{ user.invitation_count.invitee_count }}</div>
@@ -249,8 +274,27 @@
           </template>
           <div class="flex flex-col items-center">
             <p>感谢您的支持与推广！</p>
-            <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p>
-            <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500 h-[200px] w-[200px] my-4" />
+            <p class="flex items-end">
+              <span>当前可提现奖励</span>
+              <n-statistic tabular-nums class="mx-1" style="--n-value-font-size: 20px">
+                <n-number-animation
+                  :from="0.0"
+                  :to="user.invitation_count?.total_income"
+                  :precision="2"
+                  active
+                  show-separator
+                />
+              </n-statistic>
+              <span>&thinsp;元</span>
+            </p>
+            <!-- <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p> -->
+            <div class="image-container shadow-lg my-4">
+              <img :src="ChatImg" alt="QR Code" />
+              <div class="rainbows">
+                <div class="rainbow"></div>
+                <div class="rainbow"></div>
+              </div>
+            </div>
             <p>微信扫描上方二维码</p>
             <p>联系客服即可提现</p>
           </div>
@@ -264,7 +308,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { formatDateTime, copyToClipboard } from '@/utils';
+import { formatDate, formatDateTime, copyToClipboard } from '@/utils';
 import { useMessage } from 'naive-ui';
 import ChatImg from '@/assets/images/chat.png';
 import api from '@/views/saas/api';
@@ -511,44 +555,6 @@ const isValidPassword = (val) => {
   const regex = /^(?!([^(0-9a-zA-Z)])+$).{8,32}$/;
   return regex.test(val);
 };
-
-const active = ref(1);
-const page = ref(1);
-const limit = ref(10);
-const total = ref(0);
-const incomeList = ref([]);
-const pages = ref([]);
-const isStart = ref(false);
-const isEnd = ref(false);
-
-onMounted(async () => {
-  // 获取收益列表
-  const res = await api.getIncomeListApi({ page: page.value, limit: limit.value });
-
-  console.log(res);
-
-  total.value = Math.ceil(res.total / limit.value);
-
-  for (let i = 1; i <= total.value; i++) {
-    pages.value.push(i);
-  }
-
-  if (active.value === 1) {
-    isStart.value = true;
-  } else {
-    isStart.value = false;
-  }
-
-  if (active.value === total.value) {
-    isEnd.value = true;
-  } else {
-    isEnd.value = false;
-  }
-
-  for (const item of res.incomes) {
-    incomeList.value.push(item);
-  }
-});
 </script>
 
 <style lang="scss">
@@ -558,6 +564,79 @@ onMounted(async () => {
   align-items: center;
   &:not(:first-of-type) {
     margin-top: 12px;
+  }
+}
+
+.image-container {
+  --color-first: #65587f;
+  --color-second: #f18867;
+  --color-third: #e85f99;
+  --color-forth: #50bda1;
+  --border-width: 12px;
+  --border-radius-outer: 8px;
+  --border-radius-inner: calc(var(--border-radius-outer) / 2);
+
+  overflow: hidden;
+  position: relative;
+  width: 240px;
+  height: 240px;
+  border-radius: var(--border-radius-outer);
+
+  img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - var(--border-width));
+    height: calc(100% - var(--border-width));
+    border-radius: var(--border-radius-inner);
+    z-index: 1;
+  }
+
+  .rainbows {
+    width: 100%;
+    height: 100%;
+    animation: o-rotate-360 linear 8s infinite;
+
+    .rainbow {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform: translate(-50%, -50%);
+
+      &:after {
+        display: block;
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 100%;
+      }
+
+      &:first-child {
+        background: var(--color-first);
+        &:after {
+          background: var(--color-second);
+        }
+      }
+
+      &:last-child {
+        background: var(--color-third);
+        &:after {
+          background: var(--color-forth);
+        }
+      }
+    }
+  }
+}
+
+@keyframes o-rotate-360 {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>
