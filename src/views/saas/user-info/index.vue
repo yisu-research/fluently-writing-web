@@ -219,7 +219,7 @@
             </n-button>
           </template>
           <n-form ref="refPassChange" :model="modelPassChange" :rules="formPassChangeRules">
-            <n-form-item-row label="验证码" path="code">
+            <n-form-item-row v-if="useEmail2ChangePass" label="验证码" path="code">
               <n-input v-model:value="modelPassChange.code" placeholder="请输入验证码" />
               <n-button
                 type="primary"
@@ -233,9 +233,17 @@
                 <span v-else>获取验证码</span>
               </n-button>
             </n-form-item-row>
-            <n-form-item-row label="新密码" path="password">
+            <n-form-item-row v-else label="旧密码" path="oldPassword">
               <n-input
-                v-model:value="modelPassChange.password"
+                v-model:value="modelPassChange.oldPassword"
+                placeholder="请输入旧密码"
+                type="password"
+                @keydown.enter.prevent
+              />
+            </n-form-item-row>
+            <n-form-item-row label="新密码" path="newPassword">
+              <n-input
+                v-model:value="modelPassChange.newPassword"
                 placeholder="请输入新密码"
                 type="password"
                 @input="handlePasswordInput"
@@ -246,16 +254,25 @@
               <n-input
                 v-model:value="modelPassChange.confirmedPassword"
                 placeholder="请再次输入新密码"
-                :disabled="!modelPassChange.password"
+                :disabled="!modelPassChange.newPassword"
                 type="password"
                 @keydown.enter.prevent
               />
             </n-form-item-row>
           </n-form>
+          <div v-if="user.email" class="flex justify-end">
+            <n-button quaternary type="primary" @click="useEmail2ChangePass = !useEmail2ChangePass">
+              <span v-if="useEmail2ChangePass">收不到验证码？改用密码验证 </span>
+              <span v-else>不记得旧密码？改用邮箱认证</span>
+              <n-icon size="24" class="-translate-y-[3px]">
+                <icon-ic:baseline-keyboard-double-arrow-right />
+              </n-icon>
+            </n-button>
+          </div>
           <template #footer>
             <div class="flex justify-end">
               <n-button
-                :disabled="!modelPassChange.code || !modelPassChange.password"
+                :disabled="!modelPassChange.code || !modelPassChange.confirmedPassword"
                 type="primary"
                 @click="handlePassChangeClick"
               >
@@ -392,7 +409,7 @@ onMounted(() => {
 
 const showWithdrawModal = ref(false);
 const handleIncomeWithdraw = () => {
-  if (!user.value.invitation_count?.total_income || user.value.invitation_count?.total_income < 50) {
+  if (!Number.isFinite(user.value.invitation_count?.total_income) || user.value.invitation_count.total_income < 50) {
     message.error('现金奖励累计不满 50 元，暂时无法提现');
     return;
   }
@@ -433,7 +450,7 @@ const handleEmailBindClick = (e) => {
   try {
     refEmailBind.value?.validate(async (err) => {
       if (!err) {
-        await api.bindEmailApi(refEmailBind.value);
+        await api.bindEmailApi({ email: modelEmailBind.value.email, code: modelEmailBind.value.code });
         message.success(`邮箱${action}成功`);
       }
       message.error('请按提示正确填写内容');
@@ -447,20 +464,22 @@ const handleEmailBindClick = (e) => {
 const refPassChange = ref(null);
 const modelPassChange = ref({
   code: null,
-  password: null,
+  oldPassword: null,
+  newPassword: null,
   confirmedPassword: null,
 });
 const refPassConfirm = ref(null);
+const useEmail2ChangePass = ref(false);
 
 const validatePasswordStartWith = (rule, value) => {
   return (
-    !!modelPassChange.value.password &&
-    modelPassChange.value.password.startsWith(value) &&
-    modelPassChange.value.password.length >= value.length
+    !!modelPassChange.value.newPassword &&
+    modelPassChange.value.newPassword.startsWith(value) &&
+    modelPassChange.value.newPassword.length >= value.length
   );
 };
 const validatePasswordSame = (rule, value) => {
-  return value === modelPassChange.value.password;
+  return value === modelPassChange.value.newPassword;
 };
 const handlePasswordInput = () => {
   if (modelPassChange.value.confirmedPassword) {
@@ -475,7 +494,13 @@ const formPassChangeRules = {
       message: '请输入验证码',
     },
   ],
-  password: [
+  oldPassword: [
+    {
+      required: true,
+      message: '请输入旧密码',
+    },
+  ],
+  newPassword: [
     {
       required: true,
       validator(rule, value) {
@@ -510,14 +535,35 @@ const formPassChangeRules = {
 
 const handlePassChangeClick = async (e) => {
   e.preventDefault();
-  refPassChange.value?.validate((err) => {
-    if (!err) {
-      message.success('验证成功');
+  const useEmail = useEmail2ChangePass.value;
+  try {
+    refPassChange.value?.validate(async (err) => {
+      if (!err) {
+        if (useEmail) {
+          await api.resetPasswordApi({
+            email: user.value.email,
+            code: modelPassChange.value.code,
+            password: modelPassChange.value.newPassword,
+          });
+          message.success(`密码重置成功`);
+        } else {
+          await api.updatePasswordApi({
+            old_password: modelPassChange.value.oldPassword,
+            new_password: modelPassChange.value.newPassword,
+          });
+          message.success(`密码更改成功`);
+        }
+      }
+      message.error('请按提示正确填写内容');
+    });
+  } catch (err) {
+    console.error(err);
+    if (useEmail) {
+      message.success(`密码重置失败，请重试`);
     } else {
-      console.log(err);
-      message.error('验证失败');
+      message.success(`密码更改失败，请检查密码是否正确`);
     }
-  });
+  }
 };
 
 const loadEmailCode = ref(false);

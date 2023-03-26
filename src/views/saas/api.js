@@ -31,6 +31,15 @@ export default {
   // 用户详情
   getUserInfoApi: () => request.get('/api/users/current', { noNeedTip: true, noNeedToken: false }),
 
+  // 绑定邮箱
+  bindEmailApi: (data) => request.post('/api/users/email', data, { noNeedTip: true }),
+
+  // 修改密码
+  updatePasswordApi: (data) => request.put('/api/users/password', data, { noNeedTip: true }),
+
+  // 重置密码
+  resetPasswordApi: (data) => request.post('/api/password_resets', data, { noNeedTip: true }),
+
   // 生成邀请码
   createInviteCodeApi: (data) => request.post('/api/users/invite', data, { noNeedTip: true }),
 
