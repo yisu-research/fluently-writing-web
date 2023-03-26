@@ -25,15 +25,15 @@
           <!-- 购买套餐 -->
           <div class="max-w-4xl mx-auto text-center">
             <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">购买套餐</p>
-            <div class="animate-pulse text-teal-500 text-2xl font-bold leading-8 mt-4">早期尝鲜价格</div>
+            <div class="mt-4 text-2xl font-bold leading-8 text-teal-500 animate-pulse">早期尝鲜价格</div>
           </div>
 
           <!-- 套餐列表 -->
           <div
-            class="grid max-w-md grid-cols-1 mx-auto mt-10 gap-6 isolate md:max-w-2xl md:grid-cols-2 lg:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none"
+            class="grid max-w-md grid-cols-1 gap-6 mx-auto mt-10 isolate md:max-w-2xl md:grid-cols-2 lg:grid-cols-4 lg:max-w-4xl xl:mx-0 xl:max-w-none"
           >
             <div
-              v-for="tier in state.products"
+              v-for="tier in state.products.reverse()"
               :key="tier.id"
               :class="[
                 tier.mostPopular
@@ -43,21 +43,21 @@
               ]"
             >
               <div class="flex items-center justify-between gap-x-4">
-                <h3 v-if="tier.isDiscount" :id="tier.id" class="text-teal-500 text-xl font-semibold leading-8">
+                <h3 v-if="tier.isDiscount" :id="tier.id" class="text-xl font-semibold leading-8 text-teal-500">
                   {{ tier.isDiscount ? `${tier.description * 10} 折` : '' }}
                 </h3>
-                <h3 v-else :id="tier.id" class="text-transparent text-xl font-semibold leading-8">
+                <h3 v-else :id="tier.id" class="text-xl font-semibold leading-8 text-transparent">
                   {{ `${tier.description * 10}折` }}
                 </h3>
                 <p
                   v-if="tier.isDiscount"
                   class="rounded-full bg-teal-500/10 py-1 px-2.5 text-md font-semibold leading-5 text-teal-500"
                 >
-                  {{ tier.mostPopular ? '热门优惠' : '优惠' }}
+                  {{ tier.mostPopular ? '首次充值优惠' : '优惠' }}
                 </p>
               </div>
               <div class="flex items-center justify-center mt-8">
-                <h3 :id="tier.id" class="text-gray-900 text-3xl font-semibold leading-8">
+                <h3 :id="tier.id" class="text-3xl font-semibold leading-8 text-gray-900">
                   {{ `${tier.callCount} 次` }}
                 </h3>
               </div>
@@ -110,7 +110,7 @@
                           </div>
                         </div>
                       </div>
-                      <div class="flex flex-col items-center justify-center md:base-2/3 mt-6 md:mt-0">
+                      <div class="flex flex-col items-center justify-center mt-6 md:base-2/3 md:mt-0">
                         <div class="">
                           <img :src="qrcode.value" alt="QR Code" class="w-40 h-40" />
                         </div>
@@ -152,8 +152,11 @@
             </div>
           </div>
 
+          <!-- 消费记录 -->
+          <Record />
+
           <!-- 套餐说明 -->
-          <div class="text-sm text-slate-600 mt-8">
+          <div class="mt-8 text-sm text-slate-600">
             <p>
               <n-icon size="20">
                 <icon-ic:baseline-attach-money />
@@ -191,6 +194,7 @@ import { computed, onMounted, reactive } from 'vue';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { useUserStore } from '@/store';
 import { formatDateTime } from '@/utils';
+import Record from '../record/index.vue';
 
 import api from '../../api';
 import { useQRCode } from '@vueuse/integrations/useQRCode';
@@ -335,7 +339,7 @@ onMounted(async () => {
     await userStore.getUserInfo();
 
     state.products = products
-      .filter((item) => [100, 1000, 10000].includes(item.price))
+
       .map((item) => {
         const price = item.price / 100;
         const isDiscount = item.description !== '1';

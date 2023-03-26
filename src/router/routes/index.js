@@ -75,33 +75,18 @@ export const basicRoutes = [
 
   {
     name: 'Cost',
-    path: '/cost',
+    path: '/',
     component: Layout,
-    redirect: '/cost/tokens',
-    meta: {
-      title: '费用中心',
-      icon: 'uil:receipt-alt',
-      order: 0,
-    },
+    redirect: '/cost',
     children: [
       {
-        name: 'Tokens',
-        path: 'tokens',
+        name: 'Cost',
+        path: 'cost',
         component: () => import('@/views/saas/cost/tokens/index.vue'),
         meta: {
-          title: '套餐余额',
-          icon: 'uil:shop',
+          title: '费用中心',
+          icon: 'uil:receipt-alt',
           order: 0,
-        },
-      },
-      {
-        name: 'Record',
-        path: 'record',
-        component: () => import('@/views/saas/cost/record/index.vue'),
-        meta: {
-          title: '消费记录',
-          icon: 'uil:notes',
-          order: 1,
         },
       },
     ],

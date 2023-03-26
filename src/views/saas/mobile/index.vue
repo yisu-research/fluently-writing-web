@@ -5,17 +5,12 @@
       :native-scrollbar="false"
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
-      <div class="text-center text-2xl md:text-4xl tracking-wide pt-10">
+      <div class="pt-10 text-2xl tracking-wide text-center md:text-4xl">
         <span class="fancy-underline">随时随地，自由创作</span>
       </div>
-      <div class="flex justify-center items-center pt-12 lg:pt-16">
+      <div class="flex items-center justify-center pt-12 lg:pt-16">
         <div class="image-container">
           <img :src="ChatImg" alt="QR Code" class="ring-4 rounded-md ring-teal-500 h-[200px] md:h-[300px]" />
-          <div class="ripples">
-            <div class="ripple"></div>
-            <div class="ripple"></div>
-            <div class="ripple"></div>
-          </div>
         </div>
         <img
           :src="ScreenImg"
@@ -23,7 +18,7 @@
           class="h-[400px] lg:h-[500px] xl:h-[600px] drop-shadow-xl hidden md:block pr-4"
         />
       </div>
-      <div class="flex justify-center pt-4 lg:pt-8 px-4">
+      <div class="flex justify-center px-4 pt-4 lg:pt-8">
         <div class="mt-4 text-sm text-slate-600">
           <p>
             <n-icon size="20">
@@ -33,7 +28,7 @@
             <n-tooltip trigger="hover">
               <template #trigger>
                 <span
-                  class="hover:text-teal-500 cursor-pointer"
+                  class="cursor-pointer hover:text-teal-500"
                   @click="copyToClipboard('https://ai.yisukeyan.com/chat')"
                 >
                   <span class="mx-1">https://ai.yisukeyan.com/chat</span>
@@ -79,7 +74,7 @@
 
 <script setup>
 import ChatImg from '@/assets/images/chat.png';
-import ScreenImg from '@/assets/images/screenshot.png';
+import ScreenImg from '@/assets/images/screenshot.gif';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { copyToClipboard } from '@/utils';
 
