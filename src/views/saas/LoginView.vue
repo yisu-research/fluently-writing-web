@@ -281,7 +281,7 @@ const handleSendEmailCode = async (email) => {
     }, 1000);
   } catch (err) {
     console.error(err);
-    message.error(`验证码发送失败，请重试`);
+    message.error(`验证码发送失败，${err.error.message}`);
   } finally {
     loadEmailCode.value = false;
   }

@@ -405,7 +405,7 @@ const handleGetInviteIncome = async (currentPage = 1) => {
     pageIncome.pageCount = Math.ceil(res.total_count / pageIncome.pageSize);
   } catch (err) {
     console.error(err);
-    message.error(`邀请码生成失败，请重试`);
+    message.error(`邀请码生成失败，${err.error.message}`);
   }
   loadInviteIncome.value = false;
 };
@@ -464,7 +464,7 @@ const handleEmailBindClick = (e) => {
         message.success(`邮箱${action}成功`);
       } catch (err) {
         console.error(err);
-        message.success(`邮箱${action}失败，请重试`);
+        message.success(`邮箱${action}失败，${err.error.message}`);
       } finally {
         modelEmailBind.value = {
           email: null,
@@ -571,20 +571,20 @@ const handlePassChangeClick = async (e) => {
               code: modelPassChange.value.code,
               password: modelPassChange.value.newPassword,
             });
-            message.success(`密码重置成功`);
+            message.success('密码重置成功');
           } else {
             await api.updatePasswordApi({
               old_password: modelPassChange.value.oldPassword,
               new_password: modelPassChange.value.newPassword,
             });
-            message.success(`密码更改成功`);
+            message.success('密码更改成功');
           }
         } catch (_err) {
           console.error(_err);
           if (useEmail) {
-            message.error(`密码重置失败，请重试`);
+            message.error(`密码重置失败，${_err.error.message}`);
           } else {
-            message.error(`密码更改失败，请检查原密码是否正确`);
+            message.error(`密码更改失败，${_err.error.message}`);
           }
         } finally {
           modelPassChange.value = {
@@ -631,9 +631,10 @@ const handleSendEmailCode = async (email) => {
     }, 1000);
   } catch (err) {
     console.error(err);
-    message.error(`验证码发送失败，请重试`);
+    message.error(`验证码发送失败，${err.error.message}`);
+  } finally {
+    loadEmailCode.value = false;
   }
-  loadEmailCode.value = false;
 };
 
 // const isValidCode = (code) => {
