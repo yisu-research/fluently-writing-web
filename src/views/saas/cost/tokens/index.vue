@@ -29,9 +29,7 @@
           </div>
 
           <!-- 套餐列表 -->
-          <div
-            class="grid max-w-md grid-cols-1 gap-6 mx-auto mt-10 isolate md:max-w-2xl md:grid-cols-2 lg:grid-cols-4 lg:max-w-4xl xl:mx-0 xl:max-w-none"
-          >
+          <div class="grid grid-cols-1 gap-6 mx-auto mt-10 isolate md:grid-cols-2 lg:grid-cols-4 xl:mx-0">
             <div
               v-for="tier in state.products"
               :key="tier.id"
@@ -152,11 +150,8 @@
             </div>
           </div>
 
-          <!-- 消费记录 -->
-          <Record />
-
           <!-- 套餐说明 -->
-          <div class="mt-8 text-sm text-slate-600">
+          <div class="mt-10 text-sm text-slate-600">
             <p>
               <n-icon size="20">
                 <icon-ic:baseline-attach-money />
@@ -183,6 +178,9 @@
               </n-popover>
             </p>
           </div>
+
+          <!-- 消费记录 -->
+          <Record />
         </div>
       </div>
     </n-layout>

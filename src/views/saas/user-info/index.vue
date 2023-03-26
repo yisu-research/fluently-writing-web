@@ -13,11 +13,7 @@
               {{ user.username ?? '一粟创作助手' }}
             </div>
           </div>
-          <div class="text-md grid grid-cols-2 gap-x-2 gap-y-1 mt-4">
-            <div class="col-span-2">
-              <span class="font-bold">邮箱：</span>
-              <span>{{ user.email ?? '暂未绑定' }}</span>
-            </div>
+          <div class="text-md grid grid-cols-2 gap-x-2 gap-y-1 mt-6">
             <div v-if="Number.isFinite(user.balance)">
               <span class="font-bold">剩余次数：</span>
               <span>{{ user.balance.toLocaleString() }}</span>
@@ -45,7 +41,7 @@
               <div class="text-base font-bold">邮箱地址</div>
               <div class="text-md">
                 <span v-if="user.email">已绑定 {{ user.email }}</span>
-                <span v-else>暂未绑定邮箱（首次绑定可获赠&thinsp;5&thinsp;次创作体验）</span>
+                <span v-else>暂未绑定邮箱（首次绑定可获赠&thinsp;10&thinsp;次创作体验）</span>
               </div>
             </div>
             <n-button type="primary" ghost @click="showEmailModal = true">{{ user.email ? '更改' : '绑定' }}</n-button>
@@ -63,24 +59,23 @@
           title="邀请新用户"
           class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-3"
         >
-          <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！具体方案为：</p>
+          <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
           <p>
-            每成功邀请一位新用户完成注册并绑定邮箱，您和新用户都将<span class="font-bold text-teal-600"
+            成功邀请新用户完成注册并绑定邮箱，您和新用户都将<span class="font-bold text-teal-600"
               >获得&thinsp;10&thinsp;次创作体验！</span
             >
           </p>
           <p>
-            当您邀请的新用户首次充值时，您将<span class="font-bold text-teal-600"
+            您邀请的新用户首次充值时，您将<span class="font-bold text-teal-600"
               >获得&thinsp;20%&thinsp;的现金奖励！</span
             >
           </p>
           <p>
-            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的现金奖励。<span
+            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的奖励。<span
               class="font-bold text-teal-600"
-              >现金奖励累积到&thinsp;50&thinsp;元即可提现！</span
+              >奖励累积到&thinsp;50&thinsp;元即可提现！</span
             >
           </p>
-          <p>感谢您的推广与支持，让最先进的&thinsp;AI&thinsp;触达更多的人。</p>
           <div class="mt-4">
             <span>邀请码：</span>
             <span v-if="user.invite_code" class="ml-1">
@@ -93,7 +88,7 @@
                 <n-icon class="ml-2 mr-0.5" size="16">
                   <icon-ic:baseline-content-copy />
                 </n-icon>
-                <span>点击以复制邀请码</span>
+                <span>复制</span>
               </span>
             </span>
             <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请码</span>
@@ -108,7 +103,7 @@
                 <n-icon class="ml-2 mr-0.5" size="16">
                   <icon-ic:baseline-content-copy />
                 </n-icon>
-                <span>点击以复制邀请链接</span>
+                <span>复制</span>
               </span>
             </span>
             <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请链接</span>
@@ -122,7 +117,7 @@
             >
               生成邀请码
             </n-button>
-            <n-button :disabled="!user.invite_code" type="primary" class="ml-4" @click="handleCopyInviteText">
+            <n-button :disabled="!user.invite_code" type="primary" class="ml-4" @click="showPromoModal = true">
               复制邀请文案
             </n-button>
           </template>
@@ -161,6 +156,23 @@
           />
         </n-card>
       </div>
+      <n-modal v-model:show="showPromoModal">
+        <n-card style="width: 600px" title="邀请文案" :bordered="false" size="huge" role="dialog" aria-modal="true">
+          <template #header-extra>
+            <n-button strong secondary class="text-md" @click="showPromoModal = false">
+              <icon-ic:sharp-close />
+            </n-button>
+          </template>
+          <div class="border-dashed border-teal-600 border-3 rounded-md p-4">
+            <p>{{ invitePromo }}</p>
+          </div>
+          <template #footer>
+            <div class="flex justify-end">
+              <n-button type="primary" @click="copyToClipboard(invitePromo)">复制邀请文案</n-button>
+            </div>
+          </template>
+        </n-card>
+      </n-modal>
       <n-modal v-model:show="showEmailModal">
         <n-card
           style="width: 600px"
@@ -343,6 +355,8 @@ const inviteLink = computed(() => `https://ai.yisukeyan.com/signup?invite_code=$
 const { isMobile } = useBasicLayout();
 const message = useMessage();
 
+const showPromoModal = ref(false);
+
 const showEmailModal = ref(false);
 const showPasswordModal = ref(false);
 
@@ -359,10 +373,10 @@ const handleGetInviteCode = async () => {
   userStore.setUserInfo(res);
 };
 
-const handleCopyInviteText = () => {
-  const text = `向大家强烈推荐一个方便好用的 ChatGPT 工具，叫一粟创作助手。写作业、写材料、写代码，都能轻松搞定！助力工作、学习、生活，创作无极限！海量模板，迸发灵感，提升效率！详情可见：https://ai.yisukeyan.com/。通过下方链接注册还可获赠 10 次免费体验：${inviteLink.value}`;
-  copyToClipboard(text);
-};
+const invitePromo = computed(
+  () =>
+    `向大家强烈推荐一个方便好用的 ChatGPT 工具，叫一粟创作助手。写作业、写材料、写代码，都能轻松搞定！助力工作、学习、生活，创作无极限！海量模板，迸发灵感，提升效率！详情可见：https://ai.yisukeyan.com/。通过下方链接注册还可获赠 10 次免费体验：${inviteLink.value}`,
+);
 
 const dataIncome = ref([]);
 const columnIncome = [
