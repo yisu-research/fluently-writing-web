@@ -65,7 +65,7 @@ onMounted(async () => {
     );
     appStore.setIsSignup(false);
   } else {
-    console.log('欢迎您，');
+    console.log(`欢迎您，${userInfo.value.username}`);
   }
 });
 </script>

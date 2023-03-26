@@ -466,6 +466,10 @@ const handleEmailBindClick = (e) => {
         console.error(err);
         message.success(`邮箱${action}失败，请重试`);
       } finally {
+        modelEmailBind.value = {
+          email: null,
+          code: null,
+        };
         loadEmailBind.value = false;
       }
     } else {
@@ -580,9 +584,15 @@ const handlePassChangeClick = async (e) => {
           if (useEmail) {
             message.error(`密码重置失败，请重试`);
           } else {
-            message.error(`密码更改失败，请检查密码是否正确`);
+            message.error(`密码更改失败，请检查原密码是否正确`);
           }
         } finally {
+          modelPassChange.value = {
+            code: null,
+            oldPassword: null,
+            newPassword: null,
+            confirmedPassword: null,
+          };
           loadPassChange.value = false;
         }
       } else {
