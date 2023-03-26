@@ -13,18 +13,18 @@
               {{ user.username ?? '一粟创作助手' }}
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-4">
-            <div class="col-span-2 ...">
-              <span class="font-bold text-md">邮箱:</span>
-              <span class="text-sm font-normal">{{ user.email ? user.email : '未绑定（绑定可获取五次体验）' }}</span>
+          <div class="text-md grid grid-cols-2 gap-x-2 gap-y-1 mt-4">
+            <div class="col-span-2">
+              <span class="font-bold">邮箱：</span>
+              <span>{{ user.email ?? '暂未绑定' }}</span>
             </div>
-            <div v-if="Number.isFinite(user.balance)" class="flex justify-start">
-              <div class="font-bold text-md">剩余次数:</div>
-              <div class="ml-2 text-sm">{{ user.balance.toLocaleString() }}</div>
+            <div v-if="Number.isFinite(user.balance)">
+              <span class="font-bold">剩余次数：</span>
+              <span>{{ user.balance.toLocaleString() }}</span>
             </div>
-            <div v-if="user.created_at" class="flex justify-start">
-              <div class="font-bold text-md">创建日期:</div>
-              <div class="ml-2 text-sm">{{ formatDate(new Date(user.created_at)) }}</div>
+            <div v-if="user.created_at">
+              <span class="font-bold">创建日期：</span>
+              <span>{{ formatDate(new Date(user.created_at)) }}</span>
             </div>
           </div>
 
@@ -44,7 +44,7 @@
             <div>
               <div class="text-base font-bold">邮箱地址</div>
               <div class="text-md">
-                <span v-if="user.email">{{ user.email }}</span>
+                <span v-if="user.email">已绑定 {{ user.email }}</span>
                 <span v-else>暂未绑定邮箱（首次绑定可获赠&thinsp;5&thinsp;次创作体验）</span>
               </div>
             </div>
@@ -132,7 +132,7 @@
           class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-4"
         >
           <template #header-extra>
-            <n-button strong secondary type="info" @click="handleIncomeWithdraw">我要提现</n-button>
+            <n-button strong secondary type="primary" @click="handleIncomeWithdraw">我要提现</n-button>
           </template>
           <h2 class="text-lg mb-2">统计</h2>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
@@ -331,7 +331,7 @@ const handleLogout = (event) => {
 const loadInviteCode = ref(false);
 const handleGetInviteCode = async () => {
   loadInviteCode.value = true;
-  const res = await api.getUserInviteCodeApi();
+  const res = await api.createInviteCodeApi();
   loadInviteCode.value = false;
   userStore.setUserInfo(res);
 };
@@ -416,30 +416,31 @@ const ruleEmailBind = {
         }
         return true;
       },
-      trigger: ['input', 'blur'],
+      trigger: 'blur',
     },
   ],
   code: [
     {
       required: true,
+      message: '请输入验证码',
     },
   ],
 };
 
-const handleEmailBindClick = async (e) => {
+const handleEmailBindClick = (e) => {
   e.preventDefault();
-
+  const action = user.value.email ? '更改' : '绑定';
   try {
     refEmailBind.value?.validate(async (err) => {
       if (!err) {
         await api.bindEmailApi(refEmailBind.value);
-        message.success('绑定成功');
+        message.success(`邮箱${action}成功`);
       }
-
-      message.error('请按提示填写正确信息');
+      message.error('请按提示正确填写内容');
     });
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.error(err);
+    message.success(`邮箱${action}失败，请重试`);
   }
 };
 
@@ -462,7 +463,7 @@ const validatePasswordSame = (rule, value) => {
   return value === modelPassChange.value.password;
 };
 const handlePasswordInput = () => {
-  if (modelPassChange.value.reenteredPassword) {
+  if (modelPassChange.value.confirmedPassword) {
     refPassConfirm.value?.validate({ trigger: 'password-input' });
   }
 };
@@ -471,6 +472,7 @@ const formPassChangeRules = {
   code: [
     {
       required: true,
+      message: '请输入验证码',
     },
   ],
   password: [
@@ -484,6 +486,7 @@ const formPassChangeRules = {
         }
         return true;
       },
+      trigger: 'blur',
     },
   ],
   confirmedPassword: [
@@ -527,7 +530,7 @@ const handleSendEmailCode = async (email) => {
     return;
   }
   loadEmailCode.value = true;
-  await api.postMessageApi({ category: 'email', email: email });
+  await api.postVerificationApi({ category: 'email', email });
   loadEmailCode.value = false;
   message.success('验证码已发送，请注意查收');
   freezeEmailCode.value = true;

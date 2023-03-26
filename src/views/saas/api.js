@@ -22,9 +22,6 @@ export default {
   // 更新对话
   updateChatApi: (id, data) => request.put(`/api/conversations/${id}`, data, { noNeedTip: true }),
 
-  // 发送消息
-  postMessageApi: (data) => request.post('/api/verifications', data, { noNeedTip: true }),
-
   // 消息流
   getMessageStreamApi: (data) => request.get('/api/messages/stream', { noNeedTip: true, data: data, params: data }),
 
@@ -35,7 +32,7 @@ export default {
   getUserInfoApi: () => request.get('/api/users/current', { noNeedTip: true, noNeedToken: false }),
 
   // 生成邀请码
-  getUserInviteCodeApi: (data) => request.post('/api/users/invite', data, { noNeedTip: true }),
+  createInviteCodeApi: (data) => request.post('/api/users/invite', data, { noNeedTip: true }),
 
   // 产品列表
   getProductListApi: (data) => request.get('/api/products', data, { noNeedTip: true }),
@@ -54,4 +51,7 @@ export default {
 
   // 邀请奖励
   getInviteIncomeApi: (data) => request.get('/api/incomes', data, { noNeedTip: true }),
+
+  // 发送验证码
+  postVerificationApi: (data) => request.post('/api/verifications', data, { noNeedTip: true }),
 };
