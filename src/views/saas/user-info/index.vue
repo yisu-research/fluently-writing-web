@@ -325,7 +325,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { formatDate, formatDateTime, copyToClipboard } from '@/utils';
+import { formatDate, formatDateTime, copyToClipboard, isValidEmail, isValidPassword } from '@/utils';
 import { useMessage } from 'naive-ui';
 import ChatImg from '@/assets/images/chat.png';
 import api from '@/views/saas/api';
@@ -399,6 +399,7 @@ const handleGetInviteIncome = async (currentPage = 1) => {
     pageIncome.pageCount = Math.ceil(res.total_count / pageIncome.pageSize);
   } catch (err) {
     console.error(err);
+    message.error(`邀请码生成失败，请重试`);
   }
   loadInviteIncome.value = false;
 };
@@ -427,7 +428,7 @@ const ruleEmailBind = {
       required: true,
       validator(rule, value) {
         if (!value) {
-          return new Error('需要邮箱地址');
+          return new Error('请输入邮箱地址');
         } else if (!isValidEmail(value)) {
           return new Error('邮箱地址不合法');
         }
@@ -440,6 +441,7 @@ const ruleEmailBind = {
     {
       required: true,
       message: '请输入验证码',
+      trigger: 'blur',
     },
   ],
 };
@@ -492,12 +494,14 @@ const formPassChangeRules = {
     {
       required: true,
       message: '请输入验证码',
+      trigger: 'blur',
     },
   ],
   oldPassword: [
     {
       required: true,
       message: '请输入旧密码',
+      trigger: 'blur',
     },
   ],
   newPassword: [
@@ -505,7 +509,7 @@ const formPassChangeRules = {
       required: true,
       validator(rule, value) {
         if (!value) {
-          return new Error('需要密码');
+          return new Error('请输入新密码');
         } else if (!isValidPassword(value)) {
           return new Error('密码应为 8~32 位，且包含数字或字母');
         }
@@ -559,9 +563,9 @@ const handlePassChangeClick = async (e) => {
   } catch (err) {
     console.error(err);
     if (useEmail) {
-      message.success(`密码重置失败，请重试`);
+      message.error(`密码重置失败，请重试`);
     } else {
-      message.success(`密码更改失败，请检查密码是否正确`);
+      message.error(`密码更改失败，请检查密码是否正确`);
     }
   }
 };
@@ -576,34 +580,29 @@ const handleSendEmailCode = async (email) => {
     return;
   }
   loadEmailCode.value = true;
-  await api.postVerificationApi({ category: 'email', email });
+  try {
+    await api.sendCodeApi({ category: 'email', email });
+    message.success('验证码已发送，请注意查收');
+    freezeEmailCode.value = true;
+    const timer = setInterval(() => {
+      countDown.value--;
+      if (countDown.value === 0) {
+        clearInterval(timer);
+        freezeEmailCode.value = false;
+        countDown.value = 30;
+      }
+    }, 1000);
+  } catch (err) {
+    console.error(err);
+    message.error(`验证码发送失败，请重试`);
+  }
   loadEmailCode.value = false;
-  message.success('验证码已发送，请注意查收');
-  freezeEmailCode.value = true;
-  const timer = setInterval(() => {
-    countDown.value--;
-    if (countDown.value === 0) {
-      clearInterval(timer);
-      freezeEmailCode.value = false;
-      countDown.value = 30;
-    }
-  }, 1000);
-};
-
-const isValidEmail = (email) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
 };
 
 // const isValidCode = (code) => {
 //   const regex = /^\d{5}$/;
 //   return regex.test(code);
 // };
-
-const isValidPassword = (val) => {
-  const regex = /^(?!([^(0-9a-zA-Z)])+$).{8,32}$/;
-  return regex.test(val);
-};
 </script>
 
 <style lang="scss">

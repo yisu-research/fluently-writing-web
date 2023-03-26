@@ -241,7 +241,7 @@ const polling = (id) => {
           state.orders.push(obj);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     } else {
       pollingST = setTimeout(() => {
@@ -277,7 +277,7 @@ const handleOrderDetail = async (id) => {
       polling(res.id);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -288,7 +288,7 @@ const handlePayCancel = async () => {
     handleAfterLeave();
     $message.success('订单取消成功');
   } catch (error) {
-    console.log(error);
+    console.error(error);
     $message.success('取消订单失败，请稍后重试');
   }
 };

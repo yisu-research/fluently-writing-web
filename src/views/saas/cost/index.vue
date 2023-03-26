@@ -256,7 +256,7 @@ const handlePayCancel = async (index) => {
     state.showModal = false;
     state.orderModal = false;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -268,7 +268,7 @@ const handleUnpaid = async (id) => {
     state.orderDetail = res;
     text.value = res.code_url;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
   console.log(id);
   // text.value = url;

@@ -2,7 +2,7 @@ import { request } from '@/utils';
 
 export default {
   // 发送验证码
-  sendCodeApi: (data) => request.post('/api/short_messages', data, { noNeedTip: false, noNeedToken: true }),
+  sendCodeApi: (data) => request.post('/api/verifications', data, { noNeedTip: true, noNeedToken: true }),
 
   // 注册
   signupApi: (data) => request.post('/api/signup', data, { noNeedTip: true, noNeedToken: true }),
@@ -60,7 +60,4 @@ export default {
 
   // 邀请奖励
   getInviteIncomeApi: (data) => request.get('/api/incomes', data, { noNeedTip: true }),
-
-  // 发送验证码
-  postVerificationApi: (data) => request.post('/api/verifications', data, { noNeedTip: true }),
 };

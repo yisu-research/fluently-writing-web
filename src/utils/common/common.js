@@ -90,3 +90,13 @@ export function copyToClipboard(text) {
       window.$message.error('复制失败，请重试');
     });
 }
+
+export function isValidEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+export function isValidPassword(val) {
+  const regex = /^(?!([^(0-9a-zA-Z)])+$).{8,32}$/;
+  return regex.test(val);
+}

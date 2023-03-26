@@ -25,7 +25,6 @@ async function handleSelect({ id }) {
 }
 
 onMounted(async () => {
-  console.log('onMounted');
   if (!chatStore.active && dataSources.value.length) {
     await chatStore.setActive(dataSources.value[0].id);
     if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
@@ -39,7 +38,7 @@ async function handleEdit({ id, name }, isEdit, event) {
   try {
     if (!isEdit) await api.updateChatApi(id, { name: name });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     $message.success('保存失败，请重试');
   }
   chatStore.updateHistory(id, { isEdit });

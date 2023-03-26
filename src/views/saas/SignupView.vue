@@ -138,14 +138,14 @@ const onSignup = useDebounceFn(async () => {
       try {
         let res = await api.signupApi(formValue.value);
         setToken(res.token);
-        $message.success('注册成功');
+        message.success('注册成功');
         router.push('/chat');
       } catch (error) {
-        console.log(error.error.message);
-        $message.error(error.error.message);
+        console.error(error.error.message);
+        message.error(error.error.message);
       }
     } else {
-      console.log(errors);
+      console.error(errors);
       message.error('请按要求填写注册信息');
     }
   });

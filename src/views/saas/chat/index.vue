@@ -160,7 +160,7 @@ onMounted(async () => {
     await userStore.getUserInfo();
     count.value = userInfo.value.balance;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 

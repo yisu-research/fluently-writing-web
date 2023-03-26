@@ -239,7 +239,7 @@ const polling = (id) => {
         const userStore = useUserStore();
         await userStore.getUserInfo();
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     } else {
       pollingST = setTimeout(() => {
@@ -294,7 +294,7 @@ const handlePayCancel = async () => {
     handleAfterLeave();
     $message.success('订单取消成功');
   } catch (error) {
-    console.log(error);
+    console.error(error);
     $message.success('取消订单失败，请稍后重试');
   }
 };
@@ -315,7 +315,7 @@ const handleOrder = async (id) => {
     state.qrCode = res.code_url;
     polling(res.id);
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
