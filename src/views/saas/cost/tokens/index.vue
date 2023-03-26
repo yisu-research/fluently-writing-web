@@ -34,7 +34,7 @@
               v-for="tier in state.products"
               :key="tier.id"
               :class="[
-                tier.mostPopular
+                tier.mostPopular && !userInfo.first_purchase
                   ? 'ring-4 ring-teal-500 hover:shadow-lg delay-100 duration-200 hover:scale-105'
                   : 'ring-1 ring-gray-200 hover:ring-2 hover:ring-teal-500 hover:shadow-lg delay-100 duration-200 hover:scale-105',
                 'rounded-2xl p-4 lg:p-8',
@@ -51,7 +51,7 @@
                   v-if="tier.isDiscount"
                   class="rounded-full bg-teal-500/10 py-1 px-2.5 text-md font-semibold leading-5 text-teal-500"
                 >
-                  {{ tier.mostPopular ? '首次充值优惠' : '优惠' }}
+                  {{ tier.mostPopular ? '首次充值专享' : '优惠' }}
                 </p>
               </div>
               <div class="flex items-center justify-center mt-8">
@@ -68,7 +68,8 @@
                   `${tier.originalPrice}`
                 }}</span>
               </div>
-              <a
+              <div
+                v-if="!tier.mostPopular || userInfo.first_purchase"
                 :aria-describedby="tier.id"
                 :class="[
                   tier.mostPopular
@@ -79,7 +80,7 @@
                 @click="handleOrder(tier.id)"
               >
                 立即购买
-              </a>
+              </div>
               <n-modal
                 v-model:show="state.showModal"
                 class="custom-card"
@@ -353,8 +354,7 @@ onMounted(async () => {
           mostPopular,
         };
       })
-      .sort((a, b) => a.price - b.price)
-      .reverse();
+      .sort((a, b) => a.price - b.price);
   } catch (err) {
     console.error(err);
   }
