@@ -222,7 +222,7 @@ const onSignupForUser = useDebounceFn(async () => {
         message.success('登录成功');
       } catch (err) {
         console.error(err);
-        message.error(err.error.message);
+        message.error(`登录失败，${err.error.message}`);
       } finally {
         state.loading = false;
       }
@@ -245,7 +245,7 @@ const onSignupForEmail = useDebounceFn(async () => {
         message.success('登录成功');
       } catch (err) {
         console.error(err);
-        message.error(err.error.message);
+        message.error(`登录失败，${err.error.message}`);
       } finally {
         state.loading = false;
       }
@@ -259,7 +259,7 @@ const onSignupForEmail = useDebounceFn(async () => {
 
 const loadEmailCode = ref(false);
 const freezeEmailCode = ref(false);
-const countDown = ref(30);
+const countDown = ref(60);
 
 const handleSendEmailCode = async (email) => {
   if (!isValidEmail(email)) {

@@ -27,7 +27,6 @@
               <span>{{ formatDate(new Date(user.created_at)) }}</span>
             </div>
           </div>
-
           <template #action>
             <div class="text-end">
               <n-popconfirm placement="bottom" @positive-click="handleLogout($event)">
@@ -40,6 +39,7 @@
           </template>
         </n-card>
         <n-card title="账号设置" class="col-span-12 md:col-span-10 lg:col-span-7 xl:col-span-6 2xl:col-span-5 order-2">
+          <n-alert title="温馨提示" type="info" closable>尝试获取验证码但没收到邮件？检查一下垃圾箱吧！</n-alert>
           <div class="setting-item">
             <div>
               <div class="text-base font-bold">邮箱地址</div>
@@ -462,6 +462,7 @@ const handleEmailBindClick = (e) => {
       try {
         await api.bindEmailApi({ email: modelEmailBind.value.email, code: modelEmailBind.value.code });
         message.success(`邮箱${action}成功`);
+        await userStore.getUserInfo();
       } catch (err) {
         console.error(err);
         message.success(`邮箱${action}失败，${err.error.message}`);
@@ -609,7 +610,7 @@ const handlePassChangeClick = async (e) => {
 
 const loadEmailCode = ref(false);
 const freezeEmailCode = ref(false);
-const countDown = ref(30);
+const countDown = ref(60);
 
 const handleSendEmailCode = async (email) => {
   if (!isValidEmail(email)) {
@@ -636,11 +637,6 @@ const handleSendEmailCode = async (email) => {
     loadEmailCode.value = false;
   }
 };
-
-// const isValidCode = (code) => {
-//   const regex = /^\d{5}$/;
-//   return regex.test(code);
-// };
 </script>
 
 <style lang="scss">

@@ -100,3 +100,8 @@ export function isValidPassword(val) {
   const regex = /^(?!([^(0-9a-zA-Z)])+$).{8,32}$/;
   return regex.test(val);
 }
+
+export function isValidCode(code) {
+  const regex = /^\d{6}$/;
+  return regex.test(code);
+}
