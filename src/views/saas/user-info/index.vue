@@ -59,23 +59,22 @@
           title="邀请新用户"
           class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-3"
         >
-          <p>以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
-          <p>
-            成功邀请新用户完成注册并绑定邮箱，您和新用户都将<span class="font-bold text-teal-600"
-              >获得&thinsp;10&thinsp;次创作体验！</span
-            >
-          </p>
-          <p>
-            您邀请的新用户首次充值时，您将<span class="font-bold text-teal-600"
-              >获得&thinsp;20%&thinsp;的现金奖励！</span
-            >
-          </p>
-          <p>
-            例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的奖励。<span
-              class="font-bold text-teal-600"
-              >奖励累积到&thinsp;50&thinsp;元即可提现！</span
-            >
-          </p>
+          <p class="mb-4">以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
+          <ul class="list-disc list-inside">
+            <li>
+              成功邀请新用户<span class="font-bold text-teal-600">完成注册</span>并绑定邮箱，您和新用户都将获得<span
+                class="font-bold text-teal-600"
+                >&thinsp;10&thinsp;次创作体验！</span
+              >
+            </li>
+            <li>
+              您邀请的新用户<span class="font-bold text-teal-600">首次充值</span>时，您将获得<span
+                class="font-bold text-teal-600"
+                >&thinsp;20%&thinsp;的现金奖励！</span
+              >例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的奖励。
+            </li>
+            <li>现金奖励累积到&thinsp;50&thinsp;元<span class="font-bold text-teal-600">可提现！</span></li>
+          </ul>
           <div class="mt-4">
             <span>邀请码：</span>
             <span v-if="user.invite_code" class="ml-1">
@@ -109,17 +108,20 @@
             <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请链接</span>
           </div>
           <template #action>
-            <n-button
-              :disabled="!!user.invite_code"
-              type="primary"
-              :loading="loadInviteCode"
-              @click="handleGetInviteCode"
-            >
-              生成邀请码
-            </n-button>
-            <n-button :disabled="!user.invite_code" type="primary" class="ml-4" @click="showPromoModal = true">
-              复制邀请文案
-            </n-button>
+            <div class="flex justify-end">
+              <n-button
+                v-if="!user.invite_code"
+                class="mr-4"
+                type="primary"
+                :loading="loadInviteCode"
+                @click="handleGetInviteCode"
+              >
+                生成邀请码
+              </n-button>
+              <n-button :disabled="!user.invite_code" type="primary" @click="showPromoModal = true">
+                复制邀请文案
+              </n-button>
+            </div>
           </template>
         </n-card>
         <n-card
@@ -129,14 +131,13 @@
           <template #header-extra>
             <n-button strong secondary type="primary" @click="handleIncomeWithdraw">我要提现</n-button>
           </template>
-          <h2 class="text-lg mb-2">统计</h2>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
               <div class="font-bold text-md">邀请人数</div>
               <div class="text-sm">{{ user.invitation_count.invitee_count }}</div>
             </div>
             <div v-if="Number.isFinite(user.invitation_count?.call_count)">
-              <div class="font-bold text-md">奖励体验次数</div>
+              <div class="font-bold text-md">累计体验奖励</div>
               <div class="text-sm">{{ user.invitation_count.call_count }}</div>
             </div>
             <div v-if="Number.isFinite(user.invitation_count?.total_income)">
@@ -144,7 +145,6 @@
               <div class="text-sm">{{ user.invitation_count.total_income }}</div>
             </div>
           </div>
-          <h2 class="mb-2 text-lg">明细</h2>
           <n-data-table
             remote
             :columns="columnIncome"
