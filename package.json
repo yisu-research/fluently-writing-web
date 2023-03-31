@@ -27,6 +27,7 @@
     "markdown-loader": "^8.0.0",
     "pinia": "^2.0.32",
     "qrcode": "^1.5.1",
+    "qs": "^6.11.1",
     "vue": "^3.2.47",
     "vue-chartjs": "^5.2.0",
     "vue-markdown": "^2.2.4",

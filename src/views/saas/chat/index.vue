@@ -255,12 +255,13 @@ async function onConversation() {
   scrollToBottom();
 
   try {
-    const url = `https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`;
+    const url = encodeURI(`https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`);
     const token = getToken();
     let es = new EventSourcePolyfill(url, {
       headers: {
         Authorization: `Bearer ${token}`,
         withCredentials: true,
+        ContentType: 'application/json;charset=utf-8',
       },
     });
 
