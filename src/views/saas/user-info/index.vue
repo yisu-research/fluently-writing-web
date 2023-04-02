@@ -6,14 +6,14 @@
       :class="[isMobile ? 'rounded-none shadow-none' : 'border rounded-md shadow-md']"
     >
       <div class="grid grid-cols-12 gap-4">
-        <n-card title="个人信息" class="col-span-12 md:col-span-8 lg:col-span-5 xl:col-span-6 2xl:col-span-5 order-1">
+        <n-card title="个人信息" class="order-1 col-span-12 md:col-span-8 lg:col-span-5 xl:col-span-6 2xl:col-span-5">
           <div class="flex flex-col items-center">
             <img class="w-[100px] h-[100px] rounded-full" src="@/assets/avatar.jpg" alt="" />
             <div v-if="user.username" class="mt-2 text-2xl font-bold">
               {{ user.username ?? '一粟创作助手' }}
             </div>
           </div>
-          <div class="text-md grid grid-cols-2 gap-x-2 gap-y-1 mt-6">
+          <div class="grid grid-cols-2 mt-6 text-md gap-x-2 gap-y-1">
             <div v-if="Number.isFinite(user.balance)">
               <span class="font-bold">剩余次数：</span>
               <span>{{ user.balance.toLocaleString() }}</span>
@@ -34,7 +34,7 @@
             </div>
           </template>
         </n-card>
-        <n-card title="账号设置" class="col-span-12 md:col-span-10 lg:col-span-7 xl:col-span-6 2xl:col-span-5 order-2">
+        <n-card title="账号设置" class="order-2 col-span-12 md:col-span-10 lg:col-span-7 xl:col-span-6 2xl:col-span-5">
           <n-alert title="温馨提示" type="info" closable>尝试获取验证码但没收到邮件？检查一下垃圾箱吧！</n-alert>
           <div class="setting-item">
             <div>
@@ -53,11 +53,11 @@
             </div>
             <n-button type="primary" ghost @click="showPasswordModal = true">更改</n-button>
           </div>
-          <div class="font-bold text-slate-500 mt-4">更多功能即将上线，敬请期待！</div>
+          <!-- <div class="mt-4 font-bold text-slate-500">更多功能即将上线，敬请期待！</div> -->
         </n-card>
         <n-card
           title="邀请新用户"
-          class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-3"
+          class="order-3 col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5"
         >
           <p class="mb-4">以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
           <ul class="list-disc list-inside">
@@ -126,12 +126,12 @@
         </n-card>
         <n-card
           title="邀请奖励记录"
-          class="col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5 order-4"
+          class="order-4 col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5"
         >
           <template #header-extra>
             <n-button strong secondary type="primary" @click="handleIncomeWithdraw">我要提现</n-button>
           </template>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3">
             <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
               <div class="font-bold text-md">邀请人数</div>
               <div class="text-sm">{{ user.invitation_count.invitee_count }}</div>
@@ -163,7 +163,7 @@
               <icon-ic:sharp-close />
             </n-button>
           </template>
-          <div class="border-dashed border-teal-600 border-3 rounded-md p-4">
+          <div class="p-4 border-teal-600 border-dashed rounded-md border-3">
             <p>{{ invitePromo }}</p>
           </div>
           <template #footer>
@@ -323,7 +323,7 @@
               <span>&thinsp;元</span>
             </p>
             <!-- <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p> -->
-            <div class="rainbow-container shadow-lg my-4">
+            <div class="my-4 shadow-lg rainbow-container">
               <img :src="ChatImg" alt="QR Code" />
               <div class="rainbows">
                 <div class="rainbow"></div>
