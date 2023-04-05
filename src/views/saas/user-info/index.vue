@@ -324,7 +324,7 @@
             </p>
             <!-- <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p> -->
             <div class="my-4 shadow-lg rainbow-container">
-              <img :src="ChatImg" alt="QR Code" />
+              <img :src="QrCodeImg" alt="QR Code" />
               <div class="rainbows">
                 <div class="rainbow"></div>
                 <div class="rainbow"></div>
@@ -345,7 +345,7 @@ import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { formatDate, formatDateTime, copyToClipboard, isValidEmail, isValidPassword } from '@/utils';
 import { useMessage } from 'naive-ui';
-import ChatImg from '@/assets/images/chat.png';
+import QrCodeImg from '@/assets/images/qrcode.jpg';
 import api from '@/views/saas/api';
 
 const userStore = useUserStore();
