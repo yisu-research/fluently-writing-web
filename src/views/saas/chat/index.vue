@@ -290,7 +290,6 @@ async function onConversation() {
       }
       const data = JSON.parse(event.data);
       scrollToBottom();
-      newScrollToBottom();
 
       try {
         updateChat(Number(id), dataSources.value.length - 1, {
@@ -303,7 +302,6 @@ async function onConversation() {
           requestOptions: { prompt: message, options: { ...options } },
         });
         scrollToBottom();
-        newScrollToBottom();
       } catch (err) {}
     };
 
