@@ -274,11 +274,11 @@ async function onConversation() {
         loading.value = false;
         return;
       }
-      if (event.data.search('[ERROR]') !== -1) {
+      if (event.data.indexOf('[ERROR]') !== -1) {
         loading.value = false;
         updateChat(Number(id), dataSources.value.length - 1, {
           dateTime: new Date().toLocaleString(),
-          text: event.data.slice(event.data.search('[ERROR]') + 6) ?? '',
+          text: event.data.slice(event.data.indexOf('[ERROR]') + 6) ?? '',
           inversion: false,
           error: false,
           loading: false,
@@ -302,11 +302,15 @@ async function onConversation() {
           requestOptions: { prompt: message, options: { ...options } },
         });
         scrollToBottom();
-      } catch (err) {}
+      } catch (err) {
+        console.error('更新失败', err);
+      }
     };
 
-    es.onerror = (error) => {
-      console.log('链接失败', error);
+    es.onerror = (err) => {
+      if (err?.error) {
+        console.error('链接失败', err);
+      }
       loading.value = false;
       es.close();
     };
@@ -401,11 +405,15 @@ async function onRegenerate(index) {
           requestOptions: { prompt: message, ...options },
         });
         newScrollToBottom();
-      } catch (err) {}
+      } catch (err) {
+        console.error('更新失败', err);
+      }
     };
 
-    es.onerror = (error) => {
-      console.log('链接失败', error);
+    es.onerror = (err) => {
+      if (err?.error) {
+        console.error('链接失败', err);
+      }
       es.close();
     };
   } catch (error) {
