@@ -45,7 +45,7 @@ import { useUserStore } from '@/store';
 const { isMobile } = useBasicLayout();
 const message = useMessage();
 const userStore = useUserStore();
-const userInfo = computed(() => userStore.userInfo);
+const user = computed(() => userStore.userInfo);
 
 const appStore = useAppStore();
 
@@ -60,12 +60,12 @@ onMounted(async () => {
   if (isSignup.value) {
     await userStore.getUserInfo();
     message.success(
-      `欢迎您，${userInfo.value.username}，您的余额为${userInfo.value.balance}次 \n 「个人中心」绑定邮箱还可获赠10次体验次数`,
+      `欢迎您，${user.value.username}，您的余额为${user.value.balance}次。去个人中心绑定邮箱还可获赠10次体验次数`,
       { duration: 5000 },
     );
     appStore.setIsSignup(false);
   } else {
-    console.log(`欢迎您，${userInfo.value.username}`);
+    console.log(`欢迎您，${user.value.username}`);
   }
 });
 </script>

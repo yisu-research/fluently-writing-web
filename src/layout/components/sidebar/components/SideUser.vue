@@ -7,7 +7,10 @@
           : 'flex w-full p-4 border-t border-gray-200'
       "
     >
-      <user-avatar :size="40" />
+      <n-badge dot :show="showAvatarBadge" :offset="[-5, 5]">
+        <user-avatar :size="40" />
+      </n-badge>
+
       <div v-if="!appStore.collapsed" class="ml-3">
         <p class="text-base font-medium text-gray-700 group-hover:text-gray-900">
           {{ user.username ?? '一粟创作助手' }}
@@ -21,11 +24,12 @@
 </template>
 
 <script setup>
-import { useUserStore } from '@/store';
-import { useAppStore } from '@/store';
+import { computed } from 'vue';
+import { useAppStore, useUserStore } from '@/store';
 
 const appStore = useAppStore();
 const userStore = useUserStore();
 
 const user = computed(() => userStore.userInfo);
+const showAvatarBadge = computed(() => !user.value.email || !user.value.invite_code);
 </script>

@@ -44,7 +44,11 @@
                 <span v-else>暂未绑定邮箱（首次绑定可获赠&thinsp;10&thinsp;次创作体验）</span>
               </div>
             </div>
-            <n-button type="primary" ghost @click="showEmailModal = true">{{ user.email ? '更改' : '绑定' }}</n-button>
+            <n-badge dot :show="!user.email" :offset="[0, 2]">
+              <n-button type="primary" ghost @click="showEmailModal = true">{{
+                user.email ? '更改' : '绑定'
+              }}</n-button>
+            </n-badge>
           </div>
           <div class="setting-item">
             <div>
@@ -115,16 +119,10 @@
           </div>
           <template #action>
             <div class="flex justify-end">
-              <n-button
-                v-if="!user.invite_code"
-                class="mr-4"
-                type="primary"
-                :loading="loadInviteCode"
-                @click="handleGetInviteCode"
-              >
-                生成邀请码
-              </n-button>
-              <n-button :disabled="!user.invite_code" type="primary" @click="showPromoModal = true">
+              <n-badge v-if="!user.invite_code" dot :offset="[0, 2]">
+                <n-button type="primary" :loading="loadInviteCode" @click="handleGetInviteCode"> 生成邀请码 </n-button>
+              </n-badge>
+              <n-button class="ml-4" :disabled="!user.invite_code" type="primary" @click="showPromoModal = true">
                 复制邀请文案
               </n-button>
             </div>
