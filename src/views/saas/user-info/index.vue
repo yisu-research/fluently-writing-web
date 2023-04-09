@@ -8,7 +8,7 @@
       <div class="grid grid-cols-12 gap-4">
         <n-card title="个人信息" class="order-1 col-span-12 md:col-span-8 lg:col-span-5 xl:col-span-6 2xl:col-span-5">
           <div class="flex flex-col items-center">
-            <img class="w-[100px] h-[100px] rounded-full" src="@/assets/avatar.jpg" alt="" />
+            <user-avatar :size="100" class="cursor-pointer" @click="showAvatarModal = true" />
             <div v-if="user.username" class="mt-2 text-2xl font-bold">
               {{ user.username ?? '一粟创作助手' }}
             </div>
@@ -53,7 +53,13 @@
             </div>
             <n-button type="primary" ghost @click="showPasswordModal = true">更改</n-button>
           </div>
-          <!-- <div class="mt-4 font-bold text-slate-500">更多功能即将上线，敬请期待！</div> -->
+          <div class="setting-item">
+            <div>
+              <div class="text-base font-bold">更改头像</div>
+              <div class="text-md">图片必须是&thinsp;PNG&thinsp;或&thinsp;JPG&thinsp;格式</div>
+            </div>
+            <n-button type="primary" ghost @click="showAvatarModal = true">更改</n-button>
+          </div>
         </n-card>
         <n-card
           title="邀请新用户"
@@ -300,6 +306,28 @@
           </template>
         </n-card>
       </n-modal>
+      <n-modal v-model:show="showAvatarModal">
+        <n-card style="width: 600px" title="更改头像" :bordered="false" size="huge" role="dialog" aria-modal="true">
+          <template #header-extra>
+            <n-button strong secondary class="text-md" @click="showAvatarModal = false">
+              <icon-ic:sharp-close />
+            </n-button>
+          </template>
+          <user-avatar class="flex justify-center mb-8" :size="160" />
+          <n-upload
+            :max="1"
+            action="#"
+            :default-file-list="dataAvatar"
+            :show-file-list="false"
+            accept="image/png, image/jpeg"
+            class="flex justify-center mb-6"
+            :custom-request="handleAvatarUpload"
+            @before-upload="beforeAvatarUpload"
+          >
+            <n-button size="large">上传&thinsp;PNG&thinsp;或&thinsp;JPG&thinsp;文件</n-button>
+          </n-upload>
+        </n-card>
+      </n-modal>
       <n-modal v-model:show="showWithdrawModal">
         <n-card style="width: 600px" title="奖励提现" :bordered="false" size="huge" role="dialog" aria-modal="true">
           <template #header-extra>
@@ -343,10 +371,11 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { formatDate, formatDateTime, copyToClipboard, isValidEmail, isValidPassword } from '@/utils';
+import { formatDate, formatDateTime, copyToClipboard, isValidEmail, isValidPassword, lStorage } from '@/utils';
 import { useMessage } from 'naive-ui';
 import QrCodeImg from '@/assets/images/qrcode.jpg';
 import api from '@/views/saas/api';
+import UserAvatar from '@/components/common/UserAvatar.vue';
 
 const userStore = useUserStore();
 const user = computed(() => userStore.userInfo);
@@ -357,20 +386,23 @@ const message = useMessage();
 
 const showPromoModal = ref(false);
 
-const showEmailModal = ref(false);
-const showPasswordModal = ref(false);
-
 const handleLogout = (event) => {
   event?.stopPropagation();
   userStore.logout();
 };
 
+// invite code
 const loadInviteCode = ref(false);
 const handleGetInviteCode = async () => {
   loadInviteCode.value = true;
-  const res = await api.createInviteCodeApi();
+  try {
+    const res = await api.createInviteCodeApi();
+    userStore.setUserInfo(res);
+  } catch (err) {
+    console.error(err);
+    message.error(`邀请码生成失败，${err.error.message}`);
+  }
   loadInviteCode.value = false;
-  userStore.setUserInfo(res);
 };
 
 const invitePromo = computed(
@@ -378,6 +410,7 @@ const invitePromo = computed(
     `向大家强烈推荐一个方便好用的 ChatGPT 工具，叫一粟创作助手。写作业、写材料、写代码，都能轻松搞定！助力工作、学习、生活，创作无极限！海量模板，迸发灵感，提升效率！详情可见：https://ai.yisukeyan.com/。通过下方链接注册还可获赠 10 次免费体验：${inviteLink.value}`,
 );
 
+// invite income
 const dataIncome = ref([]);
 const columnIncome = [
   {
@@ -419,7 +452,7 @@ const handleGetInviteIncome = async (currentPage = 1) => {
     pageIncome.pageCount = Math.ceil(res.total_count / pageIncome.pageSize);
   } catch (err) {
     console.error(err);
-    message.error(`邀请码生成失败，${err.error.message}`);
+    message.error(`奖励记录获取失败，${err.error.message}`);
   }
   loadInviteIncome.value = false;
 };
@@ -428,6 +461,7 @@ onMounted(() => {
   handleGetInviteIncome();
 });
 
+// withdraw income
 const showWithdrawModal = ref(false);
 const handleIncomeWithdraw = () => {
   if (!Number.isFinite(user.value.invitation_count?.total_income) || user.value.invitation_count.total_income < 50) {
@@ -436,6 +470,9 @@ const handleIncomeWithdraw = () => {
   }
   showWithdrawModal.value = true;
 };
+
+// bind email
+const showEmailModal = ref(false);
 
 const refEmailBind = ref(null);
 const modelEmailBind = ref({
@@ -494,6 +531,9 @@ const handleEmailBindClick = (e) => {
     showEmailModal.value = false;
   });
 };
+
+// change password
+const showPasswordModal = ref(false);
 
 const refPassChange = ref(null);
 const modelPassChange = ref({
@@ -622,6 +662,7 @@ const handlePassChangeClick = async (e) => {
   );
 };
 
+// send verify code
 const loadEmailCode = ref(false);
 const freezeEmailCode = ref(false);
 const countDown = ref(60);
@@ -650,6 +691,52 @@ const handleSendEmailCode = async (email) => {
   } finally {
     loadEmailCode.value = false;
   }
+};
+
+// change avatar
+const showAvatarModal = ref(false);
+const dataAvatar = ref([]);
+
+const beforeAvatarUpload = ({ file }) => {
+  const fileType = file.file?.type;
+  const allowedTypes = ['image/jpeg', 'image/png'];
+  const fileSize = file.file?.size ?? 0;
+  const maxSize = 1 * 1024 * 1024; // 1MB
+  if (!allowedTypes.includes(fileType)) {
+    message.error('只能上传 PNG 或 JPG 格式的图片，请重新上传');
+    return false;
+  } else if (fileSize > maxSize) {
+    message.error('只能大小不超过 1MB 的图片，请重新上传');
+    return false;
+  }
+  return true;
+};
+
+const loadAvatarChange = ref(false);
+const handleAvatarUpload = ({ file }) => {
+  console.log('file', file);
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const AVATAR_NAME = 'userAvatar';
+    let base64 = e.target.result;
+    lStorage.set(AVATAR_NAME, base64);
+    userStore.setUserInfo({ avatar: base64 });
+    message.success('头像更换成功');
+    showAvatarModal.value = false;
+  };
+  reader.onerror = (err) => {
+    console.error(err);
+    message.error(`头像更换失败，${err.error.message}`);
+  };
+  reader.onloadend = () => {
+    loadAvatarChange.value = false;
+  };
+
+  loadAvatarChange.value = true;
+  reader.readAsDataURL(file.file);
+
+  dataAvatar.value = [];
 };
 </script>
 

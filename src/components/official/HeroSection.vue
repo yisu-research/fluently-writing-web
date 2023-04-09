@@ -85,10 +85,7 @@
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
           <RouterLink v-if="userInfo.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
             <div class="flex items-center justify-center">
-              <div>
-                <img class="inline-block w-8 h-8 rounded-full" src="@/assets/avatar.jpg" alt="" />
-              </div>
-
+              <user-avatar :size="30" />
               <p class="ml-2 text-lg">{{ userInfo.username }}</p>
             </div>
           </RouterLink>
@@ -127,10 +124,7 @@
               <div class="py-6">
                 <RouterLink v-if="userInfo.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
                   <div class="flex items-center justify-start">
-                    <div>
-                      <img class="inline-block w-8 h-8 rounded-full" src="@/assets/avatar.jpg" alt="" />
-                    </div>
-
+                    <user-avatar :size="30" />
                     <p class="ml-2 text-lg">{{ userInfo.username }}</p>
                   </div>
                 </RouterLink>
@@ -182,6 +176,7 @@ import { Dialog, DialogPanel } from '@headlessui/vue';
 import HeroSvg from '@/assets/svg/hero.svg';
 import IconLogo from '@/components/icons/IconLogo.vue';
 import { useUserStore } from '@/store';
+import UserAvatar from '@/components/common/UserAvatar.vue';
 
 const userStore = useUserStore();
 

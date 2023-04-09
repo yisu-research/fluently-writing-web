@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { resetRouter } from '@/router';
-import { removeToken, toLogin } from '@/utils';
+import { removeToken, toLogin, lStorage } from '@/utils';
 import api from '@/views/saas/api';
 import { clearLocalState } from '@/store/modules/chat/helper';
 
@@ -12,8 +12,9 @@ export const useUserStore = defineStore('user', {
         balance: 0,
         id: 0,
         email: null,
-        invite_code: null,
+        avatar: null,
         isLogin: false,
+        invite_code: null,
         invitation_count: {
           invitee_count: 3,
           total_income: 3,
@@ -46,6 +47,8 @@ export const useUserStore = defineStore('user', {
       try {
         const res = await api.getUserInfoApi();
         this.userInfo = { ...res, isLogin: true };
+        const AVATAR_NAME = 'userAvatar';
+        this.userInfo.avatar = lStorage.get(AVATAR_NAME);
         return Promise.resolve(res.data);
       } catch (error) {
         return Promise.reject(error);
@@ -58,9 +61,8 @@ export const useUserStore = defineStore('user', {
       this.$reset();
       toLogin();
     },
-
-    setUserInfo(userInfo = {}) {
-      this.userInfo = { ...this.userInfo, ...userInfo };
+    setUserInfo(info = {}) {
+      this.userInfo = { ...this.userInfo, ...info };
     },
   },
 });

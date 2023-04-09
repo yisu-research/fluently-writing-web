@@ -7,9 +7,7 @@
           : 'flex w-full p-4 border-t border-gray-200'
       "
     >
-      <div>
-        <img class="inline-block w-10 h-10 rounded-full" src="@/assets/avatar.jpg" alt="" />
-      </div>
+      <user-avatar :size="40" />
       <div v-if="!appStore.collapsed" class="ml-3">
         <p class="text-base font-medium text-gray-700 group-hover:text-gray-900">
           {{ user.username ?? '一粟创作助手' }}
