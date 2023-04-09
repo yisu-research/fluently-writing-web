@@ -712,14 +712,20 @@ const beforeAvatarUpload = ({ file }) => {
 
 const loadAvatarChange = ref(false);
 const handleAvatarUpload = ({ file }) => {
-  console.log('file', file);
-
   const reader = new FileReader();
   reader.onload = (e) => {
-    const AVATAR_NAME = 'userAvatar';
     let base64 = e.target.result;
-    lStorage.set(AVATAR_NAME, base64);
+
+    const AVATAR_NAME = 'userAvatar';
+    let userAvatar = lStorage.get(AVATAR_NAME);
+    if (!userAvatar) {
+      userAvatar = {};
+    }
+
+    userAvatar[user.value.id] = base64;
+    lStorage.set(AVATAR_NAME, userAvatar);
     userStore.setUserInfo({ avatar: base64 });
+
     message.success('头像更换成功');
     showAvatarModal.value = false;
   };

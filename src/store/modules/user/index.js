@@ -47,8 +47,13 @@ export const useUserStore = defineStore('user', {
       try {
         const res = await api.getUserInfoApi();
         this.userInfo = { ...res, isLogin: true };
+
         const AVATAR_NAME = 'userAvatar';
-        this.userInfo.avatar = lStorage.get(AVATAR_NAME);
+        const userAvatar = lStorage.get(AVATAR_NAME);
+        if (userAvatar) {
+          this.userInfo.avatar = userAvatar[this.userInfo.id];
+        }
+
         return Promise.resolve(res.data);
       } catch (error) {
         return Promise.reject(error);
