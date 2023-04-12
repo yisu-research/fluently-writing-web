@@ -27,7 +27,7 @@ async function handleSelect({ id }) {
 onMounted(async () => {
   if (!chatStore.active && dataSources.value.length) {
     await chatStore.setActive(dataSources.value[0].id);
-    if (chatStore.active) chatStore.updateHistory(chatStsore.active, { isEdit: false });
+    if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
   }
   const conversation = chatStore.history.find((item) => item.id === chatStore.active);
   console.log(chatStore.active);
