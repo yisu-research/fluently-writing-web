@@ -1,13 +1,11 @@
 <template>
   <div></div>
-  <div class="bg-teal-50/[0.3] w-full overflow-hidden h-screen">
-    <div class="flex flex-col items-center justify-center h-screen px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+  <div class="bg-teal-50/[0.3] w-full overflow-hidden h-[100dvh]">
+    <div class="flex flex-col items-center justify-center h-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div
-        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-sm sm:h-auto ring-slate-100 ring-1"
+        class="flex flex-col justify-between w-full h-full my-4 overflow-hidden bg-white rounded-lg shadow-sm sm:h-auto ring-slate-100 ring-1"
       >
         <div class="px-4 sm:p-6 sm:flex sm:justify-center">
-          <!-- Content goes here -->
-
           <!-- 插画 -->
           <div
             class="hidden w-full py-8 sm:rounded-sm ring-13 ring-white/10 bg-teal-50 lg:flex lg:flex-1 lg:justify-center"
@@ -33,34 +31,14 @@
                     <n-form-item-row label="密码" path="password">
                       <n-input v-model:value="formUser.password" placeholder="请输入密码" type="password" />
                     </n-form-item-row>
-                    <div class="flex flex-row-reverse"><n-button text @click="handleForget">忘记密码？</n-button></div>
-                    <n-modal v-model:show="state.showModal">
-                      <n-card
-                        style="width: 600px"
-                        title="温馨提示"
-                        :bordered="false"
-                        size="huge"
-                        preset="dialog"
-                        aria-modal="true"
-                      >
-                        <template #header-extra
-                          ><SvgIcon icon="uil:times" class="text-2xl text-slate-800" @click="handleClose"
-                        /></template>
-                        <p class="py-4 text-lg">请您联系客服找回密码</p>
-                        <div class="py-2 mx-auto w-50 sm:w-60 lg:py-4 lg:px-8">
-                          <img
-                            :src="QrCodeImg"
-                            alt="Product screenshot"
-                            class="p-4 rounded-xl sm:rounded-lg ring-2 ring-teal-400"
-                          />
-                        </div>
-                      </n-card>
-                    </n-modal>
+                    <div class="flex flex-row-reverse">
+                      <n-button text @click="showForgetModal = true">忘记密码？</n-button>
+                    </div>
                   </n-form>
                   <n-button
                     class="mt-8"
                     type="primary"
-                    :disabled="state.loading"
+                    :loading="loadLogin"
                     block
                     secondary
                     strong
@@ -97,7 +75,7 @@
                     secondary
                     strong
                     class="mt-8"
-                    :disabled="state.loading"
+                    :loading="loadLogin"
                     @click.prevent="onSignupForEmail"
                   >
                     登录
@@ -111,7 +89,26 @@
           </div>
         </div>
 
-        <!-- footer -->
+        <!-- 忘记密码 -->
+        <n-modal v-model:show="showForgetModal">
+          <n-card style="width: 600px" title="温馨提示" :bordered="false" size="huge" preset="dialog" aria-modal="true">
+            <template #header-extra>
+              <n-button strong secondary class="text-md" @click="showForgetModal = false">
+                <icon-ic:sharp-close />
+              </n-button>
+            </template>
+            <p class="py-4 text-lg">请您联系客服找回密码</p>
+            <div class="py-2 mx-auto w-50 sm:w-60 lg:py-4 lg:px-8">
+              <img
+                :src="QrCodeImg"
+                alt="Product screenshot"
+                class="p-4 rounded-xl sm:rounded-lg ring-2 ring-teal-400"
+              />
+            </div>
+          </n-card>
+        </n-modal>
+
+        <!-- 封底 -->
         <div class="px-4 sm:px-6">
           <div class="py-4 border-t border-slate-900/5">
             <div class="flex flex-wrap items-center justify-center">
@@ -128,28 +125,24 @@
 </template>
 
 <script setup>
-import LogoSvg from '@/assets/svg/logo.svg';
-import NatureSvg from '@/assets/svg/nature.svg';
-import { setToken, isValidEmail, isValidPassword } from '@/utils';
-import api from './api';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useMessage } from 'naive-ui';
-import { ref, reactive } from 'vue';
-import { useDebounceFn } from '@vueuse/core';
+import { setToken, isValidEmail, isValidPassword } from '@/utils';
 import QrCodeImg from '@/assets/images/qrcode.jpg';
 import YisuImg from '@/assets/svg/yisu.svg';
-
-const state = reactive({
-  loading: false,
-  showModal: false,
-});
+import LogoSvg from '@/assets/svg/logo.svg';
+import NatureSvg from '@/assets/svg/nature.svg';
+import api from './api';
 
 const router = useRouter();
+const message = useMessage();
+
+const showForgetModal = ref(false);
+const loadLogin = ref(false);
 
 const formUserRef = ref(null);
-
 const formEmailRef = ref(null);
-
-const message = useMessage();
 
 const formUser = ref({
   username: '',
@@ -203,59 +196,53 @@ const rulesForEmail = {
   },
 };
 
-const handleForget = useDebounceFn(() => {
-  state.showModal = true;
-}, 500);
-
-const handleClose = () => {
-  state.showModal = false;
+const onSignupForUser = async () => {
+  formUserRef.value?.validate(async (err) => {
+    if (!err) {
+      loadLogin.value = true;
+      try {
+        const res = await api.loginApi(formUser.value);
+        setToken(res.token);
+        router.push('/chat');
+        message.success('登录成功');
+      } catch (_err) {
+        console.error(_err);
+        message.error(`登录失败，${_err.error.message}`);
+      } finally {
+        setTimeout(() => {
+          loadLogin.value = false;
+        }, 1000);
+      }
+    } else {
+      console.error(err);
+      message.error('请按要求填写账号信息');
+    }
+  });
 };
 
-const onSignupForUser = useDebounceFn(async () => {
-  state.loading = true;
-  formUserRef.value?.validate(async (errs) => {
-    if (!errs) {
+const onSignupForEmail = async () => {
+  formEmailRef.value?.validate(async (err) => {
+    if (!err) {
+      loadLogin.value = true;
       try {
-        let res = await api.loginApi(formUser.value);
+        const res = await api.loginApi(formEmail.value);
         setToken(res.token);
         router.push('/chat');
         message.success('登录成功');
-      } catch (err) {
-        console.error(err);
-        message.error(`登录失败，${err.error.message}`);
+      } catch (_err) {
+        console.error(_err);
+        message.error(`登录失败，${_err.error.message}`);
       } finally {
-        state.loading = false;
+        setTimeout(() => {
+          loadLogin.value = false;
+        }, 1000);
       }
     } else {
-      console.error(errs);
-      state.loading = false;
+      console.error(err);
       message.error('请按要求填写账号信息');
     }
   });
-}, 600);
-
-const onSignupForEmail = useDebounceFn(async () => {
-  state.loading = true;
-  formEmailRef.value?.validate(async (errs) => {
-    if (!errs) {
-      try {
-        let res = await api.loginApi(formEmail.value);
-        setToken(res.token);
-        router.push('/chat');
-        message.success('登录成功');
-      } catch (err) {
-        console.error(err);
-        message.error(`登录失败，${err.error.message}`);
-      } finally {
-        state.loading = false;
-      }
-    } else {
-      console.error(errs);
-      state.loading = false;
-      message.error('请按要求填写账号信息');
-    }
-  });
-}, 600);
+};
 
 const loadEmailCode = ref(false);
 const freezeEmailCode = ref(false);

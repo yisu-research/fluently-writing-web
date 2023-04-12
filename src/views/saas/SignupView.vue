@@ -1,12 +1,10 @@
 <template>
-  <div class="bg-teal-50/[0.3] w-full">
-    <div class="flex flex-col items-center justify-center h-screen px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+  <div class="bg-teal-50/[0.3] w-full overflow-hidden h-[100dvh]">
+    <div class="flex flex-col items-center justify-center h-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div
-        class="flex flex-col justify-between w-full h-screen my-4 overflow-hidden bg-white rounded-lg shadow-sm ring-slate-100 ring-1 sm:h-auto"
+        class="flex flex-col justify-between w-full h-full my-4 overflow-hidden bg-white rounded-lg shadow-sm ring-slate-100 ring-1 sm:h-auto"
       >
         <div class="px-4 sm:p-6 sm:flex sm:justify-center">
-          <!-- Content goes here -->
-
           <!-- 插画 -->
           <div
             class="hidden w-full py-8 sm:rounded-sm ring-13 ring-white/10 bg-teal-50 lg:flex lg:flex-1 lg:justify-center"

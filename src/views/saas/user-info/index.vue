@@ -65,116 +65,9 @@
             <n-button type="primary" ghost @click="showAvatarModal = true">更改</n-button>
           </div>
         </n-card>
-        <n-card
-          title="邀请新用户"
-          class="order-3 col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5"
-        >
-          <template #header-extra>
-            <n-button v-if="user.invite_code" class="ml-4" type="primary" @click="showPromoModal = true">
-              复制邀请文案
-            </n-button>
-            <n-button v-else type="primary" :loading="loadInviteCode" @click="handleGetInviteCode">
-              生成邀请码
-            </n-button>
-          </template>
-          <p class="mb-4">以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
-          <ul class="list-disc list-inside">
-            <li>
-              成功邀请新用户<span class="font-bold text-teal-600">完成注册</span>并绑定邮箱，您和新用户都将获得<span
-                class="font-bold text-teal-600"
-                >&thinsp;10&thinsp;次创作体验！</span
-              >
-            </li>
-            <li>
-              您邀请的新用户<span class="font-bold text-teal-600">首次充值</span>时，您将获得<span
-                class="font-bold text-teal-600"
-                >&thinsp;20%&thinsp;的现金奖励！</span
-              >例如，新用户首次充值了&thinsp;100&thinsp;元，您将获得&thinsp;20&thinsp;元的奖励。
-            </li>
-            <li>现金奖励累积到&thinsp;50&thinsp;元<span class="font-bold text-teal-600">可提现！</span></li>
-          </ul>
-          <div class="mt-4">
-            <span>邀请码：</span>
-            <span v-if="user.invite_code" class="ml-1">
-              <span>{{ user.invite_code }}</span>
-              <span
-                v-if="user.invite_code"
-                class="cursor-pointer hover:text-teal-500"
-                @click="copyToClipboard(user.invite_code)"
-              >
-                <n-icon class="ml-2 mr-0.5" size="16">
-                  <icon-ic:baseline-content-copy />
-                </n-icon>
-                <span>复制</span>
-              </span>
-            </span>
-            <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请码</span>
-          </div>
-          <div>
-            <span>邀请链接：</span>
-            <span v-if="user.invite_code" class="ml-1">
-              <a :href="inviteLink" target="__blank" class="text-teal-600 hover:underline">
-                {{ inviteLink }}
-              </a>
-              <span class="cursor-pointer hover:text-teal-500" @click="copyToClipboard(inviteLink)">
-                <n-icon class="ml-2 mr-0.5" size="16">
-                  <icon-ic:baseline-content-copy />
-                </n-icon>
-                <span>复制</span>
-              </span>
-            </span>
-            <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请链接</span>
-          </div>
-        </n-card>
-        <n-card
-          title="邀请奖励记录"
-          class="order-4 col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5"
-        >
-          <template #header-extra>
-            <n-button strong secondary type="primary" @click="handleIncomeWithdraw">我要提现</n-button>
-          </template>
-          <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3">
-            <div v-if="Number.isFinite(user.invitation_count?.invitee_count)">
-              <div class="font-bold text-md">邀请人数</div>
-              <div class="text-sm">{{ user.invitation_count.invitee_count }}</div>
-            </div>
-            <div v-if="Number.isFinite(user.invitation_count?.call_count)">
-              <div class="font-bold text-md">累计体验奖励</div>
-              <div class="text-sm">{{ user.invitation_count.call_count }}</div>
-            </div>
-            <div v-if="Number.isFinite(user.invitation_count?.total_income)">
-              <div class="font-bold text-md">累计现金奖励</div>
-              <div class="text-sm">{{ user.invitation_count.total_income }}</div>
-            </div>
-          </div>
-          <n-data-table
-            remote
-            :columns="columnIncome"
-            :data="dataIncome"
-            :loading="loadInviteIncome"
-            :pagination="pageIncome"
-            :bordered="false"
-            @update:page="handleGetInviteIncome"
-          />
-        </n-card>
+        <PromoShare />
+        <PromoHistory />
       </div>
-      <n-modal v-model:show="showPromoModal">
-        <n-card style="width: 600px" title="邀请文案" :bordered="false" size="huge" role="dialog" aria-modal="true">
-          <template #header-extra>
-            <n-button strong secondary class="text-md" @click="showPromoModal = false">
-              <icon-ic:sharp-close />
-            </n-button>
-          </template>
-          <div class="p-4 border-teal-600 border-dashed rounded-md border-3">
-            <p>{{ invitePromo }}</p>
-          </div>
-          <template #footer>
-            <div class="flex justify-end">
-              <n-button type="primary" @click="copyToClipboard(invitePromo)">复制邀请文案</n-button>
-            </div>
-          </template>
-        </n-card>
-      </n-modal>
       <n-modal v-model:show="showEmailModal">
         <n-card
           style="width: 600px"
@@ -324,147 +217,29 @@
           </n-upload>
         </n-card>
       </n-modal>
-      <n-modal v-model:show="showWithdrawModal">
-        <n-card style="width: 600px" title="奖励提现" :bordered="false" size="huge" role="dialog" aria-modal="true">
-          <template #header-extra>
-            <n-button strong secondary class="text-md" @click="showWithdrawModal = false">
-              <icon-ic:sharp-close />
-            </n-button>
-          </template>
-          <div class="flex flex-col items-center">
-            <p>感谢您的支持与推广！</p>
-            <p class="flex items-end">
-              <span>当前可提现奖励</span>
-              <n-statistic tabular-nums class="mx-1" style="--n-value-font-size: 20px">
-                <n-number-animation
-                  :from="0.0"
-                  :to="user.invitation_count?.total_income"
-                  :precision="2"
-                  active
-                  show-separator
-                />
-              </n-statistic>
-              <span>&thinsp;元</span>
-            </p>
-            <!-- <p>当前可提现奖励为：{{ user.invitation_count?.total_income }}&thinsp;元</p> -->
-            <div class="my-4 shadow-lg rainbow-container">
-              <img :src="QrCodeImg" alt="QR Code" />
-              <div class="rainbows">
-                <div class="rainbow"></div>
-                <div class="rainbow"></div>
-              </div>
-            </div>
-            <p>微信扫描上方二维码</p>
-            <p>联系客服即可提现</p>
-          </div>
-        </n-card>
-      </n-modal>
     </n-layout>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-import { formatDate, formatDateTime, copyToClipboard, isValidEmail, isValidPassword, lStorage } from '@/utils';
+import { formatDate, isValidEmail, isValidPassword, lStorage } from '@/utils';
 import { useMessage } from 'naive-ui';
-import QrCodeImg from '@/assets/images/qrcode.jpg';
 import api from '@/views/saas/api';
 import UserAvatar from '@/components/common/UserAvatar.vue';
+import { PromoShare, PromoHistory } from '@/views/saas/user-info/components';
 
 const userStore = useUserStore();
 const user = computed(() => userStore.userInfo);
-const inviteLink = computed(() => `https://ai.yisukeyan.com/signup?invite_code=${user.value.invite_code}`);
 
 const { isMobile } = useBasicLayout();
 const message = useMessage();
 
-const showPromoModal = ref(false);
-
 const handleLogout = (event) => {
   event?.stopPropagation();
   userStore.logout();
-};
-
-// invite code
-const loadInviteCode = ref(false);
-const handleGetInviteCode = async () => {
-  loadInviteCode.value = true;
-  try {
-    const res = await api.createInviteCodeApi();
-    userStore.setUserInfo(res);
-  } catch (err) {
-    console.error(err);
-    message.error(`邀请码生成失败，${err.error.message}`);
-  }
-  loadInviteCode.value = false;
-};
-
-const invitePromo = computed(
-  () =>
-    `向大家强烈推荐一个方便好用的 ChatGPT 工具，叫一粟创作助手。写作业、写材料、写代码，都能轻松搞定！助力工作、学习、生活，创作无极限！海量模板，迸发灵感，提升效率！详情可见：https://ai.yisukeyan.com/。通过下方链接注册还可获赠 10 次免费体验：${inviteLink.value}`,
-);
-
-// invite income
-const dataIncome = ref([]);
-const columnIncome = [
-  {
-    title: '时间',
-    key: 'time',
-  },
-  {
-    title: '来源',
-    key: 'action',
-  },
-  {
-    title: '奖励',
-    key: 'income',
-  },
-];
-const pageIncome = reactive({
-  page: 1,
-  pageCount: 1,
-  pageSize: 5,
-  prefix({ itemCount }) {
-    return `共 ${itemCount} 条`;
-  },
-});
-const loadInviteIncome = ref(false);
-const handleGetInviteIncome = async (currentPage = 1) => {
-  loadInviteIncome.value = true;
-  try {
-    const res = await api.getInviteIncomeApi({ limit: pageIncome.pageSize, page: currentPage });
-    dataIncome.value = res.incomes.map((item) => {
-      return {
-        key: item.id,
-        time: formatDateTime(new Date(item.created_at)),
-        action: item.action,
-        income: item.description,
-      };
-    });
-    pageIncome.page = currentPage;
-    pageIncome.itemCount = res.total_count;
-    pageIncome.pageCount = Math.ceil(res.total_count / pageIncome.pageSize);
-  } catch (err) {
-    console.error(err);
-    message.error(`奖励记录获取失败，${err.error.message}`);
-  }
-  loadInviteIncome.value = false;
-};
-
-onMounted(() => {
-  handleGetInviteIncome();
-});
-
-// withdraw income
-const showWithdrawModal = ref(false);
-const handleIncomeWithdraw = () => {
-  if (!Number.isFinite(user.value.invitation_count?.total_income) || user.value.invitation_count.total_income < 50) {
-    message.error('现金奖励累计不满 50 元，暂时无法提现');
-    return;
-  }
-  showWithdrawModal.value = true;
 };
 
 // bind email
@@ -749,79 +524,6 @@ const handleAvatarUpload = ({ file }) => {
   align-items: center;
   &:not(:first-of-type) {
     margin-top: 12px;
-  }
-}
-
-.rainbow-container {
-  --color-first: #65587f;
-  --color-second: #f18867;
-  --color-third: #e85f99;
-  --color-forth: #50bda1;
-  --border-width: 12px;
-  --border-radius-outer: 8px;
-  --border-radius-inner: calc(var(--border-radius-outer) / 2);
-
-  overflow: hidden;
-  position: relative;
-  width: 240px;
-  height: 240px;
-  border-radius: var(--border-radius-outer);
-
-  img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: calc(100% - var(--border-width));
-    height: calc(100% - var(--border-width));
-    border-radius: var(--border-radius-inner);
-    z-index: 1;
-  }
-
-  .rainbows {
-    width: 100%;
-    height: 100%;
-    animation: o-rotate-360 linear 8s infinite;
-
-    .rainbow {
-      display: block;
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform: translate(-50%, -50%);
-
-      &:after {
-        display: block;
-        content: '';
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        left: 100%;
-      }
-
-      &:first-child {
-        background: var(--color-first);
-        &:after {
-          background: var(--color-second);
-        }
-      }
-
-      &:last-child {
-        background: var(--color-third);
-        &:after {
-          background: var(--color-forth);
-        }
-      }
-    }
-  }
-}
-
-@keyframes o-rotate-360 {
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
   }
 }
 </style>

@@ -7,10 +7,7 @@
           : 'flex w-full p-4 border-t border-gray-200'
       "
     >
-      <n-badge dot :show="userStore.showBadge" :offset="[-5, 5]">
-        <user-avatar :size="40" />
-      </n-badge>
-
+      <user-avatar :size="40" />
       <div v-if="!appStore.collapsed" class="ml-3">
         <p class="text-base font-medium text-gray-700 group-hover:text-gray-900">
           {{ userStore.name ?? '一粟创作助手' }}

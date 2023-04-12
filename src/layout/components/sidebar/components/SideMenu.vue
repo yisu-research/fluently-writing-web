@@ -93,7 +93,6 @@ function getIcon(meta) {
 }
 
 function nodeProps(option) {
-  console.log('option', option);
   return {
     class: option.label === '个人中心' && userStore.showBadge ? 'menu-item-active' : '',
   };
