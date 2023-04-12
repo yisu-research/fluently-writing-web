@@ -39,7 +39,7 @@
                     block
                     secondary
                     strong
-                    :disabled="state.loading"
+                    :loading="loadSignup"
                     class="mt-8"
                     @click.prevent="onSignup"
                   >
@@ -71,28 +71,22 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { setToken } from '@/utils';
+import { useRoute, useRouter } from 'vue-router';
+import { useMessage } from 'naive-ui';
+import YisuImg from '@/assets/svg/yisu.svg';
 import LogoSvg from '@/assets/svg/logo.svg';
 import WelcomeSvg from '@/assets/svg/welcome.svg';
-import { setToken } from '@/utils';
 import api from './api';
-import { useRoute } from 'vue-router';
-import { useMessage } from 'naive-ui';
-import { useDebounceFn } from '@vueuse/core';
-import YisuImg from '@/assets/svg/yisu.svg';
-
-import { ref, onMounted } from 'vue';
-const router = useRouter();
-
-const state = reactive({
-  loading: false,
-});
-
-const formRef = ref(null);
 
 const route = useRoute();
-
+const router = useRouter();
 const message = useMessage();
 
+const loadSignup = ref(false);
+
+const formRef = ref(null);
 const formValue = ref({
   username: '',
   invite_code: null,
@@ -130,22 +124,27 @@ onMounted(() => {
   formValue.value.invite_code = route.query.invite_code ?? '';
 });
 
-const onSignup = useDebounceFn(async () => {
-  formRef.value?.validate(async (errors) => {
-    if (!errors) {
+const onSignup = async () => {
+  formRef.value?.validate(async (err) => {
+    if (!err) {
+      loadSignup.value = true;
       try {
-        let res = await api.signupApi(formValue.value);
+        const res = await api.signupApi(formValue.value);
         setToken(res.token);
         message.success('注册成功');
         router.push('/chat');
-      } catch (error) {
-        console.error(error.error.message);
-        message.error(error.error.message);
+      } catch (_err) {
+        console.error(_err);
+        message.error(`注册失败，${_err.error.message}`);
+      } finally {
+        setTimeout(() => {
+          loadSignup.value = false;
+        }, 1000);
       }
     } else {
-      console.error(errors);
+      console.error(err);
       message.error('请按要求填写注册信息');
     }
   });
-}, 600);
+};
 </script>
