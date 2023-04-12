@@ -41,13 +41,13 @@
             <div>
               <div class="text-base font-bold">邮箱地址</div>
               <div class="text-md">
-                <span v-if="user.email">已绑定 {{ user.email }}</span>
+                <span v-if="isEmailBind">已绑定 {{ user.email }}</span>
                 <span v-else>暂未绑定邮箱（首次绑定可获赠&thinsp;10&thinsp;次创作体验）</span>
               </div>
             </div>
-            <n-badge dot :show="!user.email" :offset="[0, 2]">
+            <n-badge dot :show="!isEmailBind" :offset="[0, 2]">
               <n-button type="primary" ghost @click="showEmailModal = true">{{
-                user.email ? '更改' : '绑定'
+                isEmailBind ? '更改' : '绑定'
               }}</n-button>
             </n-badge>
           </div>
@@ -72,7 +72,7 @@
       <n-modal v-model:show="showEmailModal">
         <n-card
           style="width: 600px"
-          :title="`${user.email ? '更改' : '绑定'}邮箱地址`"
+          :title="`${isEmailBind ? '更改' : '绑定'}邮箱地址`"
           :bordered="false"
           size="huge"
           role="dialog"
@@ -83,7 +83,10 @@
               <icon-ic:sharp-close />
             </n-button>
           </template>
-          <n-alert title="安全提示" type="warning" class="mb-6">为了保障您的账号安全，请您及时绑定邮箱！</n-alert>
+          <n-alert v-if="!isEmailBind" title="安全提示" type="warning" class="mb-6">
+            <p>为了保障您的账号安全，请您及时绑定邮箱！</p>
+            <p>现在绑定还能获赠&thinsp;10&thinsp;次体验机会！</p>
+          </n-alert>
           <n-form ref="refEmailBind" :model="modelEmailBind" :rules="ruleEmailBind">
             <n-form-item-row label="邮箱地址" path="email">
               <n-input v-model:value="modelEmailBind.email" placeholder="请输入邮箱地址" />
@@ -115,7 +118,7 @@
                 :loading="loadEmailBind"
                 @click="handleEmailBindClick"
               >
-                {{ user.email ? '更改' : '绑定' }}
+                {{ isEmailBind ? '更改' : '绑定' }}
               </n-button>
             </div>
           </template>
@@ -170,11 +173,11 @@
               />
             </n-form-item-row>
           </n-form>
-          <div v-if="user.email" class="flex justify-end">
+          <div v-if="isEmailBind" class="flex justify-end">
             <n-button quaternary type="primary" @click="useEmail2ChangePass = !useEmail2ChangePass">
               <span v-if="useEmail2ChangePass">收不到验证码？改用密码验证 </span>
               <span v-else>不记得旧密码？改用邮箱认证</span>
-              <n-icon size="24" class="-translate-y-[3px]">
+              <n-icon size="24">
                 <icon-ic:baseline-keyboard-double-arrow-right />
               </n-icon>
             </n-button>
@@ -238,6 +241,7 @@ const isEmailReminded = computed(() => appStore.isEmailReminded);
 
 const userStore = useUserStore();
 const user = computed(() => userStore.userInfo);
+const isEmailBind = computed(() => Boolean(user.value.email));
 
 const { isMobile } = useBasicLayout();
 const message = useMessage();
