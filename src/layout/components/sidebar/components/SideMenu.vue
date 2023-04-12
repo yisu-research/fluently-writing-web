@@ -7,19 +7,21 @@
     :collapsed-icon-size="22"
     :collapsed-width="64"
     :options="menuOptions"
+    :node-props="nodeProps"
     :value="activeKey"
     @update:value="handleMenuSelect"
   />
 </template>
 
 <script setup>
-import { usePermissionStore, useAppStore } from '@/store';
+import { usePermissionStore, useAppStore, useUserStore } from '@/store';
 import { renderCustomIcon, renderIcon, isExternal } from '@/utils';
 
 const router = useRouter();
 const curRoute = useRoute();
 const permissionStore = usePermissionStore();
 const appStore = useAppStore();
+const userStore = useUserStore();
 
 const activeKey = computed(() => curRoute.meta?.activeMenu || curRoute.name);
 
@@ -46,7 +48,7 @@ function resolvePath(basePath, path) {
 
 function getMenuItem(route, basePath = '') {
   let menuItem = {
-    label: (route.meta && route.meta.title) || route.name,
+    label: route.meta?.title || route.name,
     key: route.name,
     path: resolvePath(basePath, route.path),
     icon: getIcon(route.meta),
@@ -90,6 +92,13 @@ function getIcon(meta) {
   return null;
 }
 
+function nodeProps(option) {
+  console.log('option', option);
+  return {
+    class: option.label === '个人中心' && userStore.showBadge ? 'menu-item-active' : '',
+  };
+}
+
 function handleMenuSelect(key, item) {
   if (isExternal(item.path)) {
     window.open(item.path);
@@ -114,6 +123,34 @@ function handleMenuSelect(key, item) {
     &:hover {
       &::before {
         border-left: 4px solid var(--primary-color);
+      }
+    }
+  }
+}
+
+.side-menu {
+  .n-menu-item.menu-item-active .n-menu-item-content {
+    &::after {
+      z-index: auto;
+      content: '';
+      position: absolute;
+      transform: translateY(-50%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      top: 50%;
+      right: 20px;
+      pointer-events: none;
+      height: 10px;
+      width: 10px;
+      border-radius: 10px;
+      background: #d03050;
+    }
+  }
+  &.n-menu--collapsed {
+    .n-menu-item.menu-item-active .n-menu-item-content {
+      &::after {
+        transform: none;
+        top: 10px;
+        right: 16px;
       }
     }
   }

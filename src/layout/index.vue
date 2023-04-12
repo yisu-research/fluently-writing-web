@@ -48,7 +48,6 @@ const userStore = useUserStore();
 const user = computed(() => userStore.userInfo);
 
 const appStore = useAppStore();
-
 const isSignup = computed(() => appStore.isSignup);
 
 const handleUpdate = (collapsed) => {

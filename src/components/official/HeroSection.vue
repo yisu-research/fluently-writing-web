@@ -83,12 +83,12 @@
           >
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-          <RouterLink v-if="user.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
+          <RouterLink v-if="userStore.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
             <div class="flex items-center justify-center">
-              <n-badge dot :show="showAvatarBadge" :offset="[-4, 4]">
+              <n-badge dot :show="userStore.showBadge" :offset="[-4, 4]">
                 <user-avatar :size="30" />
               </n-badge>
-              <p class="ml-2 text-lg">{{ user.username }}</p>
+              <p class="ml-2 text-lg">{{ userStore.name }}</p>
             </div>
           </RouterLink>
 
@@ -124,12 +124,12 @@
                 >
               </div>
               <div class="py-6">
-                <RouterLink v-if="user.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
+                <RouterLink v-if="userStore.isLogin" to="/chat" class="text-sm font-semibold leading-6 text-gray-900">
                   <div class="flex items-center justify-start">
-                    <n-badge dot :show="showAvatarBadge" :offset="[-4, 4]">
+                    <n-badge dot :show="userStore.showBadge" :offset="[-4, 4]">
                       <user-avatar :size="30" />
                     </n-badge>
-                    <p class="ml-2 text-lg">{{ user.username }}</p>
+                    <p class="ml-2 text-lg">{{ userStore.name }}</p>
                   </div>
                 </RouterLink>
                 <RouterLink
@@ -176,15 +176,13 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useUserStore } from '@/store';
 import { Dialog, DialogPanel } from '@headlessui/vue';
 import HeroSvg from '@/assets/svg/hero.svg';
 import IconLogo from '@/components/icons/IconLogo.vue';
-import { useUserStore } from '@/store';
 import UserAvatar from '@/components/common/UserAvatar.vue';
 
 const userStore = useUserStore();
-const user = computed(() => userStore.userInfo);
-const showAvatarBadge = computed(() => !user.value.email || !user.value.invite_code);
 
 const navigation = [
   // { name: 'Product', href: '#' },

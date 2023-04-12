@@ -41,6 +41,9 @@ export const useUserStore = defineStore('user', {
     isLogin() {
       return this.userInfo?.isLogin;
     },
+    showBadge() {
+      return !this.userInfo?.email;
+    },
   },
   actions: {
     async getUserInfo() {

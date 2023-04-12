@@ -55,7 +55,7 @@ export const basicRoutes = [
   },
 
   {
-    name: 'userCenter',
+    name: 'UserCenter',
     path: '/',
     component: Layout,
     redirect: '/user-center',

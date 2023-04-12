@@ -69,6 +69,14 @@
           title="邀请新用户"
           class="order-3 col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5"
         >
+          <template #header-extra>
+            <n-button v-if="user.invite_code" class="ml-4" type="primary" @click="showPromoModal = true">
+              复制邀请文案
+            </n-button>
+            <n-button v-else type="primary" :loading="loadInviteCode" @click="handleGetInviteCode">
+              生成邀请码
+            </n-button>
+          </template>
           <p class="mb-4">以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
           <ul class="list-disc list-inside">
             <li>
@@ -117,16 +125,6 @@
             </span>
             <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请链接</span>
           </div>
-          <template #action>
-            <div class="flex justify-end">
-              <n-badge v-if="!user.invite_code" dot :offset="[0, 2]">
-                <n-button type="primary" :loading="loadInviteCode" @click="handleGetInviteCode"> 生成邀请码 </n-button>
-              </n-badge>
-              <n-button class="ml-4" :disabled="!user.invite_code" type="primary" @click="showPromoModal = true">
-                复制邀请文案
-              </n-button>
-            </div>
-          </template>
         </n-card>
         <n-card
           title="邀请奖励记录"
@@ -427,7 +425,7 @@ const columnIncome = [
 const pageIncome = reactive({
   page: 1,
   pageCount: 1,
-  pageSize: 10,
+  pageSize: 5,
   prefix({ itemCount }) {
     return `共 ${itemCount} 条`;
   },
