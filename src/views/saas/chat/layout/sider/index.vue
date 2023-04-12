@@ -13,15 +13,21 @@ const chatStore = useChatStore();
 
 const { isMobile } = useBasicLayout();
 
+const showModal = ref(false);
+
 const collapsed = computed(() => appStore.siderCollapsed);
 
-async function handleAdd() {
+function handleAdd() {
+  showModal.value = true;
+}
+
+async function createChat(type) {
   // 请求创建对话
   const uuid = day(Date.now()).format('YYMMDD-HH:mm:ss');
-  const res = await api.postChatApi({ name: uuid });
-  const { id, name } = res;
+  const res = await api.postChatApi({ name: uuid, pattern: type });
+  const { id, name, pattern, spend_count } = res;
 
-  chatStore.addHistory({ name: name, id: id, isEdit: false });
+  chatStore.addHistory({ name: name, id: id, isEdit: false, pattern, spendCount: spend_count });
 
   if (!chatStore.active) {
     await chatStore.setActive(id);
@@ -51,6 +57,15 @@ const mobileSafeArea = computed(() => {
   }
   return {};
 });
+
+const bodyStyle = {
+  width: '600px',
+};
+
+const segmented = {
+  content: 'soft',
+  footer: 'soft',
+};
 
 watch(
   isMobile,
@@ -83,6 +98,37 @@ watch(
             <NButton dashed block @click="handleAdd"
               ><SvgIcon class="mr-2 text-lg bg-transparent" icon="uil:plus-circle" /> <span>创建新对话</span>
             </NButton>
+            <n-modal
+              v-model:show="showModal"
+              class="custom-card"
+              preset="card"
+              :style="bodyStyle"
+              title="创建对话"
+              size="huge"
+              :bordered="false"
+              :segmented="segmented"
+            >
+              <div class="flex flex-col items-center justify-center">
+                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('single')">
+                  <template #icon>
+                    <SvgIcon icon="uil:comment-alt" />
+                  </template>
+                  单轮对话
+                </n-button>
+                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('multi')">
+                  <template #icon>
+                    <SvgIcon icon="uil:comment-alt-dots" />
+                  </template>
+                  多轮对话
+                </n-button>
+                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('image')">
+                  <template #icon>
+                    <SvgIcon icon="uil:comment-alt-image" />
+                  </template>
+                  图片生成
+                </n-button>
+              </div>
+            </n-modal>
           </div>
           <div class="flex-1 min-h-0 pb-4 overflow-hidden">
             <SiderList />

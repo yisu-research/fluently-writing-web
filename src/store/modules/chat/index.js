@@ -29,15 +29,15 @@ export const useChatStore = defineStore('chat-store', {
         chatList.push(item.id);
       }
       try {
-        const res = await api.getChatListApi({ state: 'active', page: 1, limit: 10 });
+        const res = await api.getChatListApi({ state: 'active', page: 1, limit: 100 });
         const { conversations } = res;
         this.history = [];
         // if (conversations === 0) return Promise.resolve(res);
         for (const item of conversations) {
-          const { id, name } = item;
-          this.history.unshift({ id, name, isEdit: false });
+          const { id, name, pattern, spend_count } = item;
+          this.history.push({ id, name, pattern, spendCount: spend_count, isEdit: false });
           if (chatList.includes(id)) continue;
-          this.chat.unshift({ id, data: [] });
+          this.chat.push({ id, data: [] });
         }
         this.recordState();
         return Promise.resolve(res);
@@ -215,7 +215,9 @@ export const useChatStore = defineStore('chat-store', {
       if (!id) {
         await router.push({ name: 'Chat' });
       } else {
-        await router.push({ path: `/chat/${id}` });
+        const conversation = this.history.find((item) => item.id === id);
+        console.log(conversation);
+        await router.push({ path: `/chat/${id}`, query: { pattern: conversation.pattern } });
       }
     },
 

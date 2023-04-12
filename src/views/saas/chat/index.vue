@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col w-full h-full">
-    <main class="flex-1 overflow-hidden" :class="isMobile ? 'mt-16' : ''">
+    <main class="flex-1 overflow-hidden" :class="isMobile ? 'mt-0' : ''">
       <!-- <n-scrollbar id="newScrollRef" ref="newScrollRef" class="h-full p-4 overflow-hidden overflow-y-auto"> -->
       <div id="scrollRef" ref="scrollRef" class="'p-4 m-2 h-full overflow-hidden myScroll">
         <div class="w-full max-w-screen-xl m-auto">
@@ -39,6 +39,15 @@
     </main>
     <footer :class="footerClass">
       <div class="w-full max-w-screen-xl m-auto">
+        <div class="flex items-center justify-between mb-4">
+          <p v-if="pattern === 'image'" class="text-xs">生成1张图片将消耗10次（ 限时免费！！！）</p>
+          <div v-if="pattern === 'image'" class="flex justify-end mb-4 md:hidden">
+            <n-input-number v-model:value="imageCount" placeholder="最大值" :min="1" :max="10" class="w-20 mr-4" />
+            <n-popselect v-model:value="imageSize" :options="options" trigger="click">
+              <n-button>{{ imageSize || '图片质量' }}</n-button>
+            </n-popselect>
+          </div>
+        </div>
         <div class="flex items-center justify-between space-x-2">
           <!-- <n-button tertiary type="error" @click="handleClear">
             <template #icon>
@@ -55,6 +64,12 @@
             :placeholder="placeholder"
             @keypress="handleEnter"
           />
+          <div v-if="pattern === 'image'" class="items-center justify-start hidden md:flex">
+            <n-input-number v-model:value="imageCount" placeholder="最大值" :min="1" :max="10" class="w-20 mr-2" />
+            <n-popselect v-model:value="imageSize" :options="options" trigger="click">
+              <n-button>{{ imageSize || '图片质量' }}</n-button>
+            </n-popselect>
+          </div>
           <n-button strong secondary type="success" :disabled="buttonDisabled" @click="handleSubmit">
             <template #icon>
               <span>
@@ -78,20 +93,22 @@ import { useScroll } from '@/views/saas/chat/hooks/useScroll';
 import { useChat } from '@/views/saas/chat/hooks/useChat';
 import { useUserStore } from '@/store';
 import { useCopyCode } from '@/views/saas/chat/hooks/useCopyCode';
-import { NButton, NInput, useDialog } from 'naive-ui';
-import { getToken } from '@/utils';
+import { NButton, NInput, useDialog, useNotification } from 'naive-ui';
+import { getToken, lStorage } from '@/utils';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
 import { Message } from '@/views/saas/chat/components';
 
 import api from '@/views/saas/api';
-import { onMounted, nextTick, ref } from 'vue';
+import { onMounted, nextTick, ref, computed } from 'vue';
 import { formatDateTime } from '@/utils';
 
 let controller = new AbortController();
 
 const newScrollRef = ref(null);
+
+const notification = useNotification();
 
 const route = useRoute();
 const router = useRouter();
@@ -104,7 +121,17 @@ useCopyCode();
 
 const userInfo = computed(() => userStore.userInfo);
 
-const count = ref(0);
+const count = computed(() => userInfo.value.balance);
+
+const imageSize = ref('256x256');
+
+const options = [
+  { label: '256x256', value: '256x256' },
+  { label: '512x512', value: '512x512' },
+  { label: '1024x1024', value: '1024x1024' },
+];
+
+const imageCount = ref(1);
 
 const { isMobile } = useBasicLayout();
 
@@ -112,6 +139,8 @@ const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
 const { scrollRef, scrollToBottom } = useScroll();
 
 const id = route.params.id;
+
+const pattern = route.query.pattern;
 
 const dataSources = computed(() => chatStore.getChatById(Number(id)));
 
@@ -133,36 +162,95 @@ const newScrollToBottom = async () => {
 
 onMounted(async () => {
   try {
+    await userStore.getUserInfo();
+    count.value = userInfo.value.balance;
     const res = await api.getMessageListApi({ conversation_id: id });
     const index = chatStore.chat.findIndex((item) => item.id === Number(id));
+    if (index === -1) {
+      return;
+    }
     chatStore.chat[index].data = [];
     for (let i = 0; i < res.length; i++) {
       if (res[i] !== null) {
-        // 添加聊天记录
-        addChat(Number(id), {
-          dateTime: formatDateTime(res[i].created_at),
-          text: res[i].user_content,
-          inversion: true,
-          error: false,
-          conversationOptions: null,
-          requestOptions: { options: { prompt: res[i].user_content } },
-        });
-        addChat(Number(id), {
-          dateTime: formatDateTime(res[i].created_at),
-          text: res[i].assistant_content,
-          inversion: false,
-          error: false,
-          conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
-          requestOptions: { options: { prompt: res[i].user_content } },
-        });
+        console.log(res[i]);
+        if (res[i].pattern === 'image') {
+          let imageContent = `以下是满足 '${res[i].user_content}' 要求的图片:\n\n`;
+
+          if (res[i].completion_content === null) {
+            // 添加聊天记录
+            addChat(Number(id), {
+              dateTime: formatDateTime(res[i].created_at),
+              text: res[i].user_content,
+              inversion: true,
+              error: false,
+              conversationOptions: null,
+              requestOptions: { options: { prompt: res[i].user_content } },
+            });
+            addChat(Number(id), {
+              dateTime: formatDateTime(res[i].created_at),
+              text: '图片生成失败，请重新尝试',
+              inversion: false,
+              error: false,
+              conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
+              requestOptions: { options: { prompt: res[i].user_content } },
+            });
+            return;
+          }
+
+          for (let j = 0; j < res[i].completion_content.length; j++) {
+            const item = res[i].completion_content[j];
+            imageContent = imageContent + `![图片](${item.url})\n\n`;
+          }
+          // 添加聊天记录
+          addChat(Number(id), {
+            dateTime: formatDateTime(res[i].created_at),
+            text: res[i].user_content,
+            inversion: true,
+            error: false,
+            conversationOptions: null,
+            requestOptions: { options: { prompt: res[i].user_content } },
+          });
+          addChat(Number(id), {
+            dateTime: formatDateTime(res[i].created_at),
+            text: imageContent,
+            inversion: false,
+            error: false,
+            conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
+            requestOptions: { options: { prompt: res[i].user_content } },
+          });
+        } else {
+          // 添加聊天记录
+          addChat(Number(id), {
+            dateTime: formatDateTime(res[i].created_at),
+            text: res[i].user_content,
+            inversion: true,
+            error: false,
+            conversationOptions: null,
+            requestOptions: { options: { prompt: res[i].user_content } },
+          });
+          addChat(Number(id), {
+            dateTime: formatDateTime(res[i].created_at),
+            text: res[i].assistant_content,
+            inversion: false,
+            error: false,
+            conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
+            requestOptions: { options: { prompt: res[i].user_content } },
+          });
+        }
       }
     }
-    await userStore.getUserInfo();
-    count.value = userInfo.value.balance;
   } catch (error) {
     console.error(error);
   }
 });
+
+let pollingST = null;
+let pollCount = 0;
+const destroyed = () => {
+  clearTimeout(pollingST);
+  pollCount = 0;
+  pollingST = null;
+};
 
 // 发送消息
 async function onConversation() {
@@ -175,11 +263,10 @@ async function onConversation() {
   }
 
   if (count.value <= 0) {
-    console.log(userInfo.value.email);
     if (userInfo.value.email === null) {
       dialog.warning({
         title: '提示',
-        content: '余额不足，去「个人中心」绑定邮箱可以继续获得5次体验',
+        content: '余额不足，去「个人中心」绑定邮箱可以继续获得10次体验',
         positiveText: '去绑定',
         negativeText: '去充值',
         onPositiveClick: () => {
@@ -245,7 +332,10 @@ async function onConversation() {
   scrollToBottom();
   updateChat(Number(id), dataSources.value.length - 1, {
     dateTime: new Date().toLocaleString(),
-    text: '回答正在飞奔而来...\n\n 三十秒后如无响应，请重新发送',
+    text:
+      pattern === 'image'
+        ? '图片正在生成中...\n\n 三十秒后如无响应，请重新发送'
+        : '回答正在飞奔而来...\n\n 三十秒后如无响应，请重新发送',
     inversion: false,
     error: false,
     loading: false,
@@ -254,101 +344,162 @@ async function onConversation() {
   });
   scrollToBottom();
 
-  try {
-    const url = encodeURI(`https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`);
-    const token = getToken();
-    let es = new EventSourcePolyfill(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        withCredentials: true,
-        ContentType: 'application/json;charset=utf-8',
-      },
-    });
+  if (pattern === 'image') {
+    const polling = (idM) => {
+      pollCount++;
+      api.getMessageDetailApi(idM).then(async (res) => {
+        if (pollCount > 20) {
+          destroyed();
+          loading.value = false;
+          updateChat(Number(id), dataSources.value.length - 1, {
+            dateTime: new Date().toLocaleString(),
+            text: '图片生成失败，请重新尝试',
+            inversion: false,
+            error: false,
+            loading: false,
+            conversationOptions: { conversationId: id, parentMessageId: id },
+            requestOptions: { prompt: message, options: { ...options } },
+          });
+          scrollToBottom();
+          return;
+        }
+        if (res.completion_content !== null) {
+          destroyed();
+          loading.value = false;
+          let imageContent = `以下是满足 '${message}' 要求的图片:\n\n`;
 
-    es.onopen = (event) => {
-      console.log('链接成功', event);
+          for (let i = 0; i < res.completion_content.length; i++) {
+            const item = res.completion_content[i];
+            imageContent = imageContent + `![图片](${item.url})\n\n`;
+          }
+          console.log(imageContent);
+          updateChat(Number(id), dataSources.value.length - 1, {
+            dateTime: new Date().toLocaleString(),
+            text: imageContent ?? '',
+            inversion: false,
+            error: false,
+            loading: false,
+            conversationOptions: { conversationId: id, parentMessageId: id },
+            requestOptions: { prompt: message, options: { ...options } },
+          });
+          scrollToBottom();
+          return;
+        } else {
+          pollingST = setTimeout(() => {
+            clearTimeout(pollingST);
+            polling(idM);
+          }, 1500);
+        }
+      });
     };
+    try {
+      const res = await api.generatePictureApi({
+        conversation_id: id,
+        content: message,
+        count: imageCount.value,
+        size: imageSize.value,
+      });
+      polling(res.id);
+      console.log(res);
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    try {
+      const url = encodeURI(`https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`);
+      const token = getToken();
+      let es = new EventSourcePolyfill(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          withCredentials: true,
+          ContentType: 'application/json;charset=utf-8',
+        },
+      });
 
-    es.onmessage = (event) => {
-      if (event.data === '[DONE]') {
+      es.onopen = (event) => {
+        console.log('链接成功', event);
+      };
+
+      es.onmessage = (event) => {
+        if (event.data === '[DONE]') {
+          loading.value = false;
+          return;
+        }
+        if (event.data.indexOf('[ERROR]') !== -1) {
+          loading.value = false;
+          updateChat(Number(id), dataSources.value.length - 1, {
+            dateTime: new Date().toLocaleString(),
+            text: event.data.slice(event.data.indexOf('[ERROR]') + 6) ?? '',
+            inversion: false,
+            error: false,
+            loading: false,
+            conversationOptions: { conversationId: id, parentMessageId: id },
+            requestOptions: { prompt: message, options: { ...options } },
+          });
+          scrollToBottom();
+          return;
+        }
+        const data = JSON.parse(event.data);
+        scrollToBottom();
+
+        try {
+          updateChat(Number(id), dataSources.value.length - 1, {
+            dateTime: new Date().toLocaleString(),
+            text: data.content ?? '',
+            inversion: false,
+            error: false,
+            loading: false,
+            conversationOptions: { conversationId: id, parentMessageId: id },
+            requestOptions: { prompt: message, options: { ...options } },
+          });
+          scrollToBottom();
+        } catch (err) {
+          console.error('更新失败', err);
+        }
+      };
+
+      es.onerror = (err) => {
+        if (err?.error) {
+          console.error('链接失败', err);
+        }
         loading.value = false;
-        return;
-      }
-      if (event.data.indexOf('[ERROR]') !== -1) {
-        loading.value = false;
-        updateChat(Number(id), dataSources.value.length - 1, {
-          dateTime: new Date().toLocaleString(),
-          text: event.data.slice(event.data.indexOf('[ERROR]') + 6) ?? '',
-          inversion: false,
-          error: false,
+        es.close();
+      };
+    } catch (error) {
+      const errorMessage = error?.message ?? '好像出了什么错误，请稍后重试';
+
+      if (error.message === 'canceled') {
+        updateChatSome(Number(id), dataSources.value.length - 1, {
           loading: false,
-          conversationOptions: { conversationId: id, parentMessageId: id },
-          requestOptions: { prompt: message, options: { ...options } },
         });
         scrollToBottom();
+
         return;
       }
-      const data = JSON.parse(event.data);
-      scrollToBottom();
 
-      try {
-        updateChat(Number(id), dataSources.value.length - 1, {
-          dateTime: new Date().toLocaleString(),
-          text: data.content ?? '',
-          inversion: false,
+      const currentChat = getChatByUuidAndIndex(Number(id), dataSources.value.length - 1);
+
+      if (currentChat?.text && currentChat.text !== '') {
+        updateChatSome(Number(id), dataSources.value.length - 1, {
+          text: `${currentChat.text}\n[${errorMessage}]`,
           error: false,
           loading: false,
-          conversationOptions: { conversationId: id, parentMessageId: id },
-          requestOptions: { prompt: message, options: { ...options } },
         });
-        scrollToBottom();
-      } catch (err) {
-        console.error('更新失败', err);
+        return;
       }
-    };
 
-    es.onerror = (err) => {
-      if (err?.error) {
-        console.error('链接失败', err);
-      }
-      loading.value = false;
-      es.close();
-    };
-  } catch (error) {
-    const errorMessage = error?.message ?? '好像出了什么错误，请稍后重试';
-
-    if (error.message === 'canceled') {
-      updateChatSome(Number(id), dataSources.value.length - 1, {
+      updateChat(Number(id), dataSources.value.length - 1, {
+        dateTime: new Date().toLocaleString(),
+        text: errorMessage,
+        inversion: false,
+        error: true,
         loading: false,
+        conversationOptions: null,
+        requestOptions: { prompt: message, options: { ...options } },
       });
       scrollToBottom();
       newScrollToBottom();
-
-      return;
     }
-
-    const currentChat = getChatByUuidAndIndex(Number(id), dataSources.value.length - 1);
-
-    if (currentChat?.text && currentChat.text !== '') {
-      updateChatSome(Number(id), dataSources.value.length - 1, {
-        text: `${currentChat.text}\n[${errorMessage}]`,
-        error: false,
-        loading: false,
-      });
-      return;
-    }
-
-    updateChat(Number(id), dataSources.value.length - 1, {
-      dateTime: new Date().toLocaleString(),
-      text: errorMessage,
-      inversion: false,
-      error: true,
-      loading: false,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: { ...options } },
-    });
-    scrollToBottom();
-    newScrollToBottom();
   }
 }
 
@@ -501,13 +652,40 @@ const footerClass = computed(() => {
   return classes;
 });
 
-onMounted(() => {
+// 是否已读
+let markAsReadNote = lStorage.get('markAsRead');
+
+onMounted(async () => {
   scrollToBottom();
-  newScrollToBottom();
+  if (!markAsReadNote) {
+    let markAsRead = false;
+    const n = notification.create({
+      title: '更新通知',
+      content: `新增「图片生成」功能，原先创作拆分成「单轮问答」与「多轮对话」，并调整了计费策略。详细可移步「系统说明」`,
+      meta: new Date().toLocaleString(),
+      action: () =>
+        h(
+          NButton,
+          {
+            text: true,
+            type: 'primary',
+            onClick: () => {
+              markAsRead = true;
+              lStorage.set('markAsRead', true);
+              n.destroy();
+            },
+          },
+          {
+            default: () => '已读',
+          },
+        ),
+    });
+  }
 });
 
 onUnmounted(() => {
   if (loading.value) controller.abort();
+  destroyed();
 });
 </script>
 

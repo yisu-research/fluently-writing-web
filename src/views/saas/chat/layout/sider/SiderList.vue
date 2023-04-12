@@ -27,9 +27,12 @@ async function handleSelect({ id }) {
 onMounted(async () => {
   if (!chatStore.active && dataSources.value.length) {
     await chatStore.setActive(dataSources.value[0].id);
-    if (chatStore.active) chatStore.updateHistory(chatStore.active, { isEdit: false });
+    if (chatStore.active) chatStore.updateHistory(chatStsore.active, { isEdit: false });
   }
-  await router.push({ path: `/chat/${chatStore.active}` });
+  const conversation = chatStore.history.find((item) => item.id === chatStore.active);
+  console.log(chatStore.active);
+  if (!conversation) return;
+  await router.push({ path: `/chat/${chatStore.active}`, query: { pattern: conversation.pattern ?? null } });
 });
 
 async function handleEdit({ id, name }, isEdit, event) {
@@ -76,7 +79,9 @@ function isActive(id) {
             @click="handleSelect(item)"
           >
             <span>
-              <SvgIcon icon="uil:comment-dots" />
+              <SvgIcon v-if="item.pattern === 'single'" icon="uil:comment-dots" />
+              <SvgIcon v-if="item.pattern === 'multi'" icon="uil:comment-notes" />
+              <SvgIcon v-if="item.pattern === 'image'" icon="uil:comment-image" />
             </span>
             <div class="relative flex-1 overflow-hidden break-all text-ellipsis whitespace-nowrap">
               <n-input

@@ -28,6 +28,9 @@ export default {
   // 获取消息列表
   getMessageListApi: (data) => request.get('/api/messages', { noNeedTip: true, params: data, data: data }),
 
+  // 获取消息详情
+  getMessageDetailApi: (id) => request.get(`/api/messages/${id}`, { noNeedTip: true }),
+
   // 用户详情
   getUserInfoApi: () => request.get('/api/users/current', { noNeedTip: true, noNeedToken: false }),
 
@@ -60,4 +63,7 @@ export default {
 
   // 邀请奖励
   getInviteIncomeApi: (data) => request.get('/api/incomes', data, { noNeedTip: true }),
+
+  // 生成图片
+  generatePictureApi: (data) => request.post('/api/messages', data, { noNeedTip: true }),
 };
