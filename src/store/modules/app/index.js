@@ -15,6 +15,7 @@ export const useAppStore = defineStore('app', {
       siderCollapsed: false,
       isChat: true,
       isSignup: false,
+      isEmailReminded: false,
     };
   },
   actions: {
@@ -52,13 +53,17 @@ export const useAppStore = defineStore('app', {
     setAliveKeys(key, val) {
       this.aliveKeys[key] = val;
     },
-    /** 设置暗黑模式 */
+    /* 设置暗黑模式 */
     setDark(isDark) {
       this.isDark = isDark;
     },
-    /** 切换/关闭 暗黑模式 */
+    /* 切换/关闭 暗黑模式 */
     toggleDark() {
       this.isDark = !this.isDark;
+    },
+    /* 设置邮箱绑定提醒 */
+    setEmailReminded(isReminded) {
+      this.isEmailReminded = isReminded;
     },
   },
 });

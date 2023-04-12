@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { resetRouter } from '@/router';
-import { removeToken, toLogin, lStorage } from '@/utils';
+import { removeToken, toLogin } from '@/utils';
+// import { removeToken, toLogin, lStorage } from '@/utils';
 import api from '@/views/saas/api';
 import { clearLocalState } from '@/store/modules/chat/helper';
 
@@ -51,11 +52,11 @@ export const useUserStore = defineStore('user', {
         const res = await api.getUserInfoApi();
         this.userInfo = { ...res, isLogin: true };
 
-        const AVATAR_NAME = 'userAvatar';
-        const userAvatar = lStorage.get(AVATAR_NAME);
-        if (userAvatar) {
-          this.userInfo.avatar = userAvatar[this.userInfo.id];
-        }
+        // const AVATAR_NAME = 'userAvatar';
+        // const userAvatar = lStorage.get(AVATAR_NAME);
+        // if (userAvatar) {
+        //   this.userInfo.avatar = userAvatar[this.userInfo.id];
+        // }
 
         return Promise.resolve(res.data);
       } catch (error) {

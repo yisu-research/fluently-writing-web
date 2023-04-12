@@ -14,6 +14,8 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { usePermissionStore, useAppStore, useUserStore } from '@/store';
 import { renderCustomIcon, renderIcon, isExternal } from '@/utils';
 

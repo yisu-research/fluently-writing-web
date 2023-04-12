@@ -8,7 +8,8 @@
       <div class="grid grid-cols-12 gap-4">
         <n-card title="个人信息" class="order-1 col-span-12 md:col-span-8 lg:col-span-5 xl:col-span-6 2xl:col-span-5">
           <div class="flex flex-col items-center">
-            <user-avatar :size="100" class="cursor-pointer" @click="showAvatarModal = true" />
+            <user-avatar :size="100" />
+            <!-- <user-avatar :size="100" class="cursor-pointer" @click="showAvatarModal = true" /> -->
             <div v-if="user.username" class="mt-2 text-2xl font-bold">
               {{ user.username ?? '一粟创作助手' }}
             </div>
@@ -57,7 +58,7 @@
             </div>
             <n-button type="primary" ghost @click="showPasswordModal = true">更改</n-button>
           </div>
-          <div class="setting-item">
+          <div v-if="false" class="setting-item">
             <div>
               <div class="text-base font-bold">更改头像</div>
               <div class="text-md">图片必须是&thinsp;PNG&thinsp;或&thinsp;JPG&thinsp;格式</div>
@@ -82,6 +83,7 @@
               <icon-ic:sharp-close />
             </n-button>
           </template>
+          <n-alert title="安全提示" type="warning" class="mb-6">为了保障您的账号安全，请您及时绑定邮箱！</n-alert>
           <n-form ref="refEmailBind" :model="modelEmailBind" :rules="ruleEmailBind">
             <n-form-item-row label="邮箱地址" path="email">
               <n-input v-model:value="modelEmailBind.email" placeholder="请输入邮箱地址" />
@@ -222,14 +224,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useUserStore } from '@/store';
+import { ref, computed, onMounted } from 'vue';
+import { useAppStore, useUserStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { formatDate, isValidEmail, isValidPassword, lStorage } from '@/utils';
 import { useMessage } from 'naive-ui';
 import api from '@/views/saas/api';
 import UserAvatar from '@/components/common/UserAvatar.vue';
 import { PromoShare, PromoHistory } from '@/views/saas/user-info/components';
+
+const appStore = useAppStore();
+const isEmailReminded = computed(() => appStore.isEmailReminded);
 
 const userStore = useUserStore();
 const user = computed(() => userStore.userInfo);
@@ -244,6 +249,13 @@ const handleLogout = (event) => {
 
 // bind email
 const showEmailModal = ref(false);
+
+onMounted(() => {
+  if (!isEmailReminded.value) {
+    showEmailModal.value = true;
+    appStore.setEmailReminded(true);
+  }
+});
 
 const refEmailBind = ref(null);
 const modelEmailBind = ref({
