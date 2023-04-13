@@ -63,7 +63,6 @@
             </div>
             <p class="mt-5 text-sm leading-6 text-center text-slate-500">© 2023 一粟科研 Inc. All rights reserved.</p>
           </div>
-          <p></p>
         </div>
       </div>
     </div>

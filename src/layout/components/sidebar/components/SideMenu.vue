@@ -144,6 +144,7 @@ function handleMenuSelect(key, item) {
       width: 10px;
       border-radius: 10px;
       background: #d03050;
+      animation: flash cubic-bezier(0.36, 0.07, 0.19, 0.97) 1s infinite;
     }
   }
   &.n-menu--collapsed {
@@ -154,6 +155,18 @@ function handleMenuSelect(key, item) {
         right: 16px;
       }
     }
+  }
+}
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>

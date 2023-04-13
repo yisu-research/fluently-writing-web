@@ -255,7 +255,7 @@ const handleLogout = (event) => {
 const showEmailModal = ref(false);
 
 onMounted(() => {
-  if (!isEmailReminded.value) {
+  if (!isEmailBind.value && !isEmailReminded.value) {
     showEmailModal.value = true;
     appStore.setEmailReminded(true);
   }

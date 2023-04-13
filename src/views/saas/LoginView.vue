@@ -22,7 +22,7 @@
               </div>
             </RouterLink>
             <div class="w-full mt-4">
-              <n-tabs default-value="signin-username" size="large" justify-content="center">
+              <n-tabs v-model:value="tabName" size="large" justify-content="center" animated>
                 <n-tab-pane name="signin-username" tab="密码登录">
                   <n-form ref="formUserRef" :model="formUser" :rules="rulesForUser">
                     <n-form-item-row label="用户名" path="username">
@@ -32,7 +32,14 @@
                       <n-input v-model:value="formUser.password" placeholder="请输入密码" type="password" />
                     </n-form-item-row>
                     <div class="flex flex-row-reverse">
-                      <n-button text @click="showForgetModal = true">忘记密码？</n-button>
+                      <n-button
+                        text
+                        @click="
+                          showForgetModal = true;
+                          isContact = false;
+                        "
+                        >忘记密码？</n-button
+                      >
                     </div>
                   </n-form>
                   <n-button
@@ -91,19 +98,60 @@
 
         <!-- 忘记密码 -->
         <n-modal v-model:show="showForgetModal">
-          <n-card style="width: 600px" title="温馨提示" :bordered="false" size="huge" preset="dialog" aria-modal="true">
+          <n-card style="width: 600px" title="忘记密码" :bordered="false" size="huge" preset="dialog" aria-modal="true">
             <template #header-extra>
               <n-button strong secondary class="text-md" @click="showForgetModal = false">
                 <icon-ic:sharp-close />
               </n-button>
             </template>
-            <p class="py-4 text-lg">请您联系客服找回密码</p>
-            <div class="py-2 mx-auto w-50 sm:w-60 lg:py-4 lg:px-8">
-              <img
-                :src="QrCodeImg"
-                alt="Product screenshot"
-                class="p-4 rounded-xl sm:rounded-lg ring-2 ring-teal-400"
-              />
+            <div v-if="isContact">
+              <div class="flex flex-col items-center">
+                <p class="text-lg">请您联系客服找回密码</p>
+                <img
+                  :src="QrCodeImg"
+                  alt="Product screenshot"
+                  class="p-1 rounded-xl ring-6 ring-teal-500 my-6"
+                  width="200"
+                  height="200"
+                />
+              </div>
+              <div class="text-right mt-4">
+                <n-button text @click="isContact = false">
+                  <span>已绑定邮箱？用验证码登录</span>
+                  <n-icon size="18">
+                    <icon-ic:baseline-keyboard-double-arrow-right />
+                  </n-icon>
+                </n-button>
+              </div>
+            </div>
+            <div v-else>
+              <n-alert title="温馨提示" type="info" :bordered="false">
+                <template #icon>
+                  <n-icon size="20">
+                    <icon-material-symbols:alternate-email />
+                  </n-icon>
+                </template>
+                <p>若账号已绑定邮箱，请通过邮箱验证码登录。</p>
+                <p>登录成功后，请及时更改密码。</p>
+              </n-alert>
+              <n-button
+                type="primary"
+                block
+                class="mt-8"
+                @click="
+                  showForgetModal = false;
+                  tabName = 'signin-email';
+                "
+                >邮箱验证码登录</n-button
+              >
+              <div class="text-right mt-6">
+                <n-button text @click="isContact = true">
+                  <span>没有绑定邮箱？去联系客服</span>
+                  <n-icon size="18">
+                    <icon-ic:baseline-keyboard-double-arrow-right />
+                  </n-icon>
+                </n-button>
+              </div>
             </div>
           </n-card>
         </n-modal>
@@ -117,7 +165,6 @@
             </div>
             <p class="mt-5 text-sm leading-6 text-center text-slate-500">© 2023 一粟科研 Inc. All rights reserved.</p>
           </div>
-          <p></p>
         </div>
       </div>
     </div>
@@ -140,6 +187,9 @@ const message = useMessage();
 
 const showForgetModal = ref(false);
 const loadLogin = ref(false);
+
+const tabName = ref('signin-username');
+const isContact = ref(false);
 
 const formUserRef = ref(null);
 const formEmailRef = ref(null);
