@@ -18,7 +18,8 @@ const showModal = ref(false);
 const collapsed = computed(() => appStore.siderCollapsed);
 
 function handleAdd() {
-  showModal.value = true;
+  // showModal.value = true;
+  createChat('multi');
 }
 
 async function createChat(type) {

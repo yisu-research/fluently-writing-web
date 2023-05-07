@@ -14,7 +14,7 @@
       </div>
       <div v-if="Number.isFinite(user.invitation_count?.total_income)">
         <div class="font-bold text-md">累计现金奖励</div>
-        <div class="text-sm">{{ user.invitation_count.total_income }}</div>
+        <div class="text-sm">￥ {{ user.invitation_count.total_income / 100 }}</div>
       </div>
     </div>
     <n-data-table

@@ -111,24 +111,24 @@ export const basicRoutes = [
     ],
   },
 
-  {
-    name: 'Intro',
-    path: '/',
-    component: Layout,
-    redirect: '/intro',
-    children: [
-      {
-        name: 'Intro',
-        path: 'intro',
-        component: () => import('@/views/saas/intro/index.vue'),
-        meta: {
-          title: '系统说明',
-          icon: 'uil:book-reader',
-          order: 0,
-        },
-      },
-    ],
-  },
+  // {
+  //   name: 'Intro',
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/intro',
+  //   children: [
+  //     {
+  //       name: 'Intro',
+  //       path: 'intro',
+  //       component: () => import('@/views/saas/intro/index.vue'),
+  //       meta: {
+  //         title: '系统说明',
+  //         icon: 'uil:book-reader',
+  //         order: 0,
+  //       },
+  //     },
+  //   ],
+  // },
 
   {
     name: 'Mobile',

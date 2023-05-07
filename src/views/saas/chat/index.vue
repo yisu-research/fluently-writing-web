@@ -93,8 +93,8 @@ import { useScroll } from '@/views/saas/chat/hooks/useScroll';
 import { useChat } from '@/views/saas/chat/hooks/useChat';
 import { useUserStore } from '@/store';
 import { useCopyCode } from '@/views/saas/chat/hooks/useCopyCode';
-import { NButton, NInput, useDialog, useNotification } from 'naive-ui';
-import { getToken, lStorage } from '@/utils';
+import { NButton, NInput, useDialog } from 'naive-ui';
+import { getToken } from '@/utils';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
@@ -108,7 +108,7 @@ let controller = new AbortController();
 
 const newScrollRef = ref(null);
 
-const notification = useNotification();
+// const notification = useNotification();
 
 const route = useRoute();
 const router = useRouter();
@@ -653,34 +653,34 @@ const footerClass = computed(() => {
 });
 
 // 是否已读
-let markAsReadNote = lStorage.get('markAsRead');
+// let markAsReadNote = lStorage.get('markAsRead');
 
 onMounted(async () => {
   scrollToBottom();
-  if (!markAsReadNote) {
-    let markAsRead = false;
-    const n = notification.create({
-      title: '更新通知',
-      content: `新增「图片生成」功能，原先创作拆分成「单轮问答」与「多轮对话」，并调整了计费策略。详细可移步「系统说明」`,
-      meta: new Date().toLocaleString(),
-      action: () =>
-        h(
-          NButton,
-          {
-            text: true,
-            type: 'primary',
-            onClick: () => {
-              markAsRead = true;
-              lStorage.set('markAsRead', true);
-              n.destroy();
-            },
-          },
-          {
-            default: () => '已读',
-          },
-        ),
-    });
-  }
+  // if (!markAsReadNote) {
+  //   let markAsRead = false;
+  //   const n = notification.create({
+  //     title: '更新通知',
+  //     content: `新增「图片生成」功能，原先创作拆分成「单轮问答」与「多轮对话」，并调整了计费策略。详细可移步「系统说明」`,
+  //     meta: new Date().toLocaleString(),
+  //     action: () =>
+  //       h(
+  //         NButton,
+  //         {
+  //           text: true,
+  //           type: 'primary',
+  //           onClick: () => {
+  //             markAsRead = true;
+  //             lStorage.set('markAsRead', true);
+  //             n.destroy();
+  //           },
+  //         },
+  //         {
+  //           default: () => '已读',
+  //         },
+  //       ),
+  //   });
+  // }
 });
 
 onUnmounted(() => {
