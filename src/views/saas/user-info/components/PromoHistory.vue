@@ -41,7 +41,7 @@
           <n-statistic tabular-nums class="mx-1" style="--n-value-font-size: 20px">
             <n-number-animation
               :from="0.0"
-              :to="user.invitation_count?.total_income"
+              :to="`${user.invitation_count.total_income / 100}`"
               :precision="2"
               active
               show-separator

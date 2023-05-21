@@ -137,7 +137,7 @@
                       <n-icon class="mr-1" size="16">
                         <icon-material-symbols:qr-code-scanner />
                       </n-icon>
-                      <span>手机用户请长按图片或截屏，再使用微信的「扫一扫 -> 相册」来完成支付</span>
+                      <span>暂不支持手机端支付，请移步电脑端进行操作</span>
                     </div>
                   </div>
 
