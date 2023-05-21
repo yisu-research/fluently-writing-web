@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col w-full h-full">
-    <main class="flex-1 overflow-hidden" :class="isMobile ? 'mt-0' : ''">
+    <main id="capture" class="flex-1 overflow-hidden" :class="isMobile ? 'mt-0' : ''">
       <!-- <n-scrollbar id="newScrollRef" ref="newScrollRef" class="h-full p-4 overflow-hidden overflow-y-auto"> -->
       <div id="scrollRef" ref="scrollRef" class="'p-4 m-2 h-full overflow-hidden myScroll">
         <div class="w-full max-w-screen-xl m-auto">
@@ -12,17 +12,20 @@
           </template>
           <template v-else>
             <div>
-              <Message
-                v-for="(item, index) of dataSources"
-                :key="index"
-                :date-time="item.dateTime"
-                :text="item.text"
-                :inversion="item.inversion"
-                :error="item.error"
-                :loading="item.loading"
-                @regenerate="onRegenerate(index)"
-                @delete="handleDelete(index)"
-              />
+              <NCheckboxGroup :value="cities" @update:value="handleUpdateValue">
+                <Message
+                  v-for="(item, index) of dataSources"
+                  :key="index"
+                  :date-time="item.dateTime"
+                  :text="item.text"
+                  :index="index"
+                  :inversion="item.inversion"
+                  :error="item.error"
+                  :loading="item.loading"
+                  @regenerate="onRegenerate(index)"
+                  @delete="handleDelete(index)"
+                />
+              </NCheckboxGroup>
               <!-- <div class="sticky bottom-0 left-0 flex justify-center">
                 <n-button v-if="loading" type="warning" @click="handleStop">
                   <template #icon>
@@ -78,10 +81,38 @@
             </template>
             发送
           </n-button>
+          <n-button v-if="chatStore.isCheck" strong secondary type="success" @click="sharePrintScreen"> 分享 </n-button>
+          <n-button v-if="!chatStore.isCheck" strong secondary type="success" @click="handlePrintScreen">
+            生成截图
+          </n-button>
+          <n-button v-else strong secondary type="success" @click="handlePrintScreen"> 退出截图 </n-button>
         </div>
       </div>
     </footer>
   </div>
+
+  <!-- 分享图 -->
+  <NModal v-model:show="showShare">
+    <div id="shareScreen" class="p-2 my-4 bg-white rounded-lg shadow max-w-screen sm:max-w-7xl sm:w-1/2s">
+      <!-- <div><p class="mx-2 my-2 text-2xl font-medium text-center text-teal-700">Title</p></div> -->
+      <div id="share" class="p-2 my-4"></div>
+      <div class="flex flex-wrap items-start justify-between mx-2 my-2">
+        <div class="flex justify-start">
+          <img :src="YisuImg" width="25" class="mr-2" />
+          <p class="font-bold">一粟科研</p>
+        </div>
+        <div>
+          <p>邀请码</p>
+          <p>{{ userStore.userInfo.invite_code }}</p>
+        </div>
+        <div class="flex flex-col items-center justify-center text-sm">
+          <img :src="ChatImg" alt="QR Code" class="ring-0 rounded-md ring-teal-500 h-[60px] lg:h-[80px]" />
+          <p>扫码体验</p>
+        </div>
+      </div>
+    </div>
+    <!-- <div></div> -->
+  </NModal>
 </template>
 
 <script setup>
@@ -93,8 +124,10 @@ import { useScroll } from '@/views/saas/chat/hooks/useScroll';
 import { useChat } from '@/views/saas/chat/hooks/useChat';
 import { useUserStore } from '@/store';
 import { useCopyCode } from '@/views/saas/chat/hooks/useCopyCode';
-import { NButton, NInput, useDialog } from 'naive-ui';
+import { NButton, NInput, useDialog, NCheckboxGroup, NModal } from 'naive-ui';
 import { getToken } from '@/utils';
+import YisuImg from '@/assets/images/yisu.png';
+import ChatImg from '@/assets/images/chat.png';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
@@ -103,10 +136,13 @@ import { Message } from '@/views/saas/chat/components';
 import api from '@/views/saas/api';
 import { onMounted, nextTick, ref, computed } from 'vue';
 import { formatDateTime } from '@/utils';
+import html2canvas from 'html2canvas';
 
 let controller = new AbortController();
 
 const newScrollRef = ref(null);
+
+const showShare = ref(false);
 
 // const notification = useNotification();
 
@@ -119,6 +155,10 @@ const userStore = useUserStore();
 const chatStore = useChatStore();
 useCopyCode();
 
+const handleBox = () => {
+  chatStore.isCheck = !chatStore.isCheck;
+};
+
 const userInfo = computed(() => userStore.userInfo);
 
 const count = computed(() => userInfo.value.balance);
@@ -130,6 +170,13 @@ const options = [
   { label: '512x512', value: '512x512' },
   { label: '1024x1024', value: '1024x1024' },
 ];
+
+const cities = ref(null);
+
+const handleUpdateValue = (value) => {
+  cities.value = value;
+  console.log(cities.value);
+};
 
 const imageCount = ref(1);
 
@@ -158,6 +205,63 @@ function handleSubmit() {
 const newScrollToBottom = async () => {
   await nextTick();
   if (newScrollRef.value) newScrollRef.value.scrollTop = newScrollRef.value.scrollHeight;
+};
+
+const sharePrintScreen = () => {
+  if (cities.value === null || cities.value.length === 0) {
+    window.$message.info('请在对话右侧勾选需要分享的内容');
+    return;
+  }
+
+  showShare.value = true;
+
+  const containers = document.createElement('div');
+
+  handleBox();
+
+  // 将 cities.value 中的数据排序后，存入list中
+  const list = [];
+  for (const item of cities.value) {
+    list.push(item);
+  }
+
+  list.sort();
+
+  setTimeout(() => {
+    for (const item of list) {
+      const element = document.getElementById(item);
+      const copy = element.cloneNode(true);
+      containers.appendChild(copy);
+    }
+    const sharePoster = document.getElementById('share');
+    sharePoster.appendChild(containers);
+
+    const shareScreen = document.getElementById('shareScreen');
+
+    html2canvas(shareScreen, {
+      width: shareScreen.offsetWidth,
+      height: shareScreen.offsetHeight,
+    }).then((canvas) => {
+      document.body.appendChild(canvas);
+    });
+  }, 600);
+};
+
+const handlePrintScreen = () => {
+  handleBox();
+
+  // console.log(containers);
+  // console.log(shareModal.value);
+  // console.log(document.getElementById('share'));
+  // shareModal.value.appendChild(containers);
+  // const sharePoster = document.getElementById('capture');
+  // console.log('handlePrintScreen');
+  // html2canvas(containers, {
+  //   width: containers.offsetWidth,
+  //   height: containers.offsetHeight,
+  // }).then((canvas) => {
+  //   document.body.appendChild(canvas);
+  // });
 };
 
 onMounted(async () => {

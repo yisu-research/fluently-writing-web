@@ -33,3 +33,7 @@ textarea {
   border: none;
   resize: none;
 }
+
+img {
+  display: initial;
+}

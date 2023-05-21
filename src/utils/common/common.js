@@ -10,6 +10,10 @@ export function formatDateTime(time = undefined, format = 'YYYY-MM-DD HH:mm:ss')
   return dayjs(time).format(format);
 }
 
+export function GenNonDuplicateID(randomLength) {
+  return Number(Math.random().toString().substr(3, randomLength) + Date.now()).toString(36);
+}
+
 export function formatDate(date = undefined, format = 'YYYY-MM-DD') {
   return formatDateTime(date, format);
 }

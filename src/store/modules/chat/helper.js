@@ -6,7 +6,7 @@ import { lStorage } from '@/utils/storage';
 const LOCAL_NAME = 'chatStorage';
 
 export function defaultState() {
-  return { active: null, history: [], chat: [] };
+  return { active: null, history: [], chat: [], isCheck: false };
 }
 
 export function getLocalState() {
