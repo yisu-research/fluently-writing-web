@@ -72,6 +72,24 @@ export const basicRoutes = [
       },
     ],
   },
+  {
+    name: 'Discovery',
+    path: '/',
+    component: Layout,
+    redirect: '/discovery',
+    children: [
+      {
+        name: 'Discovery',
+        path: 'discovery',
+        component: () => import('@/views/saas/discovery/index.vue'),
+        meta: {
+          title: '探索发现',
+          icon: 'uil:compass',
+          order: 0,
+        },
+      },
+    ],
+  },
 
   {
     name: 'Cost',

@@ -81,11 +81,13 @@
             </template>
             发送
           </n-button>
-          <n-button v-if="chatStore.isCheck" strong secondary type="success" @click="sharePrintScreen"> 分享 </n-button>
-          <n-button v-if="!chatStore.isCheck" strong secondary type="success" @click="handlePrintScreen">
+          <n-button v-if="chatStore.isCheck" strong secondary type="success" @click="sharePrintScreen">
             生成截图
           </n-button>
-          <n-button v-else strong secondary type="success" @click="handlePrintScreen"> 退出截图 </n-button>
+          <n-button v-if="!chatStore.isCheck" strong secondary type="success" @click="handlePrintScreen">
+            分享消息
+          </n-button>
+          <n-button v-else strong secondary type="success" @click="handlePrintScreen"> 退出选择 </n-button>
         </div>
       </div>
     </footer>
@@ -93,25 +95,40 @@
 
   <!-- 分享图 -->
   <NModal v-model:show="showShare">
-    <div id="shareScreen" class="p-2 my-4 bg-white rounded-lg shadow max-w-screen sm:max-w-7xl sm:w-1/2s">
-      <!-- <div><p class="mx-2 my-2 text-2xl font-medium text-center text-teal-700">Title</p></div> -->
-      <div id="share" class="p-2 my-4"></div>
-      <div class="flex flex-wrap items-start justify-between mx-2 my-2">
-        <div class="flex justify-start">
-          <img :src="YisuImg" width="25" class="mr-2" />
-          <p class="font-bold">一粟科研</p>
-        </div>
-        <div>
-          <p>邀请码</p>
-          <p>{{ userStore.userInfo.invite_code }}</p>
-        </div>
-        <div class="flex flex-col items-center justify-center text-sm">
-          <img :src="ChatImg" alt="QR Code" class="ring-0 rounded-md ring-teal-500 h-[60px] lg:h-[80px]" />
-          <p>扫码体验</p>
+    <div class="flex flex-col items-start justify-start max-w-screen sm:w-1/2s sm:max-w-7xl">
+      <div id="shareScreen" class="w-full p-2 my-4 bg-white rounded-lg shadow">
+        <!-- <div><p class="mx-2 my-2 text-2xl font-medium text-center text-teal-700">Title</p></div> -->
+        <div id="share" class="p-2 my-4"></div>
+        <div class="flex flex-wrap items-start justify-between mx-2 my-2">
+          <div class="flex justify-start">
+            <img :src="YisuImg" width="25" class="mr-2" />
+            <p class="font-bold">一粟科研</p>
+          </div>
+          <div>
+            <p>邀请码</p>
+            <p>{{ userStore.userInfo.invite_code }}</p>
+          </div>
+          <div class="flex flex-col items-center justify-center text-sm">
+            <img :src="ChatImg" alt="QR Code" class="ring-0 rounded-md ring-teal-500 h-[60px] lg:h-[80px]" />
+            <p>扫码体验</p>
+          </div>
         </div>
       </div>
+      <div class="flex justify-between w-full p-2 rounded-3xl bg-slate-100/80">
+        <n-button icon-placement="left" secondary strong type="success" round @click="shareToDiscovery">
+          <template #icon>
+            <SvgIcon icon="solar:share-linear" />
+          </template>
+          分享到广场
+        </n-button>
+        <n-button icon-placement="left" secondary strong type="info" round @click="downloadImage(dataUrl)">
+          <template #icon>
+            <SvgIcon icon="solar:gallery-download-broken" />
+          </template>
+          下载图片
+        </n-button>
+      </div>
     </div>
-    <!-- <div></div> -->
   </NModal>
 </template>
 
@@ -135,8 +152,9 @@ import { Message } from '@/views/saas/chat/components';
 
 import api from '@/views/saas/api';
 import { onMounted, nextTick, ref, computed } from 'vue';
-import { formatDateTime } from '@/utils';
+import { formatDateTime, url2File } from '@/utils';
 import html2canvas from 'html2canvas';
+import FormData from 'form-data';
 
 let controller = new AbortController();
 
@@ -164,6 +182,8 @@ const userInfo = computed(() => userStore.userInfo);
 const count = computed(() => userInfo.value.balance);
 
 const imageSize = ref('256x256');
+
+const dataUrl = ref(null);
 
 const options = [
   { label: '256x256', value: '256x256' },
@@ -242,26 +262,41 @@ const sharePrintScreen = () => {
       width: shareScreen.offsetWidth,
       height: shareScreen.offsetHeight,
     }).then((canvas) => {
-      document.body.appendChild(canvas);
+      dataUrl.value = canvas.toDataURL('image/png');
     });
   }, 600);
 };
 
+const downloadImage = (dataURL) => {
+  // 新建一个a标签
+  let oA = document.createElement('a');
+  oA.download = Date.now() + '截图'; // 设置下载的文件名
+  oA.href = dataURL;
+  document.body.appendChild(oA);
+  oA.click(); // 模拟点击a标签
+  oA.remove(); // 下载之后把创建的元素删除
+};
+
 const handlePrintScreen = () => {
   handleBox();
+};
 
-  // console.log(containers);
-  // console.log(shareModal.value);
-  // console.log(document.getElementById('share'));
-  // shareModal.value.appendChild(containers);
-  // const sharePoster = document.getElementById('capture');
-  // console.log('handlePrintScreen');
-  // html2canvas(containers, {
-  //   width: containers.offsetWidth,
-  //   height: containers.offsetHeight,
-  // }).then((canvas) => {
-  //   document.body.appendChild(canvas);
-  // });
+const shareToDiscovery = async () => {
+  try {
+    let data = new FormData();
+    const fileData = await url2File(dataUrl.value, Date.now + '-share.png');
+    data.append('screenshot', fileData);
+    data.append('conversation_id', id);
+    let res = await api.createShareApi(data);
+    console.log('res', res);
+    if (res) {
+      $message.success('分享成功');
+      showShare.value = false;
+    }
+  } catch (err) {
+    console.log(err);
+    $message.error('分享失败');
+  }
 };
 
 onMounted(async () => {
@@ -510,7 +545,8 @@ async function onConversation() {
     }
   } else {
     try {
-      const url = encodeURI(`https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`);
+      // const url = encodeURI(`https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`);
+      const url = encodeURI(`http://8.142.167.132:3001/api/messages/stream?conversation_id=${id}&content=${message}`);
       const token = getToken();
       let es = new EventSourcePolyfill(url, {
         headers: {

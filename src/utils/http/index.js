@@ -10,7 +10,7 @@ export function createAxios(options = {}) {
     ...options,
   });
 
-  service.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+  // service.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
   service.defaults.crossDomain = true;
   service.defaults.withCredentials = true;
 

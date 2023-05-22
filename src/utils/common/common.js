@@ -82,6 +82,25 @@ export function debounce(method, wait, immediate) {
   };
 }
 
+export function dataURLToBlob(data) {
+  let parts = data.split(',');
+  let meta = parts[0].substring(5).split(';');
+  let type = meta[0];
+  let decoder = meta.indexOf('base64') !== -1 ? atob : decodeURIComponent;
+  let bstr = decoder(parts[1]);
+  let n = bstr.length;
+  let u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: type });
+}
+
+export async function url2File(url, fileName) {
+  const blob = await (await fetch(url)).blob();
+  return new File([blob], fileName, { type: blob.type });
+}
+
 export function copyToClipboard(text) {
   navigator.clipboard
     .writeText(text)

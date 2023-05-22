@@ -23,6 +23,7 @@ specifiers:
   eslint-config-alloy: ^4.9.0
   eslint-plugin-vue: ^9.9.0
   event-source-polyfill: ^1.0.31
+  form-data: ^4.0.0
   highlight.js: ^11.7.0
   html2canvas: ^1.4.1
   katex: ^0.16.4
@@ -65,6 +66,7 @@ dependencies:
   chart.js: registry.npmmirror.com/chart.js/4.2.1
   crypto-js: registry.npmmirror.com/crypto-js/4.1.1
   event-source-polyfill: registry.npmmirror.com/event-source-polyfill/1.0.31
+  form-data: registry.npmmirror.com/form-data/4.0.0
   highlight.js: registry.npmmirror.com/highlight.js/11.7.0
   html2canvas: registry.npmmirror.com/html2canvas/1.4.1
   katex: registry.npmmirror.com/katex/0.16.4

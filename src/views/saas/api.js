@@ -66,4 +66,29 @@ export default {
 
   // 生成图片
   generatePictureApi: (data) => request.post('/api/messages', data, { noNeedTip: true }),
+
+  // 创建分享
+  createShareApi: (data) =>
+    request({
+      url: '/api/shares',
+      method: 'post',
+      data,
+      noNeedTip: true,
+      header: { 'Content-Type': 'multipart/form-data' },
+    }),
+
+  // 获取分享详情
+  getShareDetailApi: (id) => request.get(`/api/shares/${id}`, { noNeedTip: true }),
+
+  // 获取分享列表
+  getShareListApi: (data) => request.get('/api/shares', { noNeedTip: true, params: data }),
+
+  // 删除分享
+  deleteShareApi: (id) => request.delete(`/api/shares/${id}`, { noNeedTip: true }),
+
+  // 点赞
+  likeApi: (id) => request.post(`/api/shares/${id}/like`, { noNeedTip: true }),
+
+  // 取消
+  unlikeApi: (id) => request.post(`/api/shares/${id}/cancel_like`, { noNeedTip: true }),
 };
