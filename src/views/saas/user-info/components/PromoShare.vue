@@ -1,8 +1,11 @@
 <template>
   <n-card title="邀请新用户" class="order-3 col-span-12 md:col-span-10 lg:col-span-10 xl:col-span-6 2xl:col-span-5">
     <template #header-extra>
-      <n-button v-if="userCode" class="ml-4" type="primary" @click="showPromoModal = true">复制邀请文案</n-button>
-      <n-button v-else type="primary" :loading="loadInviteCode" @click="handleGetInviteCode"> 生成邀请码 </n-button>
+      <div class="flex justify-end gap-4">
+        <n-button v-if="userCode" class="ml-4" type="primary" @click="showPromoModal = true">复制邀请文案</n-button>
+        <n-button v-else type="primary" :loading="loadInviteCode" @click="handleGetInviteCode"> 生成邀请码 </n-button>
+        <n-button type="info" @click="showInvite = true">生成邀请图片</n-button>
+      </div>
     </template>
     <p class="mb-4">以下是您的邀请码和邀请链接，新用户通过您的邀请码注册并使用时，您将获得相应的奖励！</p>
     <ul class="list-disc list-inside">
@@ -49,6 +52,7 @@
       <span v-else>点击<span class="font-bold underline">下方按钮</span>以生成邀请链接</span>
     </div>
   </n-card>
+
   <n-modal v-model:show="showPromoModal">
     <n-card style="width: 600px" title="邀请文案" :bordered="false" size="huge" role="dialog" aria-modal="true">
       <template #header-extra>
@@ -66,6 +70,71 @@
       </template>
     </n-card>
   </n-modal>
+
+  <!-- 邀请图片 -->
+  <n-modal v-model:show="showInvite">
+    <div>
+      <div id="invite-image" class="overflow-hidden bg-no-repeat bg-cover rounded-lg shadow bg-arrow">
+        <div class="px-4 py-5 sm:px-6">
+          <n-input
+            v-model:value="url"
+            :autofocus="false"
+            size="large"
+            disabled
+            class="text-xl text-teal-900"
+            round
+            default-value="ai.yisukeyan.com"
+            placeholder="ai.yisukeyan.com"
+          >
+            <template #prefix>
+              <SvgIcon icon="solar:card-search-broken" />
+            </template>
+          </n-input>
+          <div class="flex flex-col items-center justify-center gap-2 mt-4 text-xl font-bold text-sky-500">
+            <p>邀请使用一粟创作助手</p>
+            <p>一款方便的 ChatGPT 工具</p>
+            <p>激发灵感 提升效率</p>
+          </div>
+        </div>
+        <div class="px-4 py-5 sm:p-6">
+          <img :src="padImg" alt="phone" class="w-96" />
+        </div>
+        <div class="px-4 py-4 sm:px-6">
+          <!-- Content goes here -->
+          <div class="flex items-center justify-between text-lg font-medium text-gray-600">
+            <div>
+              <p>扫描我的专属二维码</p>
+              <p>一起来创作</p>
+            </div>
+            <div class="rounded-md">
+              <vue-qr
+                :logoSrc="Logo"
+                :text="inviteLink"
+                :callback="test"
+                qid="testid"
+                :size="180"
+                :margin="10"
+              ></vue-qr>
+            </div>
+          </div>
+          <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
+        </div>
+      </div>
+      <n-button
+        class="w-full h-12 my-4 sm:max-w-xl"
+        icon-placement="left"
+        strong
+        type="info"
+        round
+        @click="downloadImage()"
+      >
+        <template #icon>
+          <SvgIcon icon="solar:gallery-download-broken" />
+        </template>
+        下载图片
+      </n-button>
+    </div>
+  </n-modal>
 </template>
 
 <script setup>
@@ -73,14 +142,22 @@ import { ref, computed } from 'vue';
 import { copyToClipboard } from '@/utils';
 import { useMessage } from 'naive-ui';
 import { useUserStore } from '@/store';
+import padImg from '@/assets/images/pad.png';
+import { SvgIcon } from '@/components/common';
+import vueQr from 'vue-qr/src/packages/vue-qr.vue';
+import Logo from '@/assets/svg/logo.svg';
+import html2canvas from 'html2canvas';
 
 const message = useMessage();
 const showPromoModal = ref(false);
+
+const url = '  ai.yisukeyan.com';
 
 const userStore = useUserStore();
 const userCode = computed(() => userStore.userInfo.invite_code);
 
 const loadInviteCode = ref(false);
+const showInvite = ref(false);
 const handleGetInviteCode = async () => {
   loadInviteCode.value = true;
   try {
@@ -99,4 +176,26 @@ const invitePromo = computed(
   () =>
     `向大家强烈推荐一个方便好用的 ChatGPT 工具，叫一粟创作助手。写作业、写材料、写代码，都能轻松搞定！助力工作、学习、生活，创作无极限！海量模板，迸发灵感，提升效率！详情可见：https://ai.yisukeyan.com/。通过下方链接注册还可获赠 10 次免费体验：${inviteLink.value}`,
 );
+
+const downloadImage = () => {
+  const inviteImage = document.getElementById('invite-image');
+  html2canvas(inviteImage, {
+    width: inviteImage.offsetWidth,
+    height: inviteImage.offsetHeight,
+  }).then((canvas) => {
+    const dataURL = canvas.toDataURL('image/png');
+    console.log(dataURL);
+    download(dataURL);
+  });
+};
+
+const download = (dataURL) => {
+  // 新建一个a标签
+  let oA = document.createElement('a');
+  oA.download = Date.now() + '截图'; // 设置下载的文件名
+  oA.href = dataURL;
+  document.body.appendChild(oA);
+  oA.click(); // 模拟点击a标签
+  oA.remove(); // 下载之后把创建的元素删除
+};
 </script>
