@@ -10,8 +10,9 @@ export function defaultState() {
 }
 
 export function getLocalState() {
-  const localState = lStorage.get(LOCAL_NAME);
-  return localState ?? defaultState();
+  // const localState = lStorage.get(LOCAL_NAME);
+  // return localState ?? defaultState();
+  return defaultState();
 }
 
 export function setLocalState(state) {

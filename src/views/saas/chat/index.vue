@@ -51,6 +51,19 @@
             </n-popselect>
           </div>
         </div>
+        <n-upload
+          v-if="model === 'gpt-4-vision-preview'"
+          action="/api/attachments"
+          :headers="{
+            Authorization: 'Bearer ' + token,
+          }"
+          list-type="image"
+          :create-thumbnail-url="createThumbnailUrl"
+          max="1"
+          @finish="handleFinish"
+        >
+          <n-button>上传图片</n-button>
+        </n-upload>
         <div class="flex items-center justify-between space-x-2">
           <!-- <n-button tertiary type="error" @click="handleClear">
             <template #icon>
@@ -81,13 +94,13 @@
             </template>
             发送
           </n-button>
-          <n-button v-if="chatStore.isCheck" strong secondary type="success" @click="sharePrintScreen">
+          <!-- <n-button v-if="chatStore.isCheck" strong secondary type="success" @click="sharePrintScreen">
             生成截图
           </n-button>
           <n-button v-if="!chatStore.isCheck" strong secondary type="success" @click="handlePrintScreen">
             分享消息
           </n-button>
-          <n-button v-else strong secondary type="success" @click="handlePrintScreen"> 退出选择 </n-button>
+          <n-button v-else strong secondary type="success" @click="handlePrintScreen"> 退出选择 </n-button> -->
         </div>
       </div>
     </footer>
@@ -147,6 +160,7 @@ import YisuImg from '@/assets/images/yisu.png';
 import ChatImg from '@/assets/images/chat.png';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import { Message } from '@/views/saas/chat/components';
 
@@ -167,6 +181,7 @@ const showShare = ref(false);
 const route = useRoute();
 const router = useRouter();
 const dialog = useDialog();
+const token = getToken();
 
 const userStore = useUserStore();
 
@@ -185,11 +200,17 @@ const imageSize = ref('256x256');
 
 const dataUrl = ref(null);
 
+const imgUrl = ref('');
+
 const options = [
   { label: '256x256', value: '256x256' },
   { label: '512x512', value: '512x512' },
   { label: '1024x1024', value: '1024x1024' },
 ];
+
+function handleFinish({ file, event }) {
+  imgUrl.value = JSON.parse(event.target.response).url;
+}
 
 const cities = ref(null);
 
@@ -208,6 +229,8 @@ const { scrollRef, scrollToBottom } = useScroll();
 const id = route.params.id;
 
 const pattern = route.query.pattern;
+
+const model = route.query.model;
 
 const dataSources = computed(() => chatStore.getChatById(Number(id)));
 
@@ -277,6 +300,8 @@ const downloadImage = (dataURL) => {
   oA.remove(); // 下载之后把创建的元素删除
 };
 
+let message = [];
+
 const handlePrintScreen = () => {
   handleBox();
 };
@@ -299,6 +324,17 @@ const shareToDiscovery = async () => {
   }
 };
 
+function createThumbnailUrl(file) {
+  if (!file) return 0;
+
+  console.log(imgUrl.value);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(imgUrl.value);
+    }, file.name);
+  });
+}
+
 onMounted(async () => {
   try {
     await userStore.getUserInfo();
@@ -311,7 +347,6 @@ onMounted(async () => {
     chatStore.chat[index].data = [];
     for (let i = 0; i < res.length; i++) {
       if (res[i] !== null) {
-        console.log(res[i]);
         if (res[i].pattern === 'image') {
           let imageContent = `以下是满足 '${res[i].user_content}' 要求的图片:\n\n`;
 
@@ -359,22 +394,26 @@ onMounted(async () => {
           });
         } else {
           // 添加聊天记录
-          addChat(Number(id), {
-            dateTime: formatDateTime(res[i].created_at),
-            text: res[i].user_content,
-            inversion: true,
-            error: false,
-            conversationOptions: null,
-            requestOptions: { options: { prompt: res[i].user_content } },
-          });
-          addChat(Number(id), {
-            dateTime: formatDateTime(res[i].created_at),
-            text: res[i].assistant_content,
-            inversion: false,
-            error: false,
-            conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
-            requestOptions: { options: { prompt: res[i].user_content } },
-          });
+          if (res[i].role === 'user') {
+            addChat(Number(id), {
+              dateTime: formatDateTime(res[i].created_at),
+              text: res[i].content[0].text,
+              inversion: true,
+              error: false,
+              conversationOptions: null,
+              requestOptions: { options: { prompt: res[i].content[0].text } },
+            });
+          }
+          if (res[i].role === 'assistant') {
+            addChat(Number(id), {
+              dateTime: formatDateTime(res[i].created_at),
+              text: res[i].content[0].text,
+              inversion: false,
+              error: false,
+              conversationOptions: { conversationId: res[i].conversation_id, parentMessageId: res[i].conversation_id },
+              requestOptions: { options: { prompt: res[i].content[0].text } },
+            });
+          }
         }
       }
     }
@@ -390,6 +429,20 @@ const destroyed = () => {
   pollCount = 0;
   pollingST = null;
 };
+
+watch(
+  () => imgUrl.value,
+  (value) => {
+    if (value !== '') {
+      message.push({
+        type: 'image_url',
+        image_url: {
+          url: value.split('?')[0],
+        },
+      });
+    }
+  },
+);
 
 // 发送消息
 async function onConversation() {
@@ -430,11 +483,17 @@ async function onConversation() {
 
     return;
   }
-  const message = prompt.value;
+
+  message.push({
+    type: 'text',
+    text: prompt.value,
+  });
+  console.log('ccccc');
+  console.log(message);
 
   if (loading.value) return;
 
-  if (!message || message.trim() === '') return;
+  // if (!message || message[0]) return;
 
   controller = new AbortController();
 
@@ -442,11 +501,11 @@ async function onConversation() {
 
   addChat(Number(id), {
     dateTime: new Date().toLocaleString(),
-    text: message,
+    text: message[0].text,
     inversion: true,
     error: false,
     conversationOptions: null,
-    requestOptions: { prompt: message, options: null },
+    requestOptions: { prompt: message[0].text, options: null },
   });
   scrollToBottom();
   newScrollToBottom();
@@ -466,7 +525,7 @@ async function onConversation() {
     inversion: false,
     error: false,
     conversationOptions: null,
-    requestOptions: { prompt: message, options: { ...options } },
+    requestOptions: { prompt: message[0].text, options: { ...options } },
   });
   scrollToBottom();
   updateChat(Number(id), dataSources.value.length - 1, {
@@ -545,67 +604,94 @@ async function onConversation() {
     }
   } else {
     try {
-      // const url = encodeURI(`https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${message}`);
-      const url = encodeURI(`http://8.142.167.132:3001/api/messages/stream?conversation_id=${id}&content=${message}`);
+      // const url = encodeURI(
+      //   `https://ai.yisukeyan.com/api/messages/stream?conversation_id=${id}&content=${JSON.stringify(message)}`,
+      // );
+      const url = encodeURI(`/api/messages/stream?conversation_id=${id}&content=${JSON.stringify(message)}`);
       const token = getToken();
-      let es = new EventSourcePolyfill(url, {
+      console.log(url);
+      const ctrl = new AbortController();
+      console.log(ctrl);
+      await fetchEventSource(url, {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           withCredentials: true,
-          ContentType: 'application/json;charset=utf-8',
+          ContentType: 'application/json',
+        },
+        body: JSON.stringify({
+          conversation_id: id,
+          content: message,
+        }),
+        signal: ctrl.signal,
+        async onopen(event) {
+          console.log('链接成功', event);
+        },
+        onmessage(msg) {
+          console.log('onMessage');
+          console.log(msg);
+          // if the server emits an error message, throw an exception
+          // so it gets handled by the onerror callback below:
+          if (msg.event === 'FatalError') {
+            // throw new FatalError(msg.data);
+            console.log(msg.event);
+          }
+          if (msg.data === '[DONE]') {
+            loading.value = false;
+            return;
+          }
+          if (msg.data.indexOf('[ERROR]') !== -1) {
+            loading.value = false;
+            console.log(msg.data);
+            updateChat(Number(id), dataSources.value.length - 1, {
+              dateTime: new Date().toLocaleString(),
+              text: msg.data.slice(msg.data.indexOf('[ERROR]') + 6) ?? '',
+              inversion: false,
+              error: false,
+              loading: false,
+              conversationOptions: { conversationId: id, parentMessageId: id },
+              requestOptions: { prompt: message[0].text, options: { ...options } },
+            });
+            scrollToBottom();
+            return;
+          }
+          const data = JSON.parse(msg.data);
+          console.log(data);
+          scrollToBottom();
+
+          try {
+            updateChat(Number(id), dataSources.value.length - 1, {
+              dateTime: new Date().toLocaleString(),
+              text: data.content ?? '',
+              inversion: false,
+              error: false,
+              loading: false,
+              conversationOptions: { conversationId: id, parentMessageId: id },
+              requestOptions: { prompt: message, options: { ...options } },
+            });
+            scrollToBottom();
+          } catch (err) {
+            console.error('更新失败', err);
+          }
+        },
+        onclose() {
+          console.log('onClose');
+          loading.value = false;
+          ctrl.abort();
+        },
+        onerror(err) {
+          console.log('onError');
+          ctrl.abort();
+          // if the server closes the connection unexpectedly, retry:
+          // throw new RetriableError();
+          if (err?.error) {
+            console.error('链接失败', err);
+          }
+          loading.value = false;
         },
       });
-
-      es.onopen = (event) => {
-        console.log('链接成功', event);
-      };
-
-      es.onmessage = (event) => {
-        if (event.data === '[DONE]') {
-          loading.value = false;
-          return;
-        }
-        if (event.data.indexOf('[ERROR]') !== -1) {
-          loading.value = false;
-          updateChat(Number(id), dataSources.value.length - 1, {
-            dateTime: new Date().toLocaleString(),
-            text: event.data.slice(event.data.indexOf('[ERROR]') + 6) ?? '',
-            inversion: false,
-            error: false,
-            loading: false,
-            conversationOptions: { conversationId: id, parentMessageId: id },
-            requestOptions: { prompt: message, options: { ...options } },
-          });
-          scrollToBottom();
-          return;
-        }
-        const data = JSON.parse(event.data);
-        scrollToBottom();
-
-        try {
-          updateChat(Number(id), dataSources.value.length - 1, {
-            dateTime: new Date().toLocaleString(),
-            text: data.content ?? '',
-            inversion: false,
-            error: false,
-            loading: false,
-            conversationOptions: { conversationId: id, parentMessageId: id },
-            requestOptions: { prompt: message, options: { ...options } },
-          });
-          scrollToBottom();
-        } catch (err) {
-          console.error('更新失败', err);
-        }
-      };
-
-      es.onerror = (err) => {
-        if (err?.error) {
-          console.error('链接失败', err);
-        }
-        loading.value = false;
-        es.close();
-      };
     } catch (error) {
+      console.error(error);
       const errorMessage = error?.message ?? '好像出了什么错误，请稍后重试';
 
       if (error.message === 'canceled') {

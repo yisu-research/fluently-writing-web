@@ -91,4 +91,7 @@ export default {
 
   // 取消
   unlikeApi: (id) => request.post(`/api/shares/${id}/cancel_like`, { noNeedTip: true }),
+
+  // 上传文件
+  uploadApi: (data) => request.post(`/api/attachments`, { noNeedTip: true }),
 };

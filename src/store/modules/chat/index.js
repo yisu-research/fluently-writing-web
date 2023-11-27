@@ -30,12 +30,13 @@ export const useChatStore = defineStore('chat-store', {
       }
       try {
         const res = await api.getChatListApi({ state: 'active', page: 1, limit: 100 });
+        console.log(res);
         const { conversations } = res;
         this.history = [];
         // if (conversations === 0) return Promise.resolve(res);
         for (const item of conversations) {
-          const { id, name, pattern, spend_count } = item;
-          this.history.push({ id, name, pattern, spendCount: spend_count, isEdit: false });
+          const { id, name, pattern, spend_count, model } = item;
+          this.history.push({ id, name, pattern, model, spendCount: spend_count, isEdit: false });
           if (chatList.includes(id)) continue;
           this.chat.push({ id, data: [] });
         }
@@ -124,21 +125,30 @@ export const useChatStore = defineStore('chat-store', {
     },
 
     addChatByUuid(id, chat) {
+      console.log(4);
       if (!id || id === 0) {
+        console.log(5);
         if (this.history.length === 0) {
           const id = Date.now();
+          console.log(3);
           this.history.push({ id, name: chat.text, isEdit: false });
           this.chat.push({ id, data: [chat] });
           this.active = id;
           this.recordState();
         } else {
           this.chat[0].data.push(chat);
+          console.log(1);
+          console.log(this.history[0]);
+          console.log(2);
           if (this.history[0].name === 'New Chat') this.history[0].name = chat.text;
           this.recordState();
         }
       }
 
+      console.log(this.chat);
       const index = this.chat.findIndex((item) => item.id === id);
+      console.log(index);
+      console.log(this.history);
       if (index !== -1) {
         this.chat[index].data.push(chat);
         if (this.history[index].name === 'New Chat') this.history[index].name = chat.text;
@@ -217,7 +227,7 @@ export const useChatStore = defineStore('chat-store', {
       } else {
         const conversation = this.history.find((item) => item.id === id);
         console.log(conversation);
-        await router.push({ path: `/chat/${id}`, query: { pattern: conversation.pattern } });
+        await router.push({ path: `/chat/${id}`, query: { pattern: conversation.pattern, model: conversation.model } });
       }
     },
 

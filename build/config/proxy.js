@@ -3,6 +3,7 @@ import { getProxyConfig } from '../../settings';
 export function createViteProxy(isUseProxy = true, proxyType) {
   if (!isUseProxy) return undefined;
 
+  console.log(proxyType);
   const proxyConfig = getProxyConfig(proxyType);
   console.log(proxyConfig);
   const proxy = {

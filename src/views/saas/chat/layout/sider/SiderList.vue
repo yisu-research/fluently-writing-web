@@ -32,7 +32,10 @@ onMounted(async () => {
   const conversation = chatStore.history.find((item) => item.id === chatStore.active);
   console.log(chatStore.active);
   if (!conversation) return;
-  await router.push({ path: `/chat/${chatStore.active}`, query: { pattern: conversation.pattern ?? null } });
+  await router.push({
+    path: `/chat/${chatStore.active}`,
+    query: { pattern: conversation.pattern ?? null, model: conversation.model ?? null },
+  });
 });
 
 async function handleEdit({ id, name }, isEdit, event) {

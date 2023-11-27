@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.12",
     "@heroicons/vue": "^2.0.16",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@traptitech/markdown-it-katex": "^3.6.0",
     "@vueuse/core": "^9.13.0",
     "@vueuse/integrations": "^9.13.0",

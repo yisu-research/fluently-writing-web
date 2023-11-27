@@ -74,50 +74,18 @@
   <!-- 邀请图片 -->
   <n-modal v-model:show="showInvite">
     <div>
-      <div id="invite-image" class="overflow-hidden bg-no-repeat bg-cover rounded-lg shadow bg-arrow">
-        <div class="px-4 py-5 sm:px-6">
-          <n-input
-            v-model:value="url"
-            :autofocus="false"
-            size="large"
-            disabled
-            class="text-xl text-teal-900"
-            round
-            default-value="ai.yisukeyan.com"
-            placeholder="ai.yisukeyan.com"
-          >
-            <template #prefix>
-              <SvgIcon icon="solar:card-search-broken" />
-            </template>
-          </n-input>
-          <div class="flex flex-col items-center justify-center gap-2 mt-4 text-xl font-bold text-sky-500">
-            <p>邀请使用一粟创作助手</p>
-            <p>一款方便的 ChatGPT 工具</p>
-            <p>激发灵感 提升效率</p>
-          </div>
-        </div>
-        <div class="px-4 py-5 sm:p-6">
-          <img :src="padImg" alt="phone" class="w-96" />
-        </div>
-        <div class="px-4 py-4 sm:px-6">
-          <!-- Content goes here -->
-          <div class="flex items-center justify-between text-lg font-medium text-gray-600">
-            <div>
-              <p>扫描我的专属二维码</p>
-              <p>一起来创作</p>
-            </div>
-            <div class="rounded-md">
-              <vue-qr
-                :logoSrc="Logo"
-                :text="inviteLink"
-                :callback="test"
-                qid="testid"
-                :size="180"
-                :margin="10"
-              ></vue-qr>
-            </div>
-          </div>
-          <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
+      <div id="invite-image" class="overflow-hidden shadow">
+        <div class="relative">
+          <img :src="inviteImg" alt="phone" class="relative w-80" />
+          <vue-qr
+            class="absolute bottom-4 right-10"
+            :logoSrc="Logo"
+            :text="inviteLink"
+            :callback="test"
+            qid="testid"
+            :size="90"
+            :margin="10"
+          ></vue-qr>
         </div>
       </div>
       <n-button
@@ -142,16 +110,15 @@ import { ref, computed } from 'vue';
 import { copyToClipboard } from '@/utils';
 import { useMessage } from 'naive-ui';
 import { useUserStore } from '@/store';
-import padImg from '@/assets/images/pad.png';
+
 import { SvgIcon } from '@/components/common';
 import vueQr from 'vue-qr/src/packages/vue-qr.vue';
 import Logo from '@/assets/svg/logo.svg';
 import html2canvas from 'html2canvas';
+import inviteImg from '@/assets/images/invite.png';
 
 const message = useMessage();
 const showPromoModal = ref(false);
-
-const url = '  ai.yisukeyan.com';
 
 const userStore = useUserStore();
 const userCode = computed(() => userStore.userInfo.invite_code);

@@ -18,17 +18,17 @@ const showModal = ref(false);
 const collapsed = computed(() => appStore.siderCollapsed);
 
 function handleAdd() {
-  // showModal.value = true;
-  createChat('multi');
+  showModal.value = true;
+  // createChat('multi');
 }
 
-async function createChat(type) {
+async function createChat(model) {
   // 请求创建对话
   const uuid = day(Date.now()).format('YYMMDD-HH:mm:ss');
-  const res = await api.postChatApi({ name: uuid, pattern: type });
+  const res = await api.postChatApi({ name: uuid, pattern: 'multi', model: model });
   const { id, name, pattern, spend_count } = res;
 
-  chatStore.addHistory({ name: name, id: id, isEdit: false, pattern, spendCount: spend_count });
+  chatStore.addHistory({ name: name, id: id, isEdit: false, pattern, model, spendCount: spend_count });
 
   if (!chatStore.active) {
     await chatStore.setActive(id);
@@ -110,23 +110,23 @@ watch(
               :segmented="segmented"
             >
               <div class="flex flex-col items-center justify-center">
-                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('single')">
+                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('gpt-3.5-turbo')">
                   <template #icon>
                     <SvgIcon icon="uil:comment-alt" />
                   </template>
-                  单轮对话
+                  ChatGPT 对话
                 </n-button>
-                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('multi')">
+                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('gpt-4-1106-preview')">
                   <template #icon>
                     <SvgIcon icon="uil:comment-alt-dots" />
                   </template>
-                  多轮对话
+                  GPT 4.0 对话
                 </n-button>
-                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('image')">
+                <n-button type="tertiary" class="mb-4 w-50" @click="createChat('gpt-4-vision-preview')">
                   <template #icon>
                     <SvgIcon icon="uil:comment-alt-image" />
                   </template>
-                  图片生成
+                  GPT 4.0 视觉对话
                 </n-button>
               </div>
             </n-modal>
